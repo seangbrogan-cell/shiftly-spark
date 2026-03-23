@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { format, addWeeks, subWeeks, isToday, startOfWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight, Printer } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useWeeklyAssignments,
@@ -225,6 +225,14 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
             }}
           >
             <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.print()}
+            className="print:hidden"
+          >
+            <Printer className="h-4 w-4 mr-1.5" /> Print
           </Button>
         </div>
       </div>
@@ -454,7 +462,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
 
       {/* Right sidebar - Shift Templates + Publish Panel */}
       <div className={cn(
-        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200',
+        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200 print-hide',
         rightSidebarCollapsed ? 'w-10' : 'w-64'
       )}>
         {rightSidebarCollapsed ? (

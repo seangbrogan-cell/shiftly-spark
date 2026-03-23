@@ -106,3 +106,34 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything except the schedule */
+  nav, header, .print\\:hidden,
+  aside, [data-sidebar], [class*="sidebar"] {
+    display: none !important;
+  }
+
+  /* Make schedule fill the page */
+  main, [role="main"], .flex-1 {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Hide right sidebar in calendar */
+  .print-hide {
+    display: none !important;
+  }
+}
