@@ -414,15 +414,10 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               </Button>
             </div>
             <ShiftTemplateSidebar shifts={shifts} />
-            <PublishPanel
-              employerId={employerId}
-              currentWeek={currentWeek}
-              employees={employees}
-              shifts={shifts}
-            />
           </>
         )}
       </div>
+    </div>
     </div>
     </DndContext>
   );
