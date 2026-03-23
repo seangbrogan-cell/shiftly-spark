@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      employee_availability: {
+        Row: {
+          created_at: string
+          day_of_week: string
+          employee_id: string
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: string
+          employee_id: string
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: string
+          employee_id?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_availability_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           availability: string[]
