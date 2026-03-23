@@ -295,12 +295,15 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
                   const dateStr = format(day, 'yyyy-MM-dd');
                   const cellId = `${emp.id}:${dateStr}`;
                   const cellAssignments = assignmentMap[cellId] ?? [];
+                  const dayAbbr = format(day, 'EEE');
+                  const isUnavailable = emp.availability && !emp.availability.includes(dayAbbr);
 
                   return (
                     <CalendarCell
                       key={cellId}
                       id={cellId}
                       isToday={isToday(day)}
+                      unavailable={isUnavailable}
                       onClick={() => handleCellClick(emp.id, dateStr)}
                     >
                       {cellAssignments.map((a) => (
