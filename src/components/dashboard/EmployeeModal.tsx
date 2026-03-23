@@ -136,6 +136,24 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             )}
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
+          <div className="space-y-2">
+            <Label>Availability</Label>
+            <div className="flex flex-wrap gap-3">
+              {DAYS_OF_WEEK.map((day) => (
+                <label key={day} className="flex items-center gap-1.5 cursor-pointer">
+                  <Checkbox
+                    checked={availability.includes(day)}
+                    onCheckedChange={(checked) => {
+                      setAvailability(prev =>
+                        checked ? [...prev, day] : prev.filter(d => d !== day)
+                      );
+                    }}
+                  />
+                  <span className="text-sm">{day}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
               Cancel
