@@ -5,7 +5,8 @@ import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSen
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight, Printer } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
-import { roleSortPriority } from '@/lib/roles';
+import { buildRoleSortPriority } from '@/lib/roles';
+import { useRoleTypes } from '@/hooks/use-role-types';
 import {
   useWeeklyAssignments,
   useCreateAssignment,
@@ -50,11 +51,14 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
   const weekDays = useMemo(() => getWeekDays(currentWeek), [currentWeek]);
 
@@ -270,7 +274,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               </div>
             </div>
 
-            {/* Employee Rows – Management roles first (alphabetical), then others (alphabetical) */}
+            {/* Employee Rows – Sorted by role order, then alphabetically */}
             {[...employees].sort((a, b) => {
               const priorityDiff = roleSortPriority(a.role) - roleSortPriority(b.role);
               if (priorityDiff !== 0) return priorityDiff;

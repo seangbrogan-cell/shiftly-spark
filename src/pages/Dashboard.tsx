@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
+import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
 import { EmployeeModal } from '@/components/dashboard/EmployeeModal';
 import { DeleteEmployeeDialog } from '@/components/dashboard/DeleteEmployeeDialog';
@@ -98,18 +99,23 @@ export default function Dashboard() {
                 </Button>
               </div>
 
-              {loadingEmployees ? (
-                <div className="flex justify-center py-12">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
+                <div>
+                  {loadingEmployees ? (
+                    <div className="flex justify-center py-12">
+                      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    </div>
+                  ) : (
+                    <EmployeeTable
+                      employees={employees}
+                      shiftCounts={shiftCounts}
+                      onEdit={handleEdit}
+                      onDelete={setDeletingEmployee}
+                    />
+                  )}
                 </div>
-              ) : (
-                <EmployeeTable
-                  employees={employees}
-                  shiftCounts={shiftCounts}
-                  onEdit={handleEdit}
-                  onDelete={setDeletingEmployee}
-                />
-              )}
+                {employerId && <RoleManager employerId={employerId} />}
+              </div>
             </TabsContent>
 
             {/* Shifts Tab */}
