@@ -1,23 +1,23 @@
-// Preset role options – management-level roles listed first
+// Preset role options – listed in display/sort order
 export const PRESET_ROLES: string[] = [
   'Manager',
   'Shift Manager',
-  'Supervisor',
-  'Team Leader',
   'Shift Leader',
+  'Team Leader',
   'Staff',
 ];
 
-// Roles considered "management" for sorting purposes (appear at the top of schedules)
-export const MANAGEMENT_ROLES = new Set([
-  'Manager',
-  'Shift Manager',
-  'Supervisor',
-  'Team Leader',
-  'Shift Leader',
-]);
+// Role sort priority – lower number = higher in schedule
+const ROLE_ORDER: Record<string, number> = {
+  'Manager': 0,
+  'Shift Manager': 1,
+  'Shift Leader': 2,
+  'Team Leader': 3,
+  'Staff': 4,
+};
 
-/** Returns a sort-priority number: management roles → 0, others → 1 */
+/** Returns a sort-priority number: known roles by defined order, unknown roles just above Staff */
 export function roleSortPriority(role: string): number {
-  return MANAGEMENT_ROLES.has(role) ? 0 : 1;
+  return ROLE_ORDER[role] ?? 3.5;
 }
+
