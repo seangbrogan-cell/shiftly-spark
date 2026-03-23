@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee, useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
+
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 interface EmployeeModalProps {
   open: boolean;
