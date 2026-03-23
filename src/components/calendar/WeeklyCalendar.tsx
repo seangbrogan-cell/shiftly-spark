@@ -278,7 +278,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
             }).map((emp) => (
               <div key={emp.id} className="grid grid-cols-[140px_repeat(7,1fr)_60px]">
                 {/* Employee Name Cell */}
-                <div className="px-2 py-1.5 border-r border-b border-border flex items-start">
+                <div className="px-2 py-1 border-r border-b border-border flex items-start">
                   <div>
                     <p className="text-sm font-medium text-foreground truncate">{emp.name}</p>
                     <p className="text-xs text-muted-foreground">{emp.role}</p>
