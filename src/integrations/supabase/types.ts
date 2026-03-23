@@ -60,18 +60,21 @@ export type Database = {
           created_at: string
           id: string
           name: string
+          schedule_updated_at: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
+          schedule_updated_at?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
+          schedule_updated_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -209,6 +212,70 @@ export type Database = {
             columns: ["employer_id"]
             isOneToOne: false
             referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_off_requests: {
+        Row: {
+          created_at: string
+          employee_id: string
+          employer_id: string
+          end_date: string
+          id: string
+          notes: string | null
+          reason: string
+          start_date: string
+          status: string
+          suggested_replacement_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          employer_id: string
+          end_date: string
+          id?: string
+          notes?: string | null
+          reason: string
+          start_date: string
+          status?: string
+          suggested_replacement_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          employer_id?: string
+          end_date?: string
+          id?: string
+          notes?: string | null
+          reason?: string
+          start_date?: string
+          status?: string
+          suggested_replacement_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_off_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_off_requests_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_off_requests_suggested_replacement_id_fkey"
+            columns: ["suggested_replacement_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
         ]
