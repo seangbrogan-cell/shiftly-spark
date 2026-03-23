@@ -80,14 +80,15 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
     const { active, over } = event;
     if (!over) return;
 
-    // over.id is "employeeId:YYYY-MM-DD"
-    const [newEmployeeId, newDate] = (over.id as string).split(':');
-    if (!newEmployeeId || !newDate) return;
+    const overId = over.id as string;
 
-    // Check if this is a shift template being dropped
+    // Check if this is a shift template being dropped onto calendar
     const shiftTemplate = (active.data.current as any)?.shiftTemplate;
     if (shiftTemplate) {
-      // Create a new assignment from the template
+      if (overId === 'sidebar-templates') return;
+      const [newEmployeeId, newDate] = overId.split(':');
+      if (!newEmployeeId || !newDate) return;
+
       const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
       const endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
 
@@ -110,6 +111,20 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
     // Existing assignment drag
     const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
     if (!assignment) return;
+
+    // Dropped back on sidebar → delete the assignment
+    if (overId === 'sidebar-templates') {
+      try {
+        await deleteAssignment.mutateAsync(assignment.id);
+        toast({ title: 'Shift unassigned' });
+      } catch (err: any) {
+        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      }
+      return;
+    }
+
+    const [newEmployeeId, newDate] = overId.split(':');
+    if (!newEmployeeId || !newDate) return;
 
     // Skip if dropped in same cell
     if (newEmployeeId === assignment.employee_id && newDate === assignment.assigned_date) return;
