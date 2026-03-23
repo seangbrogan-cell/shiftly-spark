@@ -47,45 +47,40 @@ export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded-md border ${color.bg} ${color.border} p-2 cursor-pointer transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
+      className={`group relative rounded border ${color.bg} ${color.border} px-1.5 py-1 cursor-pointer transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
       onClick={onClick}
     >
-      <div className="flex items-start gap-1.5">
+      <div className="flex items-center gap-1">
         <button
           {...listeners}
           {...attributes}
-          className="mt-0.5 shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground"
+          className="shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground"
           onClick={(e) => e.stopPropagation()}
           aria-label="Drag to reassign"
         >
-          <GripVertical className="h-3.5 w-3.5" />
+          <GripVertical className="h-3 w-3" />
         </button>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
-            <p className={`text-xs font-semibold truncate ${color.text}`}>
-              {assignment.shifts?.name ?? 'Shift'}
-            </p>
-          </div>
-          {assignment.actual_start && assignment.actual_end && (
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              {format(new Date(assignment.actual_start), 'h:mm a')} – {format(new Date(assignment.actual_end), 'h:mm a')}
-            </p>
-          )}
-          {assignment.conflict_resolved && (
-            <AlertTriangle className="h-3 w-3 text-warning mt-0.5" />
-          )}
-        </div>
+        <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
+
+        <p className="text-[10px] text-muted-foreground truncate flex-1">
+          {assignment.actual_start && assignment.actual_end
+            ? `${format(new Date(assignment.actual_start), 'h:mma')}–${format(new Date(assignment.actual_end), 'h:mma')}`
+            : (assignment.shifts?.name ?? 'Shift')}
+        </p>
+
+        {assignment.conflict_resolved && (
+          <AlertTriangle className="h-2.5 w-2.5 text-warning shrink-0" />
+        )}
 
         <Button
           variant="ghost"
           size="icon"
-          className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
           onClick={(e) => { e.stopPropagation(); onDelete(); }}
           aria-label="Delete assignment"
         >
-          <X className="h-3 w-3" />
+          <X className="h-2.5 w-2.5" />
         </Button>
       </div>
     </div>
