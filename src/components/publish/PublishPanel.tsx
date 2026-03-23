@@ -56,51 +56,37 @@ export function PublishPanel({ employerId, currentWeek, employees, shifts }: Pub
 
   return (
     <>
-      <div className="rounded-lg border border-border bg-card px-4 py-3">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Send className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">Publish</span>
-            </div>
-            <StatusBadge status={status} publishedAt={publishStatus?.publishedAt ?? null} />
-            <span className="text-xs text-muted-foreground">
-              {format(weekStart, 'MMM d')} – {format(weekEnd, 'MMM d, yyyy')}
-            </span>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Users className="h-3.5 w-3.5" />
-              <span>{affectedEmployeeIds.length} employee{affectedEmployeeIds.length !== 1 ? 's' : ''}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="gap-1.5 text-xs"
-              onClick={() => setConfigOpen(true)}
-            >
-              <Settings className="h-3.5 w-3.5" /> Settings
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5"
-              onClick={() => setPreviewOpen(true)}
-              disabled={status === 'no_schedule'}
-            >
-              <Eye className="h-3.5 w-3.5" /> Preview
-            </Button>
-            <Button
-              size="sm"
-              className="gap-1.5"
-              onClick={handlePublish}
-              disabled={status === 'no_schedule' || status === 'published' || publishSchedule.isPending}
-            >
-              <Send className="h-3.5 w-3.5" />
-              {publishSchedule.isPending ? 'Publishing...' : 'Publish'}
-            </Button>
-          </div>
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Users className="h-3 w-3" />
+          <span>{affectedEmployeeIds.length}</span>
         </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-7 px-2 gap-1 text-xs"
+          onClick={() => setConfigOpen(true)}
+        >
+          <Settings className="h-3 w-3" />
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-7 px-2.5 gap-1 text-xs"
+          onClick={() => setPreviewOpen(true)}
+          disabled={status === 'no_schedule'}
+        >
+          <Eye className="h-3 w-3" /> Preview
+        </Button>
+        <Button
+          size="sm"
+          className="h-7 px-2.5 gap-1 text-xs"
+          onClick={handlePublish}
+          disabled={status === 'no_schedule' || status === 'published' || publishSchedule.isPending}
+        >
+          <Send className="h-3 w-3" />
+          {publishSchedule.isPending ? '...' : 'Publish'}
+        </Button>
       </div>
 
       <PublishPreviewModal
