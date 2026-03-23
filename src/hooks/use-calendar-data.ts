@@ -20,7 +20,7 @@ export function useWeeklyAssignments(weekStart: Date) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shift_assignments')
-        .select('*, shifts(name, start_time, end_time), employees(name)')
+.select('*, shifts(name, start_time, end_time, is_all_day), employees(name)')
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .order('actual_start', { ascending: true });
