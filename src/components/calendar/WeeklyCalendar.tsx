@@ -197,6 +197,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
+            {companyName && <span className="text-sm font-medium text-muted-foreground">{companyName}</span>}
             <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
             <StatusBadge
               status={publishStatus?.status ?? 'no_schedule'}

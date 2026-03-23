@@ -83,6 +83,7 @@ export default function Dashboard() {
                   employees={employees}
                   shifts={shifts}
                   employerId={employerId}
+                  companyName={(profile as any)?.employers?.name ?? ''}
                 />
               )}
             </TabsContent>
