@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee } from '@/hooks/use-dashboard-data';
+import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
+  const [editingShift, setEditingShift] = useState<Shift | null>(null);
 
   const employerId = profile?.employer_id;
 
@@ -106,7 +107,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-foreground">Shifts</h2>
                   <p className="text-sm text-muted-foreground mt-1">Create and manage your team's shifts.</p>
                 </div>
-                <Button onClick={() => setShiftModalOpen(true)} disabled={!employerId}>
+                <Button onClick={() => { setEditingShift(null); setShiftModalOpen(true); }} disabled={!employerId}>
                   <CalendarPlus className="mr-2 h-4 w-4" /> Add Shift
                 </Button>
               </div>
@@ -116,7 +117,7 @@ export default function Dashboard() {
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
                 </div>
               ) : (
-                <ShiftList shifts={shifts} />
+                <ShiftList shifts={shifts} onEdit={(s) => { setEditingShift(s); setShiftModalOpen(true); }} />
               )}
             </TabsContent>
           </Tabs>
@@ -134,8 +135,9 @@ export default function Dashboard() {
           />
           <ShiftModal
             open={shiftModalOpen}
-            onOpenChange={setShiftModalOpen}
+            onOpenChange={(o) => { setShiftModalOpen(o); if (!o) setEditingShift(null); }}
             employerId={employerId}
+            editingShift={editingShift}
           />
         </>
       )}
