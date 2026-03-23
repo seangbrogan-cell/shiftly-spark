@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { LayoutGrid, Sunrise, Sun, Moon } from 'lucide-react';
+import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Shift } from '@/hooks/use-dashboard-data';
 import { DraggableShiftTemplate } from './DraggableShiftTemplate';
