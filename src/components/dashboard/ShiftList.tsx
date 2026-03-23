@@ -23,7 +23,12 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+function isAllDay(shift: Shift): boolean {
+  return (shift as any).is_all_day === true;
+}
+
 function getStartHour(shift: Shift): number {
+  if (!shift.start_time) return -1;
   const d = new Date(shift.start_time);
   return d.getHours() + d.getMinutes() / 60;
 }
