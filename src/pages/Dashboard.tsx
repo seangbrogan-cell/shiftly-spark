@@ -109,6 +109,7 @@ export default function Dashboard() {
                     <EmployeeTable
                       employees={employees}
                       shiftCounts={shiftCounts}
+                      employerId={employerId}
                       onEdit={handleEdit}
                       onDelete={setDeletingEmployee}
                     />
