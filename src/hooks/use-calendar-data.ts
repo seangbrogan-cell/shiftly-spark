@@ -20,7 +20,7 @@ export function useWeeklyAssignments(weekStart: Date) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shift_assignments')
-.select('*, shifts(name, start_time, end_time, is_all_day), employees(name)')
+.select('*, shifts(name, start_time, end_time, is_all_day, color), employees(name)')
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .order('actual_start', { ascending: true });
@@ -37,7 +37,7 @@ export function useCreateAssignment() {
       const { data, error } = await supabase
         .from('shift_assignments')
         .insert(assignment)
-        .select('*, shifts(name, start_time, end_time, is_all_day), employees(name)')
+        .select('*, shifts(name, start_time, end_time, is_all_day, color), employees(name)')
         .single();
       if (error) throw error;
       return data;
@@ -57,7 +57,7 @@ export function useUpdateAssignment() {
         .from('shift_assignments')
         .update(updates)
         .eq('id', id)
-        .select('*, shifts(name, start_time, end_time, is_all_day), employees(name)')
+        .select('*, shifts(name, start_time, end_time, is_all_day, color), employees(name)')
         .single();
       if (error) throw error;
       return data;
