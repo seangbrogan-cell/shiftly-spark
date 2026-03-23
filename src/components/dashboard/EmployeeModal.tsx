@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee, useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
+
+const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 interface EmployeeModalProps {
   open: boolean;
@@ -25,6 +28,9 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [phone, setPhone] = useState(employee?.phone ?? '');
   const [role, setRole] = useState(employee?.role ?? 'Staff');
   const [customRole, setCustomRole] = useState(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
+  const [availability, setAvailability] = useState<string[]>(
+    (employee as any)?.availability ?? [...DAYS_OF_WEEK]
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
@@ -37,6 +43,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
     setCustomRole(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
+    setAvailability((employee as any)?.availability ?? [...DAYS_OF_WEEK]);
     setErrors({});
   };
 
@@ -62,7 +69,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           email: email.trim(),
           phone: phone.trim() || null,
           role,
-        });
+          availability,
+        } as any);
         toast({ title: 'Employee updated' });
       } else {
         await createEmployee.mutateAsync({
@@ -71,7 +79,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           email: email.trim(),
           phone: phone.trim() || null,
           role,
-        });
+          availability,
+        } as any);
         toast({ title: 'Employee added' });
       }
       onOpenChange(false);
@@ -126,6 +135,24 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
               />
             )}
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label>Availability</Label>
+            <div className="flex flex-wrap gap-3">
+              {DAYS_OF_WEEK.map((day) => (
+                <label key={day} className="flex items-center gap-1.5 cursor-pointer">
+                  <Checkbox
+                    checked={availability.includes(day)}
+                    onCheckedChange={(checked) => {
+                      setAvailability(prev =>
+                        checked ? [...prev, day] : prev.filter(d => d !== day)
+                      );
+                    }}
+                  />
+                  <span className="text-sm">{day}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
