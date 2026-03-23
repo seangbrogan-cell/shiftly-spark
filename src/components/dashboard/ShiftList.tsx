@@ -3,6 +3,7 @@ import { Clock, Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
+import { getShiftColor } from '@/lib/shift-colors';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,14 +45,16 @@ const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconC
 
 function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
   const allDay = isAllDay(shift);
+  const color = getShiftColor({ color: (shift as any).color, is_all_day: allDay, start_time: shift.start_time });
+
   return (
-    <div className="group rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
+    <div className={`group rounded-lg border ${color.border} ${color.bg} p-4 transition-shadow hover:shadow-md`}>
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-          {allDay ? <CalendarOff className="h-4 w-4 text-primary" /> : <Clock className="h-4 w-4 text-primary" />}
+        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${color.bg}`}>
+          <div className={`h-3 w-3 rounded-full ${color.dot}`} />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-foreground truncate">{shift.name}</p>
+          <p className={`font-medium ${color.text} truncate`}>{shift.name}</p>
           <p className="text-sm text-muted-foreground">
             {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
           </p>
