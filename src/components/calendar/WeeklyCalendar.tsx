@@ -179,13 +179,6 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div className="space-y-4">
-      <PublishPanel
-        employerId={employerId}
-        currentWeek={currentWeek}
-        employees={employees}
-        shifts={shifts}
-      />
     <div className="flex gap-6">
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
