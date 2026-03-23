@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateShift, useUpdateShift, type Shift } from '@/hooks/use-dashboard-data';
+import { SHIFT_COLOR_OPTIONS } from '@/lib/shift-colors';
+import { cn } from '@/lib/utils';
 
 interface ShiftModalProps {
   open: boolean;
@@ -26,6 +28,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
   const [startTime, setStartTime] = useState('06:00');
   const [endTime, setEndTime] = useState('14:00');
   const [notes, setNotes] = useState('');
+  const [color, setColor] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createShift = useCreateShift();
@@ -43,6 +46,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         setEndTime(isoToTimeInput(editingShift.end_time));
       }
       setNotes(editingShift.notes ?? '');
+      setColor((editingShift as any).color ?? null);
     }
   }, [editingShift]);
 
@@ -52,6 +56,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
     setStartTime('06:00');
     setEndTime('14:00');
     setNotes('');
+    setColor(null);
     setErrors({});
   };
 
@@ -81,6 +86,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         start_time: isAllDay ? null : new Date(`${refDate}T${startTime}:00`).toISOString(),
         end_time: isAllDay ? null : new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
         notes: notes.trim() || null,
+        color: color || null,
       };
 
       if (isEditing) {
@@ -135,6 +141,39 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
               </div>
             </div>
           )}
+          <div className="space-y-1.5">
+            <Label>Color</Label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setColor(null)}
+                className={cn(
+                  'h-7 px-2.5 rounded-md border text-xs font-medium transition-all',
+                  color === null
+                    ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30'
+                    : 'border-border bg-muted text-muted-foreground hover:border-primary/50'
+                )}
+              >
+                Default
+              </button>
+              {SHIFT_COLOR_OPTIONS.map((c) => (
+                <button
+                  key={c.key}
+                  type="button"
+                  onClick={() => setColor(c.key)}
+                  className={cn(
+                    'flex items-center gap-1.5 h-7 px-2.5 rounded-md border text-xs font-medium transition-all',
+                    color === c.key
+                      ? `${c.border} ${c.bg} ${c.text} ring-1 ring-primary/30`
+                      : `border-border hover:${c.border} hover:${c.bg}`
+                  )}
+                >
+                  <div className={`h-3 w-3 rounded-full ${c.dot}`} />
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="space-y-1.5">
             <Label htmlFor="shift-notes">Notes</Label>
             <Textarea id="shift-notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes..." rows={3} />

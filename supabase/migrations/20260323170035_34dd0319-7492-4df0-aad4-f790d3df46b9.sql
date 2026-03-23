@@ -1,0 +1,1 @@
+ALTER TABLE public.shifts ADD COLUMN color text DEFAULT NULL;
