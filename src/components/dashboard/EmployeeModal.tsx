@@ -36,7 +36,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setEmail(employee?.email ?? '');
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
-    setCustomRole(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
+    setCustomRole(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
     setErrors({});
   };
 
@@ -107,21 +107,21 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           </div>
           <div className="space-y-1.5">
             <Label>Role</Label>
-            <Select value={PRESET_ROLES.includes(role) ? role : '__custom__'} onValueChange={(v) => { if (v !== '__custom__') { setRole(v); setCustomRole(''); } else { setRole(''); } }}>
+            <Select value={roleNames.includes(role) ? role : '__custom__'} onValueChange={(v) => { if (v !== '__custom__') { setRole(v); setCustomRole(''); } else { setRole(''); } }}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                {PRESET_ROLES.map((r) => (
+                {roleNames.map((r) => (
                   <SelectItem key={r} value={r}>{r}</SelectItem>
                 ))}
                 <SelectItem value="__custom__">Custom…</SelectItem>
               </SelectContent>
             </Select>
-            {(!PRESET_ROLES.includes(role) || customRole) && (
+            {(!roleNames.includes(role) || customRole) && (
               <Input
                 placeholder="Enter custom role name"
-                value={customRole || (PRESET_ROLES.includes(role) ? '' : role)}
+                value={customRole || (roleNames.includes(role) ? '' : role)}
                 onChange={(e) => { setCustomRole(e.target.value); setRole(e.target.value); }}
               />
             )}
