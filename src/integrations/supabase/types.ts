@@ -319,6 +319,7 @@ export type Database = {
       }
       shifts: {
         Row: {
+          color: string | null
           created_at: string
           employer_id: string
           end_time: string | null
@@ -329,6 +330,7 @@ export type Database = {
           start_time: string | null
         }
         Insert: {
+          color?: string | null
           created_at?: string
           employer_id: string
           end_time?: string | null
@@ -339,6 +341,7 @@ export type Database = {
           start_time?: string | null
         }
         Update: {
+          color?: string | null
           created_at?: string
           employer_id?: string
           end_time?: string | null
