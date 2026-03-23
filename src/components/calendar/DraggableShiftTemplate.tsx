@@ -39,6 +39,8 @@ export function DraggableShiftTemplate({ shift }: DraggableShiftTemplateProps) {
     zIndex: isDragging ? 50 : 1,
   };
 
+  const allDay = (shift as any).is_all_day === true;
+
   const formatTime = (ts: string) => {
     try {
       return format(new Date(ts), 'h:mm a');
