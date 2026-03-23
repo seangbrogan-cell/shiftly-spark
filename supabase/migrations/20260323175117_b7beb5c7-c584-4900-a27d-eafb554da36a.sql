@@ -1,0 +1,1 @@
+ALTER TABLE public.employees DROP CONSTRAINT employees_role_check;
