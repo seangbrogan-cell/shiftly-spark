@@ -15,6 +15,7 @@ import {
   getWeekDays,
   type AssignmentWithDetails,
 } from '@/hooks/use-calendar-data';
+import { useAllEmployeeAvailability, type EmployeeAvailabilityRow } from '@/hooks/use-employee-availability';
 import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
 import { ShiftTemplateSidebar } from './ShiftTemplateSidebar';
