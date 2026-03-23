@@ -380,14 +380,42 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       </div>
 
       {/* Right sidebar - Shift Templates + Publish Panel */}
-      <div className="hidden lg:flex lg:flex-col gap-4 w-64 flex-shrink-0">
-        <ShiftTemplateSidebar shifts={shifts} />
-        <PublishPanel
-          employerId={employerId}
-          currentWeek={currentWeek}
-          employees={employees}
-          shifts={shifts}
-        />
+      <div className={cn(
+        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200',
+        rightSidebarCollapsed ? 'w-10' : 'w-64'
+      )}>
+        {rightSidebarCollapsed ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 mx-auto"
+            onClick={() => setRightSidebarCollapsed(false)}
+            aria-label="Expand sidebar"
+          >
+            <PanelRight className="h-4 w-4" />
+          </Button>
+        ) : (
+          <>
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setRightSidebarCollapsed(true)}
+                aria-label="Collapse sidebar"
+              >
+                <PanelRightClose className="h-4 w-4" />
+              </Button>
+            </div>
+            <ShiftTemplateSidebar shifts={shifts} />
+            <PublishPanel
+              employerId={employerId}
+              currentWeek={currentWeek}
+              employees={employees}
+              shifts={shifts}
+            />
+          </>
+        )}
       </div>
     </div>
     </DndContext>
