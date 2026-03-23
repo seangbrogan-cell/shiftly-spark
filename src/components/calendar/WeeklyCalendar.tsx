@@ -1,0 +1,282 @@
+import { useState, useMemo } from 'react';
+import { format, addWeeks, subWeeks, isToday, startOfWeek } from 'date-fns';
+import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
+import type { Employee, Shift } from '@/hooks/use-dashboard-data';
+import {
+  useWeeklyAssignments,
+  useUpdateAssignment,
+  useDeleteAssignment,
+  getWeekDays,
+  type AssignmentWithDetails,
+} from '@/hooks/use-calendar-data';
+import { CalendarCell } from './CalendarCell';
+import { ShiftCard } from './ShiftCard';
+import { EditAssignmentModal } from './EditAssignmentModal';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+interface WeeklyCalendarProps {
+  employees: Employee[];
+  shifts: Shift[];
+  employerId: string;
+}
+
+export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendarProps) {
+  const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
+  const [deletingAssignment, setDeletingAssignment] = useState<AssignmentWithDetails | null>(null);
+  const [defaultDate, setDefaultDate] = useState<string>('');
+  const [defaultEmployeeId, setDefaultEmployeeId] = useState<string>('');
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const updateAssignment = useUpdateAssignment();
+  const deleteAssignment = useDeleteAssignment();
+  const { toast } = useToast();
+
+  const weekDays = useMemo(() => getWeekDays(currentWeek), [currentWeek]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  // Group assignments by employee + date
+  const assignmentMap = useMemo(() => {
+    const map: Record<string, AssignmentWithDetails[]> = {};
+    assignments.forEach((a) => {
+      const key = `${a.employee_id}:${a.assigned_date}`;
+      if (!map[key]) map[key] = [];
+      map[key].push(a);
+    });
+    return map;
+  }, [assignments]);
+
+  const activeAssignment = useMemo(
+    () => assignments.find((a) => a.id === activeId) ?? null,
+    [activeId, assignments]
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveId(null);
+    const { active, over } = event;
+    if (!over) return;
+
+    const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
+    if (!assignment) return;
+
+    // over.id is "employeeId:YYYY-MM-DD"
+    const [newEmployeeId, newDate] = (over.id as string).split(':');
+    if (!newEmployeeId || !newDate) return;
+
+    // Skip if dropped in same cell
+    if (newEmployeeId === assignment.employee_id && newDate === assignment.assigned_date) return;
+
+    try {
+      await updateAssignment.mutateAsync({
+        id: assignment.id,
+        employee_id: newEmployeeId,
+        assigned_date: newDate,
+      });
+      toast({ title: 'Shift reassigned' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  const handleCellClick = (employeeId: string, date: string) => {
+    setEditingAssignment(null);
+    setDefaultEmployeeId(employeeId);
+    setDefaultDate(date);
+    setModalOpen(true);
+  };
+
+  const handleAssignmentClick = (a: AssignmentWithDetails) => {
+    setEditingAssignment(a);
+    setDefaultDate('');
+    setDefaultEmployeeId('');
+    setModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingAssignment) return;
+    try {
+      await deleteAssignment.mutateAsync(deletingAssignment.id);
+      toast({ title: 'Assignment deleted' });
+      setDeletingAssignment(null);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
+  return (
+    <div>
+      {/* Calendar Header / Navigation */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+          >
+            <CalendarDays className="h-4 w-4 mr-1.5" /> Today
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              setEditingAssignment(null);
+              setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+              setDefaultEmployeeId('');
+              setModalOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
+          </Button>
+        </div>
+      </div>
+
+      {isLoading ? (
+        <div className="flex justify-center py-16">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      ) : employees.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border p-16 text-center">
+          <p className="text-muted-foreground">Add employees first to start scheduling shifts.</p>
+        </div>
+      ) : (
+        <DndContext
+          sensors={sensors}
+          onDragStart={(e) => setActiveId(e.active.id as string)}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveId(null)}
+        >
+          <div className="rounded-lg border border-border bg-card overflow-x-auto">
+            {/* Day Headers */}
+            <div className="grid grid-cols-[180px_repeat(7,1fr)] border-b border-border sticky top-0 bg-card z-10">
+              <div className="p-3 border-r border-border">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
+              </div>
+              {weekDays.map((day) => (
+                <div
+                  key={day.toISOString()}
+                  className={`p-3 text-center border-r border-border last:border-r-0 ${isToday(day) ? 'bg-primary-light/30' : ''}`}
+                >
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+                  <p className={`text-lg font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
+                    {format(day, 'd')}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Employee Rows */}
+            {employees.map((emp) => (
+              <div key={emp.id} className="grid grid-cols-[180px_repeat(7,1fr)]">
+                {/* Employee Name Cell */}
+                <div className="p-3 border-r border-b border-border flex items-start">
+                  <div>
+                    <p className="text-sm font-medium text-foreground truncate">{emp.name}</p>
+                    <p className="text-xs text-muted-foreground">{emp.role}</p>
+                  </div>
+                </div>
+
+                {/* Day Cells */}
+                {weekDays.map((day) => {
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const cellId = `${emp.id}:${dateStr}`;
+                  const cellAssignments = assignmentMap[cellId] ?? [];
+
+                  return (
+                    <CalendarCell
+                      key={cellId}
+                      id={cellId}
+                      isToday={isToday(day)}
+                      onClick={() => handleCellClick(emp.id, dateStr)}
+                    >
+                      {cellAssignments.map((a) => (
+                        <ShiftCard
+                          key={a.id}
+                          assignment={a}
+                          onClick={() => handleAssignmentClick(a)}
+                          onDelete={() => setDeletingAssignment(a)}
+                        />
+                      ))}
+                    </CalendarCell>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {activeAssignment && (
+              <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
+                <p className="text-xs font-semibold text-primary">{activeAssignment.shifts?.name}</p>
+                <p className="text-[10px] text-muted-foreground">{activeAssignment.employees?.name}</p>
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
+      )}
+
+      {/* Edit/Create Assignment Modal */}
+      <EditAssignmentModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        assignment={editingAssignment}
+        employees={employees}
+        shifts={shifts}
+        employerId={employerId}
+        defaultDate={defaultDate}
+        defaultEmployeeId={defaultEmployeeId}
+      />
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deletingAssignment} onOpenChange={(o) => { if (!o) setDeletingAssignment(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Assignment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Remove <span className="font-semibold text-foreground">{deletingAssignment?.shifts?.name}</span> assignment
+              for <span className="font-semibold text-foreground">{deletingAssignment?.employees?.name}</span>?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteAssignment.isPending}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
