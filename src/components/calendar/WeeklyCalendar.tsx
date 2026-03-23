@@ -48,6 +48,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
+  const { data: publishStatus } = useWeekPublishStatus(currentWeek);
 
   const weekDays = useMemo(() => getWeekDays(currentWeek), [currentWeek]);
 
