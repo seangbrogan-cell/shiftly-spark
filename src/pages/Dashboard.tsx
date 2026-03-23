@@ -107,7 +107,7 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-foreground">Shifts</h2>
                   <p className="text-sm text-muted-foreground mt-1">Create and manage your team's shifts.</p>
                 </div>
-                <Button onClick={() => setShiftModalOpen(true)} disabled={!employerId}>
+                <Button onClick={() => { setEditingShift(null); setShiftModalOpen(true); }} disabled={!employerId}>
                   <CalendarPlus className="mr-2 h-4 w-4" /> Add Shift
                 </Button>
               </div>
