@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee, useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
+import { PRESET_ROLES } from '@/lib/roles';
 
 interface EmployeeModalProps {
   open: boolean;
@@ -20,6 +21,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [email, setEmail] = useState(employee?.email ?? '');
   const [phone, setPhone] = useState(employee?.phone ?? '');
   const [role, setRole] = useState(employee?.role ?? 'Staff');
+  const [customRole, setCustomRole] = useState(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
@@ -31,6 +33,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setEmail(employee?.email ?? '');
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
+    setCustomRole(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
     setErrors({});
   };
 
@@ -39,6 +42,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     if (!name.trim()) errs.name = 'Name is required';
     if (!email.trim()) errs.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Invalid email format';
+    if (!role.trim()) errs.role = 'Role is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -100,15 +104,25 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           </div>
           <div className="space-y-1.5">
             <Label>Role</Label>
-            <Select value={role} onValueChange={setRole}>
+            <Select value={PRESET_ROLES.includes(role) ? role : '__custom__'} onValueChange={(v) => { if (v !== '__custom__') { setRole(v); setCustomRole(''); } else { setRole(''); } }}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Manager">Manager</SelectItem>
-                <SelectItem value="Staff">Staff</SelectItem>
+                {PRESET_ROLES.map((r) => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
+                <SelectItem value="__custom__">Custom…</SelectItem>
               </SelectContent>
             </Select>
+            {(!PRESET_ROLES.includes(role) || customRole) && (
+              <Input
+                placeholder="Enter custom role name"
+                value={customRole || (PRESET_ROLES.includes(role) ? '' : role)}
+                onChange={(e) => { setCustomRole(e.target.value); setRole(e.target.value); }}
+              />
+            )}
+            {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>

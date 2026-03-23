@@ -40,7 +40,7 @@ export function EmployeeTable({ employees, shiftCounts, onEdit, onDelete }: Empl
               <TableCell className="text-muted-foreground">{emp.email}</TableCell>
               <TableCell className="hidden md:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
               <TableCell>
-                <Badge variant={emp.role === 'Manager' ? 'default' : 'secondary'}>
+                <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'}>
                   {emp.role}
                 </Badge>
               </TableCell>
