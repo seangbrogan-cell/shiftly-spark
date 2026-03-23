@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { format, addWeeks, subWeeks, isToday, startOfWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useWeeklyAssignments,
