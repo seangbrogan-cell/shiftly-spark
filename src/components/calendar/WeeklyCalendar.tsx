@@ -321,6 +321,49 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                 </div>
               </div>
             ))}
+
+            {/* Daily Shift Category Summary Row */}
+            <div className="grid grid-cols-[180px_repeat(7,1fr)_80px] border-t border-border bg-muted/30">
+              <div className="p-2 border-r border-border">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Summary</span>
+              </div>
+              {weekDays.map((day) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const counts = { allDay: 0, morning: 0, afternoon: 0, evening: 0 };
+                employees.forEach((emp) => {
+                  const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
+                  cellAssignments.forEach((a) => {
+                    if (a.shifts?.is_all_day) {
+                      counts.allDay++;
+                    } else if (a.shifts?.start_time) {
+                      const h = new Date(a.shifts.start_time).getUTCHours();
+                      if (h >= 6 && h < 12) counts.morning++;
+                      else if (h >= 12 && h < 18) counts.afternoon++;
+                      else counts.evening++;
+                    }
+                  });
+                });
+                const lines: string[] = [];
+                if (counts.morning > 0) lines.push(`${counts.morning} × Morning`);
+                if (counts.afternoon > 0) lines.push(`${counts.afternoon} × Afternoon`);
+                if (counts.evening > 0) lines.push(`${counts.evening} × Evening`);
+                if (counts.allDay > 0) lines.push(`${counts.allDay} × All Day`);
+                return (
+                  <div key={dateStr} className={`p-2 border-r border-border text-center ${isToday(day) ? 'bg-primary-light/20' : ''}`}>
+                    {lines.length === 0 ? (
+                      <span className="text-[10px] text-muted-foreground">—</span>
+                    ) : (
+                      <div className="space-y-0.5">
+                        {lines.map((line) => (
+                          <p key={line} className="text-[10px] font-medium text-muted-foreground">{line}</p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+              <div className="p-2" />
+            </div>
           </div>
 
           {/* Drag Overlay */}
