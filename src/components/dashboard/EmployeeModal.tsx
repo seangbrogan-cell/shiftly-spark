@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,15 +28,13 @@ interface EmployeeModalProps {
 export function EmployeeModal({ open, onOpenChange, employee, employerId }: EmployeeModalProps) {
   const isEdit = !!employee;
   const { data: dbRoles = [] } = useRoleTypes(employerId);
-  const roleNames = getRoleNames(dbRoles);
-  const [name, setName] = useState(employee?.name ?? '');
-  const [email, setEmail] = useState(employee?.email ?? '');
-  const [phone, setPhone] = useState(employee?.phone ?? '');
-  const [role, setRole] = useState(employee?.role ?? 'Staff');
-  const [customRole, setCustomRole] = useState(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
-  const [availability, setAvailability] = useState<string[]>(
-    (employee as any)?.availability ?? [...DAYS_OF_WEEK]
-  );
+  const roleNames = useMemo(() => getRoleNames(dbRoles), [dbRoles]);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState('Staff');
+  const [customRole, setCustomRole] = useState('');
+  const [availability, setAvailability] = useState<string[]>([...DAYS_OF_WEEK]);
   const [dayTimeRanges, setDayTimeRanges] = useState<DayTimeRange[]>(
     DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
   );
@@ -45,28 +43,38 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
   const saveAvailability = useSaveEmployeeAvailability();
+  const isSaving = createEmployee.isPending || updateEmployee.isPending || saveAvailability.isPending;
 
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
+  const initializeForm = (targetEmployee: Employee | null | undefined) => {
+    const nextRole = targetEmployee?.role ?? 'Staff';
+    const nextAvailability = (targetEmployee as any)?.availability ?? [...DAYS_OF_WEEK];
+
+    setName(targetEmployee?.name ?? '');
+    setEmail(targetEmployee?.email ?? '');
+    setPhone(targetEmployee?.phone ?? '');
+    setRole(nextRole);
+    setCustomRole(!roleNames.includes(nextRole) ? nextRole : '');
+    setAvailability(nextAvailability);
+    setDayTimeRanges(buildDayTimeRanges(nextAvailability, targetEmployee ? availabilityRows : []));
+    setErrors({});
+  };
+
+  // Always hydrate form from current modal mode (Add/Edit) when opened.
+  useEffect(() => {
+    if (!open) return;
+    initializeForm(employee);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, employee?.id, roleNames]);
+
   // Sync time ranges when availability data loads
   useEffect(() => {
-    if (employee && availabilityRows) {
+    if (open && employee && availabilityRows.length > 0) {
       const empAvail = (employee as any)?.availability ?? [...DAYS_OF_WEEK];
       setDayTimeRanges(buildDayTimeRanges(empAvail, availabilityRows));
     }
-  }, [employee, availabilityRows]);
-
-  const resetForm = () => {
-    setName(employee?.name ?? '');
-    setEmail(employee?.email ?? '');
-    setPhone(employee?.phone ?? '');
-    setRole(employee?.role ?? 'Staff');
-    setCustomRole(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
-    const empAvail = (employee as any)?.availability ?? [...DAYS_OF_WEEK];
-    setAvailability(empAvail);
-    setDayTimeRanges(buildDayTimeRanges(empAvail, availabilityRows));
-    setErrors({});
-  };
+  }, [open, employee, availabilityRows]);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -84,6 +92,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSaving) return;
     if (!validate()) return;
 
     try {
@@ -121,14 +130,13 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
         toast({ title: 'Employee added' });
       }
       onOpenChange(false);
-      resetForm();
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
@@ -237,10 +245,10 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={createEmployee.isPending || updateEmployee.isPending}>
+            <Button type="submit" disabled={isSaving}>
               {isEdit ? 'Save Changes' : 'Add Employee'}
             </Button>
           </div>
