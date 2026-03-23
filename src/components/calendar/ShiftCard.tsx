@@ -63,11 +63,11 @@ export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
 
         <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
 
-        <p className="text-[10px] text-muted-foreground truncate flex-1">
+        <div className="text-[10px] text-muted-foreground truncate flex-1 leading-tight">
           {assignment.actual_start && assignment.actual_end
-            ? `${format(new Date(assignment.actual_start), 'h:mma')}–${format(new Date(assignment.actual_end), 'h:mma')}`
+            ? (<>{format(new Date(assignment.actual_start), 'h:mma')}<br/>{format(new Date(assignment.actual_end), 'h:mma')}</>)
             : (assignment.shifts?.name ?? 'Shift')}
-        </p>
+        </div>
 
         {assignment.conflict_resolved && (
           <AlertTriangle className="h-2.5 w-2.5 text-warning shrink-0" />
