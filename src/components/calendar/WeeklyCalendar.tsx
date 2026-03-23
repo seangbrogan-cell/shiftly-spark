@@ -334,13 +334,11 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               </div>
               {weekDays.map((day) => {
                 const dateStr = format(day, 'yyyy-MM-dd');
-                const counts = { allDay: 0, morning: 0, afternoon: 0, evening: 0 };
+                const counts = { morning: 0, afternoon: 0, evening: 0 };
                 employees.forEach((emp) => {
                   const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                   cellAssignments.forEach((a) => {
-                    if (a.shifts?.is_all_day) {
-                      counts.allDay++;
-                    } else if (a.shifts?.start_time) {
+                    if (!a.shifts?.is_all_day && a.shifts?.start_time) {
                       const h = new Date(a.shifts.start_time).getUTCHours();
                       if (h >= 6 && h < 12) counts.morning++;
                       else if (h >= 12 && h < 18) counts.afternoon++;
@@ -352,7 +350,6 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                 if (counts.morning > 0) lines.push(`${counts.morning} × Morning`);
                 if (counts.afternoon > 0) lines.push(`${counts.afternoon} × Afternoon`);
                 if (counts.evening > 0) lines.push(`${counts.evening} × Evening`);
-                if (counts.allDay > 0) lines.push(`${counts.allDay} × All Day`);
                 return (
                   <div key={dateStr} className={`p-2 border-r border-border text-center ${isToday(day) ? 'bg-primary-light/20' : ''}`}>
                     {lines.length === 0 ? (
