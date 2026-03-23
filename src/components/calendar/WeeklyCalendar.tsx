@@ -271,12 +271,26 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
 
           {/* Drag Overlay */}
           <DragOverlay>
-            {activeAssignment && (
-              <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
-                <p className="text-xs font-semibold text-primary">{activeAssignment.shifts?.name}</p>
-                <p className="text-[10px] text-muted-foreground">{activeAssignment.employees?.name}</p>
-              </div>
-            )}
+            {activeId && (() => {
+              if (activeAssignment) {
+                return (
+                  <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
+                    <p className="text-xs font-semibold text-primary">{activeAssignment.shifts?.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{activeAssignment.employees?.name}</p>
+                  </div>
+                );
+              }
+              const templateShift = shifts.find(s => `template:${s.id}` === activeId);
+              if (templateShift) {
+                return (
+                  <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
+                    <p className="text-xs font-semibold text-primary">{templateShift.name}</p>
+                    <p className="text-[10px] text-muted-foreground">Drop on calendar</p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </DragOverlay>
         </DndContext>
       )}
