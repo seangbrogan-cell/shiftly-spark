@@ -317,8 +317,9 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       </AlertDialog>
       </div>
 
-      {/* Right sidebar - Publish Panel */}
-      <div className="hidden lg:block w-64 flex-shrink-0">
+      {/* Right sidebar - Shift Templates + Publish Panel */}
+      <div className="hidden lg:flex lg:flex-col gap-4 w-64 flex-shrink-0">
+        <ShiftTemplateSidebar shifts={shifts} />
         <PublishPanel
           employerId={employerId}
           currentWeek={currentWeek}
