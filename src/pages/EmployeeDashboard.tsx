@@ -16,6 +16,7 @@ import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
 import { TimeOffModal } from '@/components/employee/TimeOffModal';
 import { TimeOffHistory } from '@/components/employee/TimeOffHistory';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 
 export default function EmployeeDashboard() {
