@@ -311,7 +311,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                 })}
 
                 {/* Total Hours Cell */}
-                <div className="px-2 py-1.5 border-b border-border flex items-center justify-center">
+                <div className="px-2 py-1 border-b border-border flex items-center justify-center">
                   {(() => {
                     let totalMinutes = 0;
                     weekDays.forEach((day) => {

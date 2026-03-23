@@ -16,7 +16,7 @@ export function CalendarCell({ id, children, isToday, onClick }: CalendarCellPro
       ref={setNodeRef}
       onClick={onClick}
       className={cn(
-        'min-h-[50px] sm:min-h-[70px] border-r border-b border-border p-0.5 sm:p-1 transition-colors cursor-pointer',
+        'min-h-[40px] sm:min-h-[52px] border-r border-b border-border p-0.5 transition-colors cursor-pointer',
         isOver && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
         isToday && 'bg-primary-light/30'
       )}
