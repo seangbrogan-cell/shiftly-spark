@@ -1,9 +1,12 @@
 import type { Shift } from '@/hooks/use-dashboard-data';
-import { format } from 'date-fns';
 import { Clock } from 'lucide-react';
 
 interface ShiftListProps {
   shifts: Shift[];
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
 export function ShiftList({ shifts }: ShiftListProps) {
@@ -26,7 +29,7 @@ export function ShiftList({ shifts }: ShiftListProps) {
             <div className="min-w-0 flex-1">
               <p className="font-medium text-foreground truncate">{shift.name}</p>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(shift.start_time), 'MMM d, h:mm a')} – {format(new Date(shift.end_time), 'h:mm a')}
+                {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
               </p>
               {shift.notes && (
                 <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>

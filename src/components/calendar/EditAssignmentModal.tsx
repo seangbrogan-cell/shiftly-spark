@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { AlertTriangle } from 'lucide-react';
+import { format } from 'date-fns';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useCreateAssignment,
@@ -25,6 +26,13 @@ interface EditAssignmentModalProps {
   defaultEmployeeId?: string;
 }
 
+function formatShiftTime(shift: Shift): string {
+  const s = new Date(shift.start_time);
+  const e = new Date(shift.end_time);
+  const fmt = (d: Date) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  return `${fmt(s)} – ${fmt(e)}`;
+}
+
 export function EditAssignmentModal({
   open,
   onOpenChange,
@@ -36,15 +44,11 @@ export function EditAssignmentModal({
   defaultEmployeeId,
 }: EditAssignmentModalProps) {
   const isEdit = !!assignment;
-  const [employeeId, setEmployeeId] = useState(assignment?.employee_id ?? defaultEmployeeId ?? '');
-  const [shiftId, setShiftId] = useState(assignment?.shift_id ?? '');
-  const [date, setDate] = useState(assignment?.assigned_date ?? defaultDate ?? '');
-  const [startTime, setStartTime] = useState(
-    assignment?.actual_start ? assignment.actual_start.slice(0, 16) : ''
-  );
-  const [endTime, setEndTime] = useState(
-    assignment?.actual_end ? assignment.actual_end.slice(0, 16) : ''
-  );
+  const [employeeId, setEmployeeId] = useState('');
+  const [shiftId, setShiftId] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [conflictWarning, setConflictWarning] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -52,29 +56,40 @@ export function EditAssignmentModal({
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
 
-  const resetForm = () => {
-    setEmployeeId(defaultEmployeeId ?? '');
-    setShiftId('');
-    setDate(defaultDate ?? '');
-    setStartTime('');
-    setEndTime('');
-    setConflictWarning(false);
-    setErrors({});
-  };
+  // Re-initialize form state when modal opens or assignment changes
+  useEffect(() => {
+    if (open) {
+      if (assignment) {
+        setEmployeeId(assignment.employee_id);
+        setShiftId(assignment.shift_id);
+        setDate(assignment.assigned_date);
+        setStartTime(assignment.actual_start ? assignment.actual_start.slice(0, 16) : '');
+        setEndTime(assignment.actual_end ? assignment.actual_end.slice(0, 16) : '');
+      } else {
+        setEmployeeId(defaultEmployeeId ?? '');
+        setShiftId('');
+        setDate(defaultDate ?? '');
+        setStartTime('');
+        setEndTime('');
+      }
+      setConflictWarning(false);
+      setErrors({});
+    }
+  }, [open, assignment, defaultDate, defaultEmployeeId]);
 
-  // When a shift is selected, auto-fill start/end times
+  // When a shift is selected, auto-fill start/end times using the selected date
   const handleShiftChange = (id: string) => {
     setShiftId(id);
     const shift = shifts.find((s) => s.id === id);
-    if (shift && date) {
-      // Use the shift's default times but on the selected date
+    if (shift) {
+      const currentDate = date || format(new Date(), 'yyyy-MM-dd');
       const sDate = new Date(shift.start_time);
       const eDate = new Date(shift.end_time);
-      const datePrefix = date;
       const sHours = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
       const eHours = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
-      setStartTime(`${datePrefix}T${sHours}`);
-      setEndTime(`${datePrefix}T${eHours}`);
+      setStartTime(`${currentDate}T${sHours}`);
+      setEndTime(`${currentDate}T${eHours}`);
+      if (!date) setDate(currentDate);
     }
   };
 
@@ -97,7 +112,6 @@ export function EditAssignmentModal({
     if (!validate()) return;
 
     try {
-      // Check for conflicts
       const hasConflict = await checkConflict(
         employeeId,
         date,
@@ -108,7 +122,7 @@ export function EditAssignmentModal({
 
       if (hasConflict && !conflictWarning) {
         setConflictWarning(true);
-        return; // Show warning first, user can submit again to force
+        return;
       }
 
       if (isEdit && assignment) {
@@ -135,25 +149,18 @@ export function EditAssignmentModal({
         toast({ title: 'Assignment created' });
       }
       onOpenChange(false);
-      resetForm();
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o);
-        if (!o) resetForm();
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Assignment' : 'Assign Shift'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update the shift assignment details.' : 'Assign a shift to an employee.'}
+            {isEdit ? 'Update the shift assignment details.' : 'Select an existing shift to assign to an employee.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -189,18 +196,22 @@ export function EditAssignmentModal({
 
           <div className="space-y-1.5">
             <Label>Shift *</Label>
-            <Select value={shiftId} onValueChange={handleShiftChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select shift" />
-              </SelectTrigger>
-              <SelectContent>
-                {shifts.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {shifts.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-2">No shifts created yet. Go to the Shifts tab to create one first.</p>
+            ) : (
+              <Select value={shiftId} onValueChange={handleShiftChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select shift" />
+                </SelectTrigger>
+                <SelectContent>
+                  {shifts.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name} ({formatShiftTime(s)})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             {errors.shiftId && <p className="text-sm text-error">{errors.shiftId}</p>}
           </div>
 
@@ -236,12 +247,12 @@ export function EditAssignmentModal({
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={createAssignment.isPending || updateAssignment.isPending}
+              disabled={createAssignment.isPending || updateAssignment.isPending || shifts.length === 0}
               className={conflictWarning ? 'bg-warning text-warning-foreground hover:bg-warning/90' : ''}
             >
               {conflictWarning

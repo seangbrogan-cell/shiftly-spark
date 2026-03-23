@@ -15,8 +15,8 @@ interface ShiftModalProps {
 
 export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) {
   const [name, setName] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState('06:00');
+  const [endTime, setEndTime] = useState('14:00');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -24,8 +24,8 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
 
   const resetForm = () => {
     setName('');
-    setStartTime('');
-    setEndTime('');
+    setStartTime('06:00');
+    setEndTime('14:00');
     setNotes('');
     setErrors({});
   };
@@ -35,7 +35,7 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
     if (!name.trim()) errs.name = 'Shift name is required';
     if (!startTime) errs.startTime = 'Start time is required';
     if (!endTime) errs.endTime = 'End time is required';
-    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
+    if (startTime && endTime && startTime >= endTime) {
       errs.endTime = 'End time must be after start time';
     }
     setErrors(errs);
@@ -47,11 +47,13 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
     if (!validate()) return;
 
     try {
+      // Store times using a fixed reference date (only hours/minutes matter)
+      const refDate = '2000-01-01';
       await createShift.mutateAsync({
         employer_id: employerId,
         name: name.trim(),
-        start_time: new Date(startTime).toISOString(),
-        end_time: new Date(endTime).toISOString(),
+        start_time: new Date(`${refDate}T${startTime}:00`).toISOString(),
+        end_time: new Date(`${refDate}T${endTime}:00`).toISOString(),
         notes: notes.trim() || null,
       });
       toast({ title: 'Shift created' });
@@ -67,7 +69,7 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Shift</DialogTitle>
-          <DialogDescription>Create a new shift for your team.</DialogDescription>
+          <DialogDescription>Create a reusable shift template for your team.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
@@ -78,12 +80,12 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="shift-start">Start Time *</Label>
-              <Input id="shift-start" type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+              <Input id="shift-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
               {errors.startTime && <p className="text-sm text-error">{errors.startTime}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="shift-end">End Time *</Label>
-              <Input id="shift-end" type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+              <Input id="shift-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
               {errors.endTime && <p className="text-sm text-error">{errors.endTime}</p>}
             </div>
           </div>
