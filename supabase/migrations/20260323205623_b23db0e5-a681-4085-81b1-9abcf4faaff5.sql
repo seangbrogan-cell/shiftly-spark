@@ -1,0 +1,1 @@
+ALTER TABLE public.employees ADD COLUMN availability text[] NOT NULL DEFAULT '{Mon,Tue,Wed,Thu,Fri,Sat,Sun}'::text[];

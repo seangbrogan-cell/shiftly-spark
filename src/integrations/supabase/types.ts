@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       employees: {
         Row: {
+          availability: string[]
           created_at: string
           email: string
           employer_id: string
@@ -26,6 +27,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          availability?: string[]
           created_at?: string
           email: string
           employer_id: string
@@ -36,6 +38,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          availability?: string[]
           created_at?: string
           email?: string
           employer_id?: string
