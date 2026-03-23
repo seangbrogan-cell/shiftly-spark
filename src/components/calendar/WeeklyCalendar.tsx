@@ -54,11 +54,25 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const { data: allAvailability = [] } = useAllEmployeeAvailability();
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  // Build availability map: employeeId -> day -> { start_time, end_time }
+  const availabilityTimeMap = useMemo(() => {
+    const map: Record<string, Record<string, { start_time: string; end_time: string }>> = {};
+    allAvailability.forEach((row) => {
+      if (!map[row.employee_id]) map[row.employee_id] = {};
+      map[row.employee_id][row.day_of_week] = {
+        start_time: row.start_time.slice(0, 5),
+        end_time: row.end_time.slice(0, 5),
+      };
+    });
+    return map;
+  }, [allAvailability]);
 
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
