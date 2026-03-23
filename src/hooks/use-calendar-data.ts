@@ -37,7 +37,7 @@ export function useCreateAssignment() {
       const { data, error } = await supabase
         .from('shift_assignments')
         .insert(assignment)
-        .select('*, shifts(name, start_time, end_time), employees(name)')
+        .select('*, shifts(name, start_time, end_time, is_all_day), employees(name)')
         .single();
       if (error) throw error;
       return data;
