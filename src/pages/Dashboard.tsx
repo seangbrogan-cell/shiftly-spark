@@ -135,8 +135,9 @@ export default function Dashboard() {
           />
           <ShiftModal
             open={shiftModalOpen}
-            onOpenChange={setShiftModalOpen}
+            onOpenChange={(o) => { setShiftModalOpen(o); if (!o) setEditingShift(null); }}
             employerId={employerId}
+            editingShift={editingShift}
           />
         </>
       )}
