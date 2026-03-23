@@ -142,6 +142,39 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
             </div>
           )}
           <div className="space-y-1.5">
+            <Label>Color</Label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setColor(null)}
+                className={cn(
+                  'h-7 px-2.5 rounded-md border text-xs font-medium transition-all',
+                  color === null
+                    ? 'border-primary bg-primary/10 text-primary ring-1 ring-primary/30'
+                    : 'border-border bg-muted text-muted-foreground hover:border-primary/50'
+                )}
+              >
+                Default
+              </button>
+              {SHIFT_COLOR_OPTIONS.map((c) => (
+                <button
+                  key={c.key}
+                  type="button"
+                  onClick={() => setColor(c.key)}
+                  className={cn(
+                    'flex items-center gap-1.5 h-7 px-2.5 rounded-md border text-xs font-medium transition-all',
+                    color === c.key
+                      ? `${c.border} ${c.bg} ${c.text} ring-1 ring-primary/30`
+                      : `border-border hover:${c.border} hover:${c.bg}`
+                  )}
+                >
+                  <div className={`h-3 w-3 rounded-full ${c.dot}`} />
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-1.5">
             <Label htmlFor="shift-notes">Notes</Label>
             <Textarea id="shift-notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes..." rows={3} />
           </div>
