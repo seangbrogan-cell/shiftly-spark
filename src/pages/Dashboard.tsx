@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee } from '@/hooks/use-dashboard-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
