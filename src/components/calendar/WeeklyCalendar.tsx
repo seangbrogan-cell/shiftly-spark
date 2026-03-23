@@ -364,7 +364,29 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                   </div>
                 );
               })}
-              <div className="p-2" />
+              <div className="p-2 flex items-center justify-center">
+                {(() => {
+                  let totalMinutes = 0;
+                  employees.forEach((emp) => {
+                    weekDays.forEach((day) => {
+                      const dateStr = format(day, 'yyyy-MM-dd');
+                      const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
+                      cellAssignments.forEach((a) => {
+                        if (a.actual_start && a.actual_end) {
+                          totalMinutes += (new Date(a.actual_end).getTime() - new Date(a.actual_start).getTime()) / 60000;
+                        }
+                      });
+                    });
+                  });
+                  const hours = Math.floor(totalMinutes / 60);
+                  const mins = Math.round(totalMinutes % 60);
+                  return (
+                    <span className={`text-xs font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      {totalMinutes > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : '0h'}
+                    </span>
+                  );
+                })()}
+              </div>
             </div>
           </div>
 
