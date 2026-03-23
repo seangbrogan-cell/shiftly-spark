@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee } from '@/hooks/use-dashboard-data';
 import { Button } from '@/components/ui/button';
@@ -37,17 +38,7 @@ export default function Dashboard() {
   };
 
   if (profile && !employerId) {
-    return (
-      <div className="min-h-screen bg-background">
-        <DashboardHeader email={user?.email} onSignOut={signOut} />
-        <main className="mx-auto max-w-xl px-6 py-24 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Welcome to Shiftly</h1>
-          <p className="mt-3 text-muted-foreground">
-            Your account isn't linked to an employer yet. Please contact your administrator or set up your organization.
-          </p>
-        </main>
-      </div>
-    );
+    return <Navigate to="/onboarding" replace />;
   }
 
   return (
