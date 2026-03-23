@@ -1,0 +1,115 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
+
+export type Employee = Tables<'employees'>;
+export type EmployeeInsert = TablesInsert<'employees'>;
+export type EmployeeUpdate = TablesUpdate<'employees'>;
+export type Shift = Tables<'shifts'>;
+export type ShiftInsert = TablesInsert<'shifts'>;
+
+export function useEmployees() {
+  return useQuery({
+    queryKey: ['employees'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('employees').select('*').order('name');
+      if (error) throw error;
+      return data as Employee[];
+    },
+  });
+}
+
+export function useShifts() {
+  return useQuery({
+    queryKey: ['shifts'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('shifts').select('*').order('start_time', { ascending: false });
+      if (error) throw error;
+      return data as Shift[];
+    },
+  });
+}
+
+export function useShiftAssignmentCounts() {
+  return useQuery({
+    queryKey: ['shift-assignment-counts'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('shift_assignments').select('employee_id');
+      if (error) throw error;
+      const counts: Record<string, number> = {};
+      data.forEach((a) => {
+        counts[a.employee_id] = (counts[a.employee_id] || 0) + 1;
+      });
+      return counts;
+    },
+  });
+}
+
+export function useProfile() {
+  return useQuery({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+      const { data, error } = await supabase.from('profiles').select('*, employers(*)').eq('user_id', user.id).maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useCreateEmployee() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (employee: Omit<EmployeeInsert, 'employer_id'> & { employer_id: string }) => {
+      const { data, error } = await supabase.from('employees').insert(employee).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['employees'] });
+    },
+  });
+}
+
+export function useUpdateEmployee() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: EmployeeUpdate & { id: string }) => {
+      const { data, error } = await supabase.from('employees').update(updates).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['employees'] });
+    },
+  });
+}
+
+export function useDeleteEmployee() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('employees').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['employees'] });
+      qc.invalidateQueries({ queryKey: ['shift-assignment-counts'] });
+    },
+  });
+}
+
+export function useCreateShift() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (shift: Omit<ShiftInsert, 'employer_id'> & { employer_id: string }) => {
+      const { data, error } = await supabase.from('shifts').insert(shift).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['shifts'] });
+    },
+  });
+}
