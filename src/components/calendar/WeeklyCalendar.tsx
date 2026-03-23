@@ -80,12 +80,36 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
     const { active, over } = event;
     if (!over) return;
 
-    const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
-    if (!assignment) return;
-
     // over.id is "employeeId:YYYY-MM-DD"
     const [newEmployeeId, newDate] = (over.id as string).split(':');
     if (!newEmployeeId || !newDate) return;
+
+    // Check if this is a shift template being dropped
+    const shiftTemplate = (active.data.current as any)?.shiftTemplate;
+    if (shiftTemplate) {
+      // Create a new assignment from the template
+      const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
+      const endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
+
+      try {
+        await createAssignment.mutateAsync({
+          shift_id: shiftTemplate.id,
+          employee_id: newEmployeeId,
+          employer_id: employerId,
+          assigned_date: newDate,
+          actual_start: startDate.toISOString(),
+          actual_end: endDate.toISOString(),
+        });
+        toast({ title: 'Shift assigned' });
+      } catch (err: any) {
+        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      }
+      return;
+    }
+
+    // Existing assignment drag
+    const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
+    if (!assignment) return;
 
     // Skip if dropped in same cell
     if (newEmployeeId === assignment.employee_id && newDate === assignment.assigned_date) return;
