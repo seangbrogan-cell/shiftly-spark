@@ -41,7 +41,7 @@ interface WeeklyCalendarProps {
   companyName?: string;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
