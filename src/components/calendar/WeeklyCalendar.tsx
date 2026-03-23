@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useWeeklyAssignments,
+  useCreateAssignment,
   useUpdateAssignment,
   useDeleteAssignment,
   getWeekDays,
@@ -13,6 +14,7 @@ import {
 } from '@/hooks/use-calendar-data';
 import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
+import { ShiftTemplateSidebar } from './ShiftTemplateSidebar';
 import { EditAssignmentModal } from './EditAssignmentModal';
 import { useToast } from '@/hooks/use-toast';
 import { StatusBadge } from '@/components/publish/StatusBadge';
@@ -45,6 +47,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
@@ -77,12 +80,36 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
     const { active, over } = event;
     if (!over) return;
 
-    const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
-    if (!assignment) return;
-
     // over.id is "employeeId:YYYY-MM-DD"
     const [newEmployeeId, newDate] = (over.id as string).split(':');
     if (!newEmployeeId || !newDate) return;
+
+    // Check if this is a shift template being dropped
+    const shiftTemplate = (active.data.current as any)?.shiftTemplate;
+    if (shiftTemplate) {
+      // Create a new assignment from the template
+      const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
+      const endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
+
+      try {
+        await createAssignment.mutateAsync({
+          shift_id: shiftTemplate.id,
+          employee_id: newEmployeeId,
+          employer_id: employerId,
+          assigned_date: newDate,
+          actual_start: startDate.toISOString(),
+          actual_end: endDate.toISOString(),
+        });
+        toast({ title: 'Shift assigned' });
+      } catch (err: any) {
+        toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      }
+      return;
+    }
+
+    // Existing assignment drag
+    const assignment = (active.data.current as any)?.assignment as AssignmentWithDetails;
+    if (!assignment) return;
 
     // Skip if dropped in same cell
     if (newEmployeeId === assignment.employee_id && newDate === assignment.assigned_date) return;
@@ -244,12 +271,26 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
 
           {/* Drag Overlay */}
           <DragOverlay>
-            {activeAssignment && (
-              <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
-                <p className="text-xs font-semibold text-primary">{activeAssignment.shifts?.name}</p>
-                <p className="text-[10px] text-muted-foreground">{activeAssignment.employees?.name}</p>
-              </div>
-            )}
+            {activeId && (() => {
+              if (activeAssignment) {
+                return (
+                  <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
+                    <p className="text-xs font-semibold text-primary">{activeAssignment.shifts?.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{activeAssignment.employees?.name}</p>
+                  </div>
+                );
+              }
+              const templateShift = shifts.find(s => `template:${s.id}` === activeId);
+              if (templateShift) {
+                return (
+                  <div className="rounded-md border border-primary bg-primary-light p-2 shadow-lg opacity-90 min-w-[120px]">
+                    <p className="text-xs font-semibold text-primary">{templateShift.name}</p>
+                    <p className="text-[10px] text-muted-foreground">Drop on calendar</p>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </DragOverlay>
         </DndContext>
       )}
@@ -290,8 +331,9 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       </AlertDialog>
       </div>
 
-      {/* Right sidebar - Publish Panel */}
-      <div className="hidden lg:block w-64 flex-shrink-0">
+      {/* Right sidebar - Shift Templates + Publish Panel */}
+      <div className="hidden lg:flex lg:flex-col gap-4 w-64 flex-shrink-0">
+        <ShiftTemplateSidebar shifts={shifts} />
         <PublishPanel
           employerId={employerId}
           currentWeek={currentWeek}
