@@ -152,6 +152,12 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   };
 
   return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={(e) => setActiveId(e.active.id as string)}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+    >
     <div className="flex gap-6">
       <div className="flex-1 min-w-0">
       {/* Calendar Header / Navigation */}
@@ -205,12 +211,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
           <p className="text-muted-foreground">Add employees first to start scheduling shifts.</p>
         </div>
       ) : (
-        <DndContext
-          sensors={sensors}
-          onDragStart={(e) => setActiveId(e.active.id as string)}
-          onDragEnd={handleDragEnd}
-          onDragCancel={() => setActiveId(null)}
-        >
+        <>
           <div className="rounded-lg border border-border bg-card overflow-x-auto">
             {/* Day Headers */}
             <div className="grid grid-cols-[180px_repeat(7,1fr)] border-b border-border sticky top-0 bg-card z-10">
@@ -292,7 +293,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               return null;
             })()}
           </DragOverlay>
-        </DndContext>
+        </>
       )}
 
       {/* Edit/Create Assignment Modal */}
@@ -342,5 +343,6 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
         />
       </div>
     </div>
+    </DndContext>
   );
 }
