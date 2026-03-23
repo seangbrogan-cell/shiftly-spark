@@ -35,9 +35,7 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
     if (!name.trim()) errs.name = 'Shift name is required';
     if (!startTime) errs.startTime = 'Start time is required';
     if (!endTime) errs.endTime = 'End time is required';
-    if (startTime && endTime && startTime >= endTime) {
-      errs.endTime = 'End time must be after start time';
-    }
+    // Allow overnight shifts (end time before start time means next day)
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
