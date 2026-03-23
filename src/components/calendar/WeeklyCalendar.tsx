@@ -261,8 +261,13 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               </div>
             </div>
 
-            {/* Employee Rows */}
-            {employees.map((emp) => (
+            {/* Employee Rows – Managers first (alphabetical), then Staff (alphabetical) */}
+            {[...employees].sort((a, b) => {
+              const aManager = a.role === 'Manager' ? 0 : 1;
+              const bManager = b.role === 'Manager' ? 0 : 1;
+              if (aManager !== bManager) return aManager - bManager;
+              return a.name.localeCompare(b.name);
+            }).map((emp) => (
               <div key={emp.id} className="grid grid-cols-[180px_repeat(7,1fr)_80px]">
                 {/* Employee Name Cell */}
                 <div className="p-3 border-r border-b border-border flex items-start">
