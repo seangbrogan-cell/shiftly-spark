@@ -73,7 +73,24 @@ export function useCreateEmployee() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (employee: Omit<EmployeeInsert, 'employer_id'> & { employer_id: string; availability?: string[] }) => {
-      const { data, error } = await supabase.from('employees').insert(employee as any).select().single();
+      const normalizedEmail = employee.email.trim();
+      const { data: existing, error: existingError } = await supabase
+        .from('employees')
+        .select('id')
+        .eq('employer_id', employee.employer_id)
+        .ilike('email', normalizedEmail)
+        .limit(1);
+
+      if (existingError) throw existingError;
+      if (existing.length > 0) {
+        throw new Error('An employee with this email already exists. Please edit the existing profile instead.');
+      }
+
+      const { data, error } = await supabase
+        .from('employees')
+        .insert({ ...employee, email: normalizedEmail } as any)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
