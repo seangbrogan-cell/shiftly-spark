@@ -236,7 +236,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
 
             {/* Employee Rows */}
             {employees.map((emp) => (
-              <div key={emp.id} className="grid grid-cols-[180px_repeat(7,1fr)]">
+              <div key={emp.id} className="grid grid-cols-[180px_repeat(7,1fr)_80px]">
                 {/* Employee Name Cell */}
                 <div className="p-3 border-r border-b border-border flex items-start">
                   <div>
@@ -269,6 +269,29 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                     </CalendarCell>
                   );
                 })}
+
+                {/* Total Hours Cell */}
+                <div className="p-3 border-b border-border flex items-center justify-center">
+                  {(() => {
+                    let totalMinutes = 0;
+                    weekDays.forEach((day) => {
+                      const dateStr = format(day, 'yyyy-MM-dd');
+                      const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
+                      cellAssignments.forEach((a) => {
+                        if (a.actual_start && a.actual_end) {
+                          totalMinutes += (new Date(a.actual_end).getTime() - new Date(a.actual_start).getTime()) / 60000;
+                        }
+                      });
+                    });
+                    const hours = Math.floor(totalMinutes / 60);
+                    const mins = Math.round(totalMinutes % 60);
+                    return (
+                      <span className={`text-sm font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {totalMinutes > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : '0h'}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
             ))}
           </div>
