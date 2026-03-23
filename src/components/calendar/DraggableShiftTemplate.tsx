@@ -15,7 +15,7 @@ export function DraggableShiftTemplate({ shift }: DraggableShiftTemplateProps) {
     data: { shiftTemplate: shift },
   });
 
-  const color = getColorForShift(shift.id);
+  const color = getShiftColor(shift as any);
 
   const style = {
     transform: CSS.Translate.toString(transform),
