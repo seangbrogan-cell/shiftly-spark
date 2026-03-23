@@ -411,7 +411,6 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
         )}
       </div>
     </div>
-    </div>
     </DndContext>
   );
 }
