@@ -12,6 +12,8 @@ import { DeleteEmployeeDialog } from '@/components/dashboard/DeleteEmployeeDialo
 import { ShiftModal } from '@/components/dashboard/ShiftModal';
 import { ShiftList } from '@/components/dashboard/ShiftList';
 import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
+import { PublishPanel } from '@/components/publish/PublishPanel';
+import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
