@@ -24,7 +24,7 @@ export function useShifts() {
   return useQuery({
     queryKey: ['shifts'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('shifts').select('*').order('start_time', { ascending: false });
+      const { data, error } = await supabase.from('shifts').select('*').order('start_time', { ascending: true });
       if (error) throw error;
       return data as Shift[];
     },
