@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee } from '@/hooks/use-dashboard-data';
 import { Button } from '@/components/ui/button';
-import { Clock, LogOut, Plus, CalendarPlus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
 import { EmployeeModal } from '@/components/dashboard/EmployeeModal';
 import { DeleteEmployeeDialog } from '@/components/dashboard/DeleteEmployeeDialog';
 import { ShiftModal } from '@/components/dashboard/ShiftModal';
 import { ShiftList } from '@/components/dashboard/ShiftList';
+import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -34,7 +36,6 @@ export default function Dashboard() {
     if (!open) setEditingEmployee(null);
   };
 
-  // Show onboarding prompt if no employer is set
   if (profile && !employerId) {
     return (
       <div className="min-h-screen bg-background">
@@ -57,52 +58,77 @@ export default function Dashboard() {
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-          {/* Employees Section */}
-          <div className="mb-10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Employees</h1>
-                <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
-              </div>
-              <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
-                <Plus className="mr-2 h-4 w-4" /> Add Employee
-              </Button>
-            </div>
+          <Tabs defaultValue="schedule" className="w-full">
+            <TabsList className="mb-6">
+              <TabsTrigger value="schedule" className="gap-2">
+                <Calendar className="h-4 w-4" /> Schedule
+              </TabsTrigger>
+              <TabsTrigger value="employees" className="gap-2">
+                <Users className="h-4 w-4" /> Employees
+              </TabsTrigger>
+              <TabsTrigger value="shifts" className="gap-2">
+                <LayoutGrid className="h-4 w-4" /> Shifts
+              </TabsTrigger>
+            </TabsList>
 
-            {loadingEmployees ? (
-              <div className="flex justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-              </div>
-            ) : (
-              <EmployeeTable
-                employees={employees}
-                shiftCounts={shiftCounts}
-                onEdit={handleEdit}
-                onDelete={setDeletingEmployee}
-              />
-            )}
-          </div>
+            {/* Schedule Tab - Weekly Calendar */}
+            <TabsContent value="schedule">
+              {employerId && (
+                <WeeklyCalendar
+                  employees={employees}
+                  shifts={shifts}
+                  employerId={employerId}
+                />
+              )}
+            </TabsContent>
 
-          {/* Shifts Section */}
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">Shifts</h2>
-                <p className="text-sm text-muted-foreground mt-1">Create and manage your team's shifts.</p>
+            {/* Employees Tab */}
+            <TabsContent value="employees">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Employees</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
+                </div>
+                <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
+                  <Plus className="mr-2 h-4 w-4" /> Add Employee
+                </Button>
               </div>
-              <Button onClick={() => setShiftModalOpen(true)} disabled={!employerId}>
-                <CalendarPlus className="mr-2 h-4 w-4" /> Add Shift
-              </Button>
-            </div>
 
-            {loadingShifts ? (
-              <div className="flex justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              {loadingEmployees ? (
+                <div className="flex justify-center py-12">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                </div>
+              ) : (
+                <EmployeeTable
+                  employees={employees}
+                  shiftCounts={shiftCounts}
+                  onEdit={handleEdit}
+                  onDelete={setDeletingEmployee}
+                />
+              )}
+            </TabsContent>
+
+            {/* Shifts Tab */}
+            <TabsContent value="shifts">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-foreground">Shifts</h2>
+                  <p className="text-sm text-muted-foreground mt-1">Create and manage your team's shifts.</p>
+                </div>
+                <Button onClick={() => setShiftModalOpen(true)} disabled={!employerId}>
+                  <CalendarPlus className="mr-2 h-4 w-4" /> Add Shift
+                </Button>
               </div>
-            ) : (
-              <ShiftList shifts={shifts} />
-            )}
-          </div>
+
+              {loadingShifts ? (
+                <div className="flex justify-center py-12">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                </div>
+              ) : (
+                <ShiftList shifts={shifts} />
+              )}
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
 

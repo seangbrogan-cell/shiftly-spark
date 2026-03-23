@@ -116,22 +116,40 @@ export type Database = {
       }
       shift_assignments: {
         Row: {
+          actual_end: string | null
+          actual_start: string | null
+          assigned_date: string
+          conflict_resolved: boolean
           created_at: string
           employee_id: string
+          employer_id: string
           id: string
           shift_id: string
+          updated_at: string
         }
         Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          assigned_date?: string
+          conflict_resolved?: boolean
           created_at?: string
           employee_id: string
+          employer_id: string
           id?: string
           shift_id: string
+          updated_at?: string
         }
         Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          assigned_date?: string
+          conflict_resolved?: boolean
           created_at?: string
           employee_id?: string
+          employer_id?: string
           id?: string
           shift_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -139,6 +157,13 @@ export type Database = {
             columns: ["employee_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shift_assignments_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
             referencedColumns: ["id"]
           },
           {
@@ -193,6 +218,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_shift_conflict: {
+        Args: {
+          _actual_end: string
+          _actual_start: string
+          _assigned_date: string
+          _employee_id: string
+          _exclude_assignment_id?: string
+        }
+        Returns: boolean
+      }
       get_user_employer_id: { Args: { _user_id: string }; Returns: string }
     }
     Enums: {
