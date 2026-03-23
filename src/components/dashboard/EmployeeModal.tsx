@@ -43,6 +43,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
     setCustomRole(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
+    setAvailability((employee as any)?.availability ?? [...DAYS_OF_WEEK]);
     setErrors({});
   };
 
