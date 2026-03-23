@@ -53,17 +53,27 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Tabs defaultValue="schedule" className="w-full">
-            <TabsList className="mb-6">
-              <TabsTrigger value="schedule" className="gap-2">
-                <Calendar className="h-4 w-4" /> Schedule
-              </TabsTrigger>
-              <TabsTrigger value="employees" className="gap-2">
-                <Users className="h-4 w-4" /> Employees
-              </TabsTrigger>
-              <TabsTrigger value="shifts" className="gap-2">
-                <LayoutGrid className="h-4 w-4" /> Shifts
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+              <TabsList>
+                <TabsTrigger value="schedule" className="gap-2">
+                  <Calendar className="h-4 w-4" /> Schedule
+                </TabsTrigger>
+                <TabsTrigger value="employees" className="gap-2">
+                  <Users className="h-4 w-4" /> Employees
+                </TabsTrigger>
+                <TabsTrigger value="shifts" className="gap-2">
+                  <LayoutGrid className="h-4 w-4" /> Shifts
+                </TabsTrigger>
+              </TabsList>
+              {employerId && (
+                <PublishPanel
+                  employerId={employerId}
+                  currentWeek={startOfWeek(new Date(), { weekStartsOn: 1 })}
+                  employees={employees}
+                  shifts={shifts}
+                />
+              )}
+            </div>
 
             {/* Schedule Tab - Weekly Calendar */}
             <TabsContent value="schedule">
