@@ -53,7 +53,7 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Tabs defaultValue="schedule" className="w-full">
-            <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <div className="flex items-center justify-between gap-4 mb-6 flex-wrap print:hidden">
               <TabsList>
                 <TabsTrigger value="schedule" className="gap-2">
                   <Calendar className="h-4 w-4" /> Schedule
@@ -164,7 +164,7 @@ export default function Dashboard() {
 
 function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () => void }) {
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-40">
+    <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Clock className="h-7 w-7 text-primary" />
