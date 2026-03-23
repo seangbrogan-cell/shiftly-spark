@@ -356,7 +356,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
                       id={cellId}
                       isToday={isToday(day)}
                       unavailable={isUnavailable}
-                      timeRestriction={hasTimeRestriction ? `${empTimeAvail.start_time}–${empTimeAvail.end_time}` : undefined}
+                      timeRestriction={hasTimeRestriction && cellAssignments.length === 0 ? `${empTimeAvail.start_time}–${empTimeAvail.end_time}` : undefined}
                       onClick={() => handleCellClick(emp.id, dateStr)}
                     >
                       {cellAssignments.map((a) => (
