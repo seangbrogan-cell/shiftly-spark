@@ -462,7 +462,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
 
       {/* Right sidebar - Shift Templates + Publish Panel */}
       <div className={cn(
-        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200',
+        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200 print-hide',
         rightSidebarCollapsed ? 'w-10' : 'w-64'
       )}>
         {rightSidebarCollapsed ? (
