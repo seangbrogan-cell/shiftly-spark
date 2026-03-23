@@ -40,7 +40,6 @@ export default function Dashboard() {
   if (profile && !employerId) {
     return <Navigate to="/onboarding" replace />;
   }
-  }
 
   return (
     <div className="min-h-screen bg-background">
