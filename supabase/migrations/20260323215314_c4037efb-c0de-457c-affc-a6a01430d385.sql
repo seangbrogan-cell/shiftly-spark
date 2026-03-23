@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX employees_employer_email_unique ON public.employees (employer_id, lower(email));
