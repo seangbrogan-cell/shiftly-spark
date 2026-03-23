@@ -5,7 +5,8 @@ import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSen
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight, Printer } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
-import { roleSortPriority } from '@/lib/roles';
+import { buildRoleSortPriority } from '@/lib/roles';
+import { useRoleTypes } from '@/hooks/use-role-types';
 import {
   useWeeklyAssignments,
   useCreateAssignment,
