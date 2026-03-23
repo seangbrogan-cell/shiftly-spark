@@ -15,6 +15,7 @@ import {
   getWeekDays,
   type AssignmentWithDetails,
 } from '@/hooks/use-calendar-data';
+import { useAllEmployeeAvailability, type EmployeeAvailabilityRow } from '@/hooks/use-employee-availability';
 import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
 import { ShiftTemplateSidebar } from './ShiftTemplateSidebar';
@@ -53,11 +54,25 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const { data: allAvailability = [] } = useAllEmployeeAvailability();
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  // Build availability map: employeeId -> day -> { start_time, end_time }
+  const availabilityTimeMap = useMemo(() => {
+    const map: Record<string, Record<string, { start_time: string; end_time: string }>> = {};
+    allAvailability.forEach((row) => {
+      if (!map[row.employee_id]) map[row.employee_id] = {};
+      map[row.employee_id][row.day_of_week] = {
+        start_time: row.start_time.slice(0, 5),
+        end_time: row.end_time.slice(0, 5),
+      };
+    });
+    return map;
+  }, [allAvailability]);
 
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
@@ -298,12 +313,16 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
                   const dayAbbr = format(day, 'EEE');
                   const isUnavailable = emp.availability && !emp.availability.includes(dayAbbr);
 
+                  const empTimeAvail = availabilityTimeMap[emp.id]?.[dayAbbr];
+                  const hasTimeRestriction = empTimeAvail && (empTimeAvail.start_time !== '00:00' || empTimeAvail.end_time !== '23:59');
+
                   return (
                     <CalendarCell
                       key={cellId}
                       id={cellId}
                       isToday={isToday(day)}
                       unavailable={isUnavailable}
+                      timeRestriction={hasTimeRestriction ? `${empTimeAvail.start_time}–${empTimeAvail.end_time}` : undefined}
                       onClick={() => handleCellClick(emp.id, dateStr)}
                     >
                       {cellAssignments.map((a) => (

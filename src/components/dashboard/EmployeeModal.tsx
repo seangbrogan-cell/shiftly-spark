@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee, useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
+import {
+  useEmployeeAvailability,
+  useSaveEmployeeAvailability,
+  buildDayTimeRanges,
+  type DayTimeRange,
+} from '@/hooks/use-employee-availability';
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
@@ -31,19 +37,34 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [availability, setAvailability] = useState<string[]>(
     (employee as any)?.availability ?? [...DAYS_OF_WEEK]
   );
+  const [dayTimeRanges, setDayTimeRanges] = useState<DayTimeRange[]>(
+    DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
+  const saveAvailability = useSaveEmployeeAvailability();
 
-  // Reset form when employee changes
+  const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
+
+  // Sync time ranges when availability data loads
+  useEffect(() => {
+    if (employee && availabilityRows) {
+      const empAvail = (employee as any)?.availability ?? [...DAYS_OF_WEEK];
+      setDayTimeRanges(buildDayTimeRanges(empAvail, availabilityRows));
+    }
+  }, [employee, availabilityRows]);
+
   const resetForm = () => {
     setName(employee?.name ?? '');
     setEmail(employee?.email ?? '');
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
     setCustomRole(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
-    setAvailability((employee as any)?.availability ?? [...DAYS_OF_WEEK]);
+    const empAvail = (employee as any)?.availability ?? [...DAYS_OF_WEEK];
+    setAvailability(empAvail);
+    setDayTimeRanges(buildDayTimeRanges(empAvail, availabilityRows));
     setErrors({});
   };
 
@@ -55,6 +76,10 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     if (!role.trim()) errs.role = 'Role is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
+  };
+
+  const updateDayTime = (day: string, field: 'start_time' | 'end_time', value: string) => {
+    setDayTimeRanges(prev => prev.map(d => d.day === day ? { ...d, [field]: value } : d));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,9 +96,14 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           role,
           availability,
         });
+        await saveAvailability.mutateAsync({
+          employeeId: employee.id,
+          availability,
+          dayAvailability: dayTimeRanges,
+        });
         toast({ title: 'Employee updated' });
       } else {
-        await createEmployee.mutateAsync({
+        const created = await createEmployee.mutateAsync({
           employer_id: employerId,
           name: name.trim(),
           email: email.trim(),
@@ -81,6 +111,13 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           role,
           availability,
         });
+        if (created?.id) {
+          await saveAvailability.mutateAsync({
+            employeeId: created.id,
+            availability,
+            dayAvailability: dayTimeRanges,
+          });
+        }
         toast({ title: 'Employee added' });
       }
       onOpenChange(false);
@@ -92,7 +129,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
           <DialogDescription>
@@ -136,24 +173,69 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             )}
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
-          <div className="space-y-2">
+
+          {/* Availability Section */}
+          <div className="space-y-3">
             <Label>Availability</Label>
-            <div className="flex flex-wrap gap-3">
-              {DAYS_OF_WEEK.map((day) => (
-                <label key={day} className="flex items-center gap-1.5 cursor-pointer">
-                  <Checkbox
-                    checked={availability.includes(day)}
-                    onCheckedChange={(checked) => {
-                      setAvailability(prev =>
-                        checked ? [...prev, day] : prev.filter(d => d !== day)
-                      );
-                    }}
-                  />
-                  <span className="text-sm">{day}</span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              {DAYS_OF_WEEK.map((day) => {
+                const isEnabled = availability.includes(day);
+                const dayRange = dayTimeRanges.find(d => d.day === day);
+                const hasCustomTime = dayRange && (dayRange.start_time !== '00:00' || dayRange.end_time !== '23:59');
+
+                return (
+                  <div key={day} className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 cursor-pointer w-16 shrink-0">
+                      <Checkbox
+                        checked={isEnabled}
+                        onCheckedChange={(checked) => {
+                          setAvailability(prev =>
+                            checked ? [...prev, day] : prev.filter(d => d !== day)
+                          );
+                        }}
+                      />
+                      <span className="text-sm font-medium">{day}</span>
+                    </label>
+                    {isEnabled && (
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <Input
+                          type="time"
+                          value={dayRange?.start_time ?? '00:00'}
+                          onChange={(e) => updateDayTime(day, 'start_time', e.target.value)}
+                          className="h-8 text-xs w-[110px]"
+                        />
+                        <span className="text-xs text-muted-foreground">to</span>
+                        <Input
+                          type="time"
+                          value={dayRange?.end_time ?? '23:59'}
+                          onChange={(e) => updateDayTime(day, 'end_time', e.target.value)}
+                          className="h-8 text-xs w-[110px]"
+                        />
+                        {hasCustomTime && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs text-muted-foreground"
+                            onClick={() => {
+                              updateDayTime(day, 'start_time', '00:00');
+                              updateDayTime(day, 'end_time', '23:59');
+                            }}
+                          >
+                            All day
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                    {!isEnabled && (
+                      <span className="text-xs text-muted-foreground">Not available</span>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
+
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
               Cancel

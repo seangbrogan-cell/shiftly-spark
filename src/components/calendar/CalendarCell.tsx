@@ -6,10 +6,11 @@ interface CalendarCellProps {
   children: React.ReactNode;
   isToday?: boolean;
   unavailable?: boolean;
+  timeRestriction?: string;
   onClick?: () => void;
 }
 
-export function CalendarCell({ id, children, isToday, unavailable, onClick }: CalendarCellProps) {
+export function CalendarCell({ id, children, isToday, unavailable, timeRestriction, onClick }: CalendarCellProps) {
   const { setNodeRef, isOver } = useDroppable({ id, disabled: unavailable });
 
   return (
@@ -30,7 +31,12 @@ export function CalendarCell({ id, children, isToday, unavailable, onClick }: Ca
           <span className="text-[10px] text-muted-foreground/50 select-none">N/A</span>
         </div>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
+          {timeRestriction && (
+            <div className="text-[9px] text-muted-foreground/70 text-center leading-tight font-medium">
+              {timeRestriction}
+            </div>
+          )}
           {children}
         </div>
       )}
