@@ -21,6 +21,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [email, setEmail] = useState(employee?.email ?? '');
   const [phone, setPhone] = useState(employee?.phone ?? '');
   const [role, setRole] = useState(employee?.role ?? 'Staff');
+  const [customRole, setCustomRole] = useState(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
