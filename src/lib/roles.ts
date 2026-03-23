@@ -1,12 +1,12 @@
 // Preset role options – management-level roles listed first
-export const PRESET_ROLES = [
+export const PRESET_ROLES: string[] = [
   'Manager',
   'Shift Manager',
   'Supervisor',
   'Team Leader',
   'Shift Leader',
   'Staff',
-] as const;
+];
 
 // Roles considered "management" for sorting purposes (appear at the top of schedules)
 export const MANAGEMENT_ROLES = new Set([
