@@ -13,6 +13,7 @@ import {
 } from '@/hooks/use-calendar-data';
 import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
+import { ShiftTemplateSidebar } from './ShiftTemplateSidebar';
 import { EditAssignmentModal } from './EditAssignmentModal';
 import { useToast } from '@/hooks/use-toast';
 import { StatusBadge } from '@/components/publish/StatusBadge';
