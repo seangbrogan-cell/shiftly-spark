@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee, useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
-import { PRESET_ROLES } from '@/lib/roles';
+import { getRoleNames } from '@/lib/roles';
+import { useRoleTypes } from '@/hooks/use-role-types';
 
 interface EmployeeModalProps {
   open: boolean;
