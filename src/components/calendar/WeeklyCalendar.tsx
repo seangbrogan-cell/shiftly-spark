@@ -98,6 +98,26 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
     [activeId, assignments]
   );
 
+  // Helper: check if a shift's times fit within an employee's availability window for a given day
+  const fitsAvailability = (employeeId: string, dateStr: string, shiftStartTime: string | null, shiftEndTime: string | null, isAllDay: boolean): boolean => {
+    if (isAllDay) return true; // all-day shifts always allowed on available days
+    if (!shiftStartTime || !shiftEndTime) return true;
+
+    const dayAbbr = format(new Date(dateStr + 'T12:00:00'), 'EEE');
+    const empAvail = availabilityTimeMap[employeeId]?.[dayAbbr];
+    if (!empAvail) return true; // no specific time restriction = full day
+
+    // Check if it's actually restricted (not full day)
+    if (empAvail.start_time === '00:00' && empAvail.end_time === '23:59') return true;
+
+    // Extract HH:MM from the shift times
+    const shiftStartHHMM = new Date(shiftStartTime).toISOString().slice(11, 16);
+    const shiftEndHHMM = new Date(shiftEndTime).toISOString().slice(11, 16);
+
+    // Shift must start at or after availability start, and end at or before availability end
+    return shiftStartHHMM >= empAvail.start_time && shiftEndHHMM <= empAvail.end_time;
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
     setActiveId(null);
     const { active, over } = event;
@@ -113,6 +133,13 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
       if (!newEmployeeId || !newDate) return;
 
       const isAllDayShift = (shiftTemplate as any).is_all_day === true;
+
+      // Validate time availability
+      if (!fitsAvailability(newEmployeeId, newDate, shiftTemplate.start_time, shiftTemplate.end_time, isAllDayShift)) {
+        toast({ title: 'Cannot assign shift', description: 'This shift falls outside the employee\'s available hours for this day.', variant: 'destructive' });
+        return;
+      }
+
       let actualStart: string | null = null;
       let actualEnd: string | null = null;
 
@@ -162,6 +189,13 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
 
     // Skip if dropped in same cell
     if (newEmployeeId === assignment.employee_id && newDate === assignment.assigned_date) return;
+
+    // Validate time availability for reassigned shift
+    const shiftData = assignment.shifts;
+    if (shiftData && !fitsAvailability(newEmployeeId, newDate, shiftData.start_time, shiftData.end_time, shiftData.is_all_day)) {
+      toast({ title: 'Cannot reassign shift', description: 'This shift falls outside the employee\'s available hours for this day.', variant: 'destructive' });
+      return;
+    }
 
     try {
       await updateAssignment.mutateAsync({
