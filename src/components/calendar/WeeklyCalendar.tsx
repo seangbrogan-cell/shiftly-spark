@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
+import { cn } from '@/lib/utils';
 import { format, addWeeks, subWeeks, isToday, startOfWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useWeeklyAssignments,
@@ -45,6 +46,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const [defaultDate, setDefaultDate] = useState<string>('');
   const [defaultEmployeeId, setDefaultEmployeeId] = useState<string>('');
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
   const createAssignment = useCreateAssignment();
@@ -378,14 +380,42 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       </div>
 
       {/* Right sidebar - Shift Templates + Publish Panel */}
-      <div className="hidden lg:flex lg:flex-col gap-4 w-64 flex-shrink-0">
-        <ShiftTemplateSidebar shifts={shifts} />
-        <PublishPanel
-          employerId={employerId}
-          currentWeek={currentWeek}
-          employees={employees}
-          shifts={shifts}
-        />
+      <div className={cn(
+        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200',
+        rightSidebarCollapsed ? 'w-10' : 'w-64'
+      )}>
+        {rightSidebarCollapsed ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 mx-auto"
+            onClick={() => setRightSidebarCollapsed(false)}
+            aria-label="Expand sidebar"
+          >
+            <PanelRight className="h-4 w-4" />
+          </Button>
+        ) : (
+          <>
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => setRightSidebarCollapsed(true)}
+                aria-label="Collapse sidebar"
+              >
+                <PanelRightClose className="h-4 w-4" />
+              </Button>
+            </div>
+            <ShiftTemplateSidebar shifts={shifts} />
+            <PublishPanel
+              employerId={employerId}
+              currentWeek={currentWeek}
+              employees={employees}
+              shifts={shifts}
+            />
+          </>
+        )}
       </div>
     </div>
     </DndContext>
