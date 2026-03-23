@@ -202,6 +202,7 @@ function EmployeeHeader({ email, displayName, onSignOut }: { email?: string; dis
           <span className="hidden sm:block text-sm text-muted-foreground">
             {displayName || email}
           </span>
+          <NotificationBell employeeId={undefined} />
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>

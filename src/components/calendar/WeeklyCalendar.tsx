@@ -288,6 +288,17 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
+
+      {/* Right sidebar - Publish Panel */}
+      <div className="hidden lg:block w-64 flex-shrink-0">
+        <PublishPanel
+          employerId={employerId}
+          currentWeek={currentWeek}
+          employees={employees}
+          shifts={shifts}
+        />
+      </div>
     </div>
   );
 }
