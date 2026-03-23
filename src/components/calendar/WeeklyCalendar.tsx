@@ -250,21 +250,21 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
           <div className="rounded-lg border border-border bg-card overflow-x-auto">
             {/* Day Headers */}
             <div className="grid grid-cols-[140px_repeat(7,1fr)_60px] border-b border-border sticky top-0 bg-card z-10">
-              <div className="p-3 border-r border-border">
+              <div className="px-2 py-1.5 border-r border-border flex items-center">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
               </div>
               {weekDays.map((day) => (
                 <div
                   key={day.toISOString()}
-                  className={`p-3 text-center border-r border-border ${isToday(day) ? 'bg-primary-light/30' : ''}`}
+                  className={`px-1 py-1.5 text-center border-r border-border ${isToday(day) ? 'bg-primary-light/30' : ''}`}
                 >
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
-                  <p className={`text-lg font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+                  <p className={`text-sm font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
                     {format(day, 'd')}
                   </p>
                 </div>
               ))}
-              <div className="p-3 text-center">
+              <div className="px-1 py-1.5 text-center flex items-center justify-center">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hours</span>
               </div>
             </div>
