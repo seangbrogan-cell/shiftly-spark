@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import type { Employee } from '@/hooks/use-dashboard-data';
+import { useRoleTypes } from '@/hooks/use-role-types';
+import { buildRoleSortPriority } from '@/lib/roles';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +10,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 interface EmployeeTableProps {
   employees: Employee[];
   shiftCounts: Record<string, number>;
+  employerId?: string;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
 }
@@ -42,7 +45,10 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
   );
 }
 
-export function EmployeeTable({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
+export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete }: EmployeeTableProps) {
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
+
   const { management, staff } = useMemo(() => {
     const mgmt: Employee[] = [];
     const stf: Employee[] = [];
@@ -50,8 +56,14 @@ export function EmployeeTable({ employees, shiftCounts, onEdit, onDelete }: Empl
       if (e.role === 'Staff') stf.push(e);
       else mgmt.push(e);
     });
+    // Sort management by role priority then name
+    mgmt.sort((a, b) => {
+      const p = roleSortPriority(a.role) - roleSortPriority(b.role);
+      return p !== 0 ? p : a.name.localeCompare(b.name);
+    });
+    stf.sort((a, b) => a.name.localeCompare(b.name));
     return { management: mgmt, staff: stf };
-  }, [employees]);
+  }, [employees, roleSortPriority]);
 
   if (employees.length === 0) {
     return (
