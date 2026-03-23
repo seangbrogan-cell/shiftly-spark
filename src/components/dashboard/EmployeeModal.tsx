@@ -101,15 +101,24 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           </div>
           <div className="space-y-1.5">
             <Label>Role</Label>
-            <Select value={role} onValueChange={setRole}>
+            <Select value={PRESET_ROLES.includes(role) ? role : '__custom__'} onValueChange={(v) => { if (v !== '__custom__') { setRole(v); setCustomRole(''); } else { setRole(''); } }}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Manager">Manager</SelectItem>
-                <SelectItem value="Staff">Staff</SelectItem>
+                {PRESET_ROLES.map((r) => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
+                <SelectItem value="__custom__">Custom…</SelectItem>
               </SelectContent>
             </Select>
+            {(!PRESET_ROLES.includes(role) || customRole) && (
+              <Input
+                placeholder="Enter custom role name"
+                value={customRole || (PRESET_ROLES.includes(role) ? '' : role)}
+                onChange={(e) => { setCustomRole(e.target.value); setRole(e.target.value); }}
+              />
+            )}
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
