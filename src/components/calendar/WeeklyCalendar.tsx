@@ -313,12 +313,16 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
                   const dayAbbr = format(day, 'EEE');
                   const isUnavailable = emp.availability && !emp.availability.includes(dayAbbr);
 
+                  const empTimeAvail = availabilityTimeMap[emp.id]?.[dayAbbr];
+                  const hasTimeRestriction = empTimeAvail && (empTimeAvail.start_time !== '00:00' || empTimeAvail.end_time !== '23:59');
+
                   return (
                     <CalendarCell
                       key={cellId}
                       id={cellId}
                       isToday={isToday(day)}
                       unavailable={isUnavailable}
+                      timeRestriction={hasTimeRestriction ? `${empTimeAvail.start_time}–${empTimeAvail.end_time}` : undefined}
                       onClick={() => handleCellClick(emp.id, dateStr)}
                     >
                       {cellAssignments.map((a) => (
