@@ -56,6 +56,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
     setStartTime('06:00');
     setEndTime('14:00');
     setNotes('');
+    setColor(null);
     setErrors({});
   };
 
