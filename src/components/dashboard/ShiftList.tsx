@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Clock, Pencil, Trash2 } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Clock, Pencil, Trash2, Sun, Sunrise, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
@@ -23,10 +23,63 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+function getStartHour(shift: Shift): number {
+  const d = new Date(shift.start_time);
+  return d.getHours() + d.getMinutes() / 60;
+}
+
+type Period = 'morning' | 'afternoon' | 'evening';
+
+const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconClass: string; borderClass: string; bgClass: string }> = {
+  morning: { label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-200 dark:border-amber-800', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  afternoon: { label: 'Afternoon', icon: Sun, iconClass: 'text-orange-500', borderClass: 'border-orange-200 dark:border-orange-800', bgClass: 'bg-orange-50 dark:bg-orange-950/30' },
+  evening: { label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50 dark:bg-indigo-950/30' },
+};
+
+function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
+  return (
+    <div className="group rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+          <Clock className="h-4 w-4 text-primary" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-foreground truncate">{shift.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
+          </p>
+          {shift.notes && (
+            <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>
+          )}
+        </div>
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={onDelete}>
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const [deletingShift, setDeletingShift] = useState<Shift | null>(null);
   const deleteShift = useDeleteShift();
   const { toast } = useToast();
+
+  const grouped = useMemo(() => {
+    const groups: Record<Period, Shift[]> = { morning: [], afternoon: [], evening: [] };
+    shifts.forEach((s) => {
+      const h = getStartHour(s);
+      if (h >= 6 && h < 12) groups.morning.push(s);
+      else if (h >= 12 && h < 18) groups.afternoon.push(s);
+      else groups.evening.push(s);
+    });
+    return groups;
+  }, [shifts]);
 
   const handleDelete = async () => {
     if (!deletingShift) return;
@@ -49,33 +102,36 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
 
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {shifts.map((shift) => (
-          <div key={shift.id} className="group rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
-            <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <Clock className="h-4 w-4 text-primary" />
+      <div className="grid gap-4 lg:grid-cols-3">
+        {(['morning', 'afternoon', 'evening'] as Period[]).map((period) => {
+          const config = PERIOD_CONFIG[period];
+          const Icon = config.icon;
+          const periodShifts = grouped[period];
+
+          return (
+            <div key={period} className={`rounded-lg border ${config.borderClass} ${config.bgClass} p-4`}>
+              <div className="flex items-center gap-2 mb-3">
+                <Icon className={`h-5 w-5 ${config.iconClass}`} />
+                <h3 className="text-sm font-semibold text-foreground">{config.label}</h3>
+                <span className="text-xs text-muted-foreground ml-auto">{periodShifts.length} shift{periodShifts.length !== 1 ? 's' : ''}</span>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-foreground truncate">{shift.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
-                </p>
-                {shift.notes && (
-                  <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>
-                )}
-              </div>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(shift)}>
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingShift(shift)}>
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
+              {periodShifts.length === 0 ? (
+                <p className="text-xs text-muted-foreground text-center py-4 italic">No shifts</p>
+              ) : (
+                <div className="space-y-2">
+                  {periodShifts.map((shift) => (
+                    <ShiftCard
+                      key={shift.id}
+                      shift={shift}
+                      onEdit={() => onEdit(shift)}
+                      onDelete={() => setDeletingShift(shift)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <AlertDialog open={!!deletingShift} onOpenChange={(o) => { if (!o) setDeletingShift(null); }}>
