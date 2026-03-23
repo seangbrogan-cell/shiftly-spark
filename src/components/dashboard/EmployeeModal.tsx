@@ -33,6 +33,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setEmail(employee?.email ?? '');
     setPhone(employee?.phone ?? '');
     setRole(employee?.role ?? 'Staff');
+    setCustomRole(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
     setErrors({});
   };
 
