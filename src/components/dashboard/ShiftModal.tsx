@@ -28,6 +28,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
   const [startTime, setStartTime] = useState('06:00');
   const [endTime, setEndTime] = useState('14:00');
   const [notes, setNotes] = useState('');
+  const [color, setColor] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createShift = useCreateShift();
