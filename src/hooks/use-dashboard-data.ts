@@ -86,8 +86,8 @@ export function useCreateEmployee() {
 export function useUpdateEmployee() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...updates }: EmployeeUpdate & { id: string }) => {
-      const { data, error } = await supabase.from('employees').update(updates).eq('id', id).select().single();
+    mutationFn: async ({ id, ...updates }: EmployeeUpdate & { id: string; availability?: string[] }) => {
+      const { data, error } = await supabase.from('employees').update(updates as any).eq('id', id).select().single();
       if (error) throw error;
       return data;
     },
