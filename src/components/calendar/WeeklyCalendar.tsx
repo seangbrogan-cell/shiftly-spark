@@ -293,7 +293,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               return null;
             })()}
           </DragOverlay>
-        </DndContext>
+        </>
       )}
 
       {/* Edit/Create Assignment Modal */}
@@ -343,5 +343,6 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
         />
       </div>
     </div>
+    </DndContext>
   );
 }
