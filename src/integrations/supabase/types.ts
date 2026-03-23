@@ -321,29 +321,32 @@ export type Database = {
         Row: {
           created_at: string
           employer_id: string
-          end_time: string
+          end_time: string | null
           id: string
+          is_all_day: boolean
           name: string
           notes: string | null
-          start_time: string
+          start_time: string | null
         }
         Insert: {
           created_at?: string
           employer_id: string
-          end_time: string
+          end_time?: string | null
           id?: string
+          is_all_day?: boolean
           name: string
           notes?: string | null
-          start_time: string
+          start_time?: string | null
         }
         Update: {
           created_at?: string
           employer_id?: string
-          end_time?: string
+          end_time?: string | null
           id?: string
+          is_all_day?: boolean
           name?: string
           notes?: string | null
-          start_time?: string
+          start_time?: string | null
         }
         Relationships: [
           {

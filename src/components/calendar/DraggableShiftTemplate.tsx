@@ -39,6 +39,8 @@ export function DraggableShiftTemplate({ shift }: DraggableShiftTemplateProps) {
     zIndex: isDragging ? 50 : 1,
   };
 
+  const allDay = (shift as any).is_all_day === true;
+
   const formatTime = (ts: string) => {
     try {
       return format(new Date(ts), 'h:mm a');
@@ -62,7 +64,7 @@ export function DraggableShiftTemplate({ shift }: DraggableShiftTemplateProps) {
           <p className={`text-xs font-semibold truncate ${color.text}`}>{shift.name}</p>
         </div>
         <p className="text-[10px] text-muted-foreground mt-0.5">
-          {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
+          {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
         </p>
       </div>
     </div>

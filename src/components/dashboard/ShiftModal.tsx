@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateShift, useUpdateShift, type Shift } from '@/hooks/use-dashboard-data';
 
@@ -21,6 +22,7 @@ function isoToTimeInput(iso: string): string {
 
 export function ShiftModal({ open, onOpenChange, employerId, editingShift }: ShiftModalProps) {
   const [name, setName] = useState('');
+  const [isAllDay, setIsAllDay] = useState(false);
   const [startTime, setStartTime] = useState('06:00');
   const [endTime, setEndTime] = useState('14:00');
   const [notes, setNotes] = useState('');
@@ -34,14 +36,19 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
   useEffect(() => {
     if (editingShift) {
       setName(editingShift.name);
-      setStartTime(isoToTimeInput(editingShift.start_time));
-      setEndTime(isoToTimeInput(editingShift.end_time));
+      const allDay = (editingShift as any).is_all_day ?? false;
+      setIsAllDay(allDay);
+      if (!allDay && editingShift.start_time && editingShift.end_time) {
+        setStartTime(isoToTimeInput(editingShift.start_time));
+        setEndTime(isoToTimeInput(editingShift.end_time));
+      }
       setNotes(editingShift.notes ?? '');
     }
   }, [editingShift]);
 
   const resetForm = () => {
     setName('');
+    setIsAllDay(false);
     setStartTime('06:00');
     setEndTime('14:00');
     setNotes('');
@@ -51,8 +58,10 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!name.trim()) errs.name = 'Shift name is required';
-    if (!startTime) errs.startTime = 'Start time is required';
-    if (!endTime) errs.endTime = 'End time is required';
+    if (!isAllDay) {
+      if (!startTime) errs.startTime = 'Start time is required';
+      if (!endTime) errs.endTime = 'End time is required';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -63,26 +72,22 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
 
     const refDate = '2000-01-01';
     const nextDate = '2000-01-02';
-    const isOvernight = endTime <= startTime;
+    const isOvernight = !isAllDay && endTime <= startTime;
 
     try {
+      const shiftData: any = {
+        name: name.trim(),
+        is_all_day: isAllDay,
+        start_time: isAllDay ? null : new Date(`${refDate}T${startTime}:00`).toISOString(),
+        end_time: isAllDay ? null : new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
+        notes: notes.trim() || null,
+      };
+
       if (isEditing) {
-        await updateShift.mutateAsync({
-          id: editingShift.id,
-          name: name.trim(),
-          start_time: new Date(`${refDate}T${startTime}:00`).toISOString(),
-          end_time: new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
-          notes: notes.trim() || null,
-        });
+        await updateShift.mutateAsync({ id: editingShift.id, ...shiftData });
         toast({ title: 'Shift updated' });
       } else {
-        await createShift.mutateAsync({
-          employer_id: employerId,
-          name: name.trim(),
-          start_time: new Date(`${refDate}T${startTime}:00`).toISOString(),
-          end_time: new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
-          notes: notes.trim() || null,
-        });
+        await createShift.mutateAsync({ employer_id: employerId, ...shiftData });
         toast({ title: 'Shift created' });
       }
       onOpenChange(false);
@@ -106,21 +111,30 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
             <Label htmlFor="shift-name">Shift Name *</Label>
-            <Input id="shift-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Morning Shift" />
+            <Input id="shift-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={isAllDay ? "e.g. Holiday, Sick Leave" : "Morning Shift"} />
             {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="shift-start">Start Time *</Label>
-              <Input id="shift-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-              {errors.startTime && <p className="text-sm text-destructive">{errors.startTime}</p>}
+          <div className="flex items-center justify-between rounded-lg border border-border p-3">
+            <div>
+              <Label htmlFor="all-day-toggle" className="text-sm font-medium">All Day / No Time</Label>
+              <p className="text-xs text-muted-foreground">For holidays, leave, days off, etc.</p>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="shift-end">End Time *</Label>
-              <Input id="shift-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-              {errors.endTime && <p className="text-sm text-destructive">{errors.endTime}</p>}
-            </div>
+            <Switch id="all-day-toggle" checked={isAllDay} onCheckedChange={setIsAllDay} />
           </div>
+          {!isAllDay && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="shift-start">Start Time *</Label>
+                <Input id="shift-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                {errors.startTime && <p className="text-sm text-destructive">{errors.startTime}</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="shift-end">End Time *</Label>
+                <Input id="shift-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+                {errors.endTime && <p className="text-sm text-destructive">{errors.endTime}</p>}
+              </div>
+            </div>
+          )}
           <div className="space-y-1.5">
             <Label htmlFor="shift-notes">Notes</Label>
             <Textarea id="shift-notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes..." rows={3} />

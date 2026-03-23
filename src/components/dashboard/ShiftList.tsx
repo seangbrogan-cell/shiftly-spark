@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Clock, Pencil, Trash2, Sun, Sunrise, Moon } from 'lucide-react';
+import { Clock, Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
@@ -23,30 +23,37 @@ function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
+function isAllDay(shift: Shift): boolean {
+  return (shift as any).is_all_day === true;
+}
+
 function getStartHour(shift: Shift): number {
+  if (!shift.start_time) return -1;
   const d = new Date(shift.start_time);
   return d.getHours() + d.getMinutes() / 60;
 }
 
-type Period = 'morning' | 'afternoon' | 'evening';
+type Period = 'morning' | 'afternoon' | 'evening' | 'allday';
 
 const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconClass: string; borderClass: string; bgClass: string }> = {
+  allday: { label: 'All Day / Miscellaneous', icon: CalendarOff, iconClass: 'text-slate-500', borderClass: 'border-slate-200 dark:border-slate-700', bgClass: 'bg-slate-50 dark:bg-slate-950/30' },
   morning: { label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-200 dark:border-amber-800', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
   afternoon: { label: 'Afternoon', icon: Sun, iconClass: 'text-orange-500', borderClass: 'border-orange-200 dark:border-orange-800', bgClass: 'bg-orange-50 dark:bg-orange-950/30' },
   evening: { label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50 dark:bg-indigo-950/30' },
 };
 
 function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
+  const allDay = isAllDay(shift);
   return (
     <div className="group rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-          <Clock className="h-4 w-4 text-primary" />
+          {allDay ? <CalendarOff className="h-4 w-4 text-primary" /> : <Clock className="h-4 w-4 text-primary" />}
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-medium text-foreground truncate">{shift.name}</p>
           <p className="text-sm text-muted-foreground">
-            {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
+            {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
           </p>
           {shift.notes && (
             <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>
@@ -71,8 +78,9 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const { toast } = useToast();
 
   const grouped = useMemo(() => {
-    const groups: Record<Period, Shift[]> = { morning: [], afternoon: [], evening: [] };
+    const groups: Record<Period, Shift[]> = { allday: [], morning: [], afternoon: [], evening: [] };
     shifts.forEach((s) => {
+      if (isAllDay(s)) { groups.allday.push(s); return; }
       const h = getStartHour(s);
       if (h >= 6 && h < 12) groups.morning.push(s);
       else if (h >= 12 && h < 18) groups.afternoon.push(s);
@@ -103,7 +111,7 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   return (
     <>
       <div className="grid gap-4 lg:grid-cols-3">
-        {(['morning', 'afternoon', 'evening'] as Period[]).map((period) => {
+        {(['allday', 'morning', 'afternoon', 'evening'] as Period[]).map((period) => {
           const config = PERIOD_CONFIG[period];
           const Icon = config.icon;
           const periodShifts = grouped[period];
