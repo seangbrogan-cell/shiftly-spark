@@ -43,16 +43,17 @@ const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconC
 };
 
 function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
+  const allDay = isAllDay(shift);
   return (
     <div className="group rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-md">
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-          <Clock className="h-4 w-4 text-primary" />
+          {allDay ? <CalendarOff className="h-4 w-4 text-primary" /> : <Clock className="h-4 w-4 text-primary" />}
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-medium text-foreground truncate">{shift.name}</p>
           <p className="text-sm text-muted-foreground">
-            {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
+            {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
           </p>
           {shift.notes && (
             <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>
