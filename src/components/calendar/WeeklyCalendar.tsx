@@ -125,12 +125,19 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   };
 
   return (
-    <div>
+    <div className="flex gap-6">
+      <div className="flex-1 min-w-0">
       {/* Calendar Header / Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <div className="flex items-center gap-3 mb-1">
+            <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
+            <StatusBadge
+              status={publishStatus?.status ?? 'no_schedule'}
+              publishedAt={publishStatus?.publishedAt ?? null}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
             {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
           </p>
         </div>
