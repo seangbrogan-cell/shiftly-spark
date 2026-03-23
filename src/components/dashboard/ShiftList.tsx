@@ -111,7 +111,7 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   return (
     <>
       <div className="grid gap-4 lg:grid-cols-3">
-        {(['allday', 'morning', 'afternoon', 'evening'] as Period[]).map((period) => {
+        {(['morning', 'afternoon', 'evening', 'allday'] as Period[]).map((period) => {
           const config = PERIOD_CONFIG[period];
           const Icon = config.icon;
           const periodShifts = grouped[period];
