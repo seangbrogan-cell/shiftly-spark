@@ -152,6 +152,12 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   };
 
   return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={(e) => setActiveId(e.active.id as string)}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => setActiveId(null)}
+    >
     <div className="flex gap-6">
       <div className="flex-1 min-w-0">
       {/* Calendar Header / Navigation */}
