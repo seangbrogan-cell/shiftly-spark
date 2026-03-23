@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      employees: {
+        Row: {
+          created_at: string
+          email: string
+          employer_id: string
+          id: string
+          name: string
+          phone: string | null
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          employer_id: string
+          id?: string
+          name: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          employer_id?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employers: {
         Row: {
           created_at: string
@@ -66,6 +107,80 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shift_assignments: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          shift_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          shift_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          shift_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shift_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shift_assignments_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shifts: {
+        Row: {
+          created_at: string
+          employer_id: string
+          end_time: string
+          id: string
+          name: string
+          notes: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          end_time: string
+          id?: string
+          name: string
+          notes?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          end_time?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shifts_employer_id_fkey"
             columns: ["employer_id"]
             isOneToOne: false
             referencedRelation: "employers"
