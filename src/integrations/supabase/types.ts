@@ -79,6 +79,98 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_config: {
+        Row: {
+          channels: string[]
+          created_at: string
+          daily_reminder: boolean
+          employer_id: string
+          id: string
+          on_change: boolean
+          on_publish: boolean
+          updated_at: string
+          weekly_reminder: boolean
+        }
+        Insert: {
+          channels?: string[]
+          created_at?: string
+          daily_reminder?: boolean
+          employer_id: string
+          id?: string
+          on_change?: boolean
+          on_publish?: boolean
+          updated_at?: string
+          weekly_reminder?: boolean
+        }
+        Update: {
+          channels?: string[]
+          created_at?: string
+          daily_reminder?: boolean
+          employer_id?: string
+          id?: string
+          on_change?: boolean
+          on_publish?: boolean
+          updated_at?: string
+          weekly_reminder?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_config_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: true
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          employee_id: string
+          employer_id: string
+          id: string
+          message: string
+          read_at: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          employer_id: string
+          id?: string
+          message: string
+          read_at?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          employer_id?: string
+          id?: string
+          message?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -117,6 +209,50 @@ export type Database = {
           },
         ]
       }
+      publish_history: {
+        Row: {
+          action: string
+          created_at: string
+          employee_count: number
+          employer_id: string
+          end_date: string
+          id: string
+          notification_channels: string[]
+          published_at: string
+          start_date: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          employee_count?: number
+          employer_id: string
+          end_date: string
+          id?: string
+          notification_channels?: string[]
+          published_at?: string
+          start_date: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          employee_count?: number
+          employer_id?: string
+          end_date?: string
+          id?: string
+          notification_channels?: string[]
+          published_at?: string
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publish_history_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shift_assignments: {
         Row: {
           actual_end: string | null
@@ -127,6 +263,7 @@ export type Database = {
           employee_id: string
           employer_id: string
           id: string
+          published_at: string | null
           shift_id: string
           updated_at: string
         }
@@ -139,6 +276,7 @@ export type Database = {
           employee_id: string
           employer_id: string
           id?: string
+          published_at?: string | null
           shift_id: string
           updated_at?: string
         }
@@ -151,6 +289,7 @@ export type Database = {
           employee_id?: string
           employer_id?: string
           id?: string
+          published_at?: string | null
           shift_id?: string
           updated_at?: string
         }

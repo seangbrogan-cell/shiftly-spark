@@ -15,6 +15,9 @@ import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
 import { EditAssignmentModal } from './EditAssignmentModal';
 import { useToast } from '@/hooks/use-toast';
+import { StatusBadge } from '@/components/publish/StatusBadge';
+import { PublishPanel } from '@/components/publish/PublishPanel';
+import { useWeekPublishStatus } from '@/hooks/use-publish-data';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,6 +48,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
+  const { data: publishStatus } = useWeekPublishStatus(currentWeek);
 
   const weekDays = useMemo(() => getWeekDays(currentWeek), [currentWeek]);
 
@@ -121,12 +125,19 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   };
 
   return (
-    <div>
+    <div className="flex gap-6">
+      <div className="flex-1 min-w-0">
       {/* Calendar Header / Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
-          <p className="text-sm text-muted-foreground mt-1">
+          <div className="flex items-center gap-3 mb-1">
+            <h2 className="text-2xl font-bold text-foreground">Schedule</h2>
+            <StatusBadge
+              status={publishStatus?.status ?? 'no_schedule'}
+              publishedAt={publishStatus?.publishedAt ?? null}
+            />
+          </div>
+          <p className="text-sm text-muted-foreground">
             {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
           </p>
         </div>
@@ -277,6 +288,17 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
+
+      {/* Right sidebar - Publish Panel */}
+      <div className="hidden lg:block w-64 flex-shrink-0">
+        <PublishPanel
+          employerId={employerId}
+          currentWeek={currentWeek}
+          employees={employees}
+          shifts={shifts}
+        />
+      </div>
     </div>
   );
 }
