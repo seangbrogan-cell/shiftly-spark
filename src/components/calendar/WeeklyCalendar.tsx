@@ -38,6 +38,7 @@ interface WeeklyCalendarProps {
   employees: Employee[];
   shifts: Shift[];
   employerId: string;
+  companyName?: string;
 }
 
 export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendarProps) {
