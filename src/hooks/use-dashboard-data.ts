@@ -72,8 +72,8 @@ export function useProfile() {
 export function useCreateEmployee() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (employee: Omit<EmployeeInsert, 'employer_id'> & { employer_id: string }) => {
-      const { data, error } = await supabase.from('employees').insert(employee).select().single();
+    mutationFn: async (employee: Omit<EmployeeInsert, 'employer_id'> & { employer_id: string; availability?: string[] }) => {
+      const { data, error } = await supabase.from('employees').insert(employee as any).select().single();
       if (error) throw error;
       return data;
     },
