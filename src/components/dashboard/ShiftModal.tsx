@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateShift, useUpdateShift, type Shift } from '@/hooks/use-dashboard-data';
+import { SHIFT_COLOR_OPTIONS } from '@/lib/shift-colors';
+import { cn } from '@/lib/utils';
 
 interface ShiftModalProps {
   open: boolean;
