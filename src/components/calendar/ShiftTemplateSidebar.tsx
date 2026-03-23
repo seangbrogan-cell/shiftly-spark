@@ -19,6 +19,7 @@ const PERIODS: { key: Period; label: string; icon: typeof Sunrise; iconClass: st
 ];
 
 function getStartHour(shift: Shift): number {
+  if ((shift as any).is_all_day || !shift.start_time) return -1;
   const d = new Date(shift.start_time);
   return d.getHours() + d.getMinutes() / 60;
 }
