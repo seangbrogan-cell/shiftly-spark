@@ -78,8 +78,9 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const { toast } = useToast();
 
   const grouped = useMemo(() => {
-    const groups: Record<Period, Shift[]> = { morning: [], afternoon: [], evening: [] };
+    const groups: Record<Period, Shift[]> = { allday: [], morning: [], afternoon: [], evening: [] };
     shifts.forEach((s) => {
+      if (isAllDay(s)) { groups.allday.push(s); return; }
       const h = getStartHour(s);
       if (h >= 6 && h < 12) groups.morning.push(s);
       else if (h >= 12 && h < 18) groups.afternoon.push(s);
