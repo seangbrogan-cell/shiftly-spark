@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import {
   useWeeklyAssignments,
+  useCreateAssignment,
   useUpdateAssignment,
   useDeleteAssignment,
   getWeekDays,
