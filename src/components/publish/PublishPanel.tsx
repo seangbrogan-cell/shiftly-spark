@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useWeekPublishStatus, usePublishSchedule, useNotificationConfig } from '@/hooks/use-publish-data';
 import { StatusBadge } from './StatusBadge';
 import { PublishPreviewModal } from './PublishPreviewModal';
 import { NotificationConfigPanel } from './NotificationConfigPanel';
 import { Send, Eye, Users, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useWeeklyAssignments, type AssignmentWithDetails } from '@/hooks/use-calendar-data';
+import { useWeeklyAssignments } from '@/hooks/use-calendar-data';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 
 interface PublishPanelProps {
@@ -57,57 +56,52 @@ export function PublishPanel({ employerId, currentWeek, employees, shifts }: Pub
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Send className="h-4 w-4" /> Publish Schedule
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <StatusBadge status={status} publishedAt={publishStatus?.publishedAt ?? null} />
-
-          <div className="text-xs text-muted-foreground">
-            <p className="font-medium">
+      <div className="rounded-lg border border-border bg-card px-4 py-3">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Send className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">Publish</span>
+            </div>
+            <StatusBadge status={status} publishedAt={publishStatus?.publishedAt ?? null} />
+            <span className="text-xs text-muted-foreground">
               {format(weekStart, 'MMM d')} – {format(weekEnd, 'MMM d, yyyy')}
-            </p>
+            </span>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Users className="h-3.5 w-3.5" />
+              <span>{affectedEmployeeIds.length} employee{affectedEmployeeIds.length !== 1 ? 's' : ''}</span>
+            </div>
           </div>
-
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Users className="h-3.5 w-3.5" />
-            <span>Affects {affectedEmployeeIds.length} employee{affectedEmployeeIds.length !== 1 ? 's' : ''}</span>
-          </div>
-
-          <div className="space-y-2">
+          <div className="flex items-center gap-2">
             <Button
               size="sm"
-              variant="outline"
-              className="w-full justify-start gap-2"
-              onClick={() => setPreviewOpen(true)}
-              disabled={status === 'no_schedule'}
+              variant="ghost"
+              className="gap-1.5 text-xs"
+              onClick={() => setConfigOpen(true)}
             >
-              <Eye className="h-3.5 w-3.5" /> Preview Before Publishing
+              <Settings className="h-3.5 w-3.5" /> Settings
             </Button>
             <Button
               size="sm"
-              className="w-full gap-2"
+              variant="outline"
+              className="gap-1.5"
+              onClick={() => setPreviewOpen(true)}
+              disabled={status === 'no_schedule'}
+            >
+              <Eye className="h-3.5 w-3.5" /> Preview
+            </Button>
+            <Button
+              size="sm"
+              className="gap-1.5"
               onClick={handlePublish}
               disabled={status === 'no_schedule' || status === 'published' || publishSchedule.isPending}
             >
               <Send className="h-3.5 w-3.5" />
-              {publishSchedule.isPending ? 'Publishing...' : 'Publish Schedule'}
+              {publishSchedule.isPending ? 'Publishing...' : 'Publish'}
             </Button>
           </div>
-
-          <Button
-            size="sm"
-            variant="ghost"
-            className="w-full justify-start gap-2 text-xs"
-            onClick={() => setConfigOpen(true)}
-          >
-            <Settings className="h-3.5 w-3.5" /> Notification Settings
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <PublishPreviewModal
         open={previewOpen}
