@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee } from '@/hooks/use-dashboard-data';
+import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
