@@ -5,25 +5,35 @@ interface CalendarCellProps {
   id: string;
   children: React.ReactNode;
   isToday?: boolean;
+  unavailable?: boolean;
   onClick?: () => void;
 }
 
-export function CalendarCell({ id, children, isToday, onClick }: CalendarCellProps) {
-  const { setNodeRef, isOver } = useDroppable({ id });
+export function CalendarCell({ id, children, isToday, unavailable, onClick }: CalendarCellProps) {
+  const { setNodeRef, isOver } = useDroppable({ id, disabled: unavailable });
 
   return (
     <div
       ref={setNodeRef}
-      onClick={onClick}
+      onClick={unavailable ? undefined : onClick}
       className={cn(
-        'min-h-[40px] sm:min-h-[52px] border-r border-b border-border p-0.5 transition-colors cursor-pointer',
-        isOver && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
-        isToday && 'bg-primary-light/30'
+        'min-h-[40px] sm:min-h-[52px] border-r border-b border-border p-0.5 transition-colors',
+        unavailable
+          ? 'bg-muted/60 cursor-not-allowed'
+          : 'cursor-pointer',
+        !unavailable && isOver && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
+        !unavailable && isToday && 'bg-primary-light/30'
       )}
     >
-      <div className="space-y-1">
-        {children}
-      </div>
+      {unavailable ? (
+        <div className="flex items-center justify-center h-full">
+          <span className="text-[10px] text-muted-foreground/50 select-none">N/A</span>
+        </div>
+      ) : (
+        <div className="space-y-1">
+          {children}
+        </div>
+      )}
     </div>
   );
 }
