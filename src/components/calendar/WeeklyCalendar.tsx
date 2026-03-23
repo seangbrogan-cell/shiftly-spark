@@ -90,7 +90,11 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       if (!newEmployeeId || !newDate) return;
 
       const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
-      const endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
+      let endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
+      // Handle overnight shifts
+      if (endDate <= startDate) {
+        endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+      }
 
       try {
         await createAssignment.mutateAsync({

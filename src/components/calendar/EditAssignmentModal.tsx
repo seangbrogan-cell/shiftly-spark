@@ -100,9 +100,7 @@ export function EditAssignmentModal({
     if (!date) errs.date = 'Select a date';
     if (!startTime) errs.startTime = 'Start time is required';
     if (!endTime) errs.endTime = 'End time is required';
-    if (startTime && endTime && new Date(startTime) >= new Date(endTime)) {
-      errs.endTime = 'End time must be after start time';
-    }
+    // Allow overnight shifts (end time before start time means next day)
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
