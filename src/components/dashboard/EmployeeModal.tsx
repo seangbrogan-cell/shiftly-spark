@@ -18,11 +18,13 @@ interface EmployeeModalProps {
 
 export function EmployeeModal({ open, onOpenChange, employee, employerId }: EmployeeModalProps) {
   const isEdit = !!employee;
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const roleNames = getRoleNames(dbRoles);
   const [name, setName] = useState(employee?.name ?? '');
   const [email, setEmail] = useState(employee?.email ?? '');
   const [phone, setPhone] = useState(employee?.phone ?? '');
   const [role, setRole] = useState(employee?.role ?? 'Staff');
-  const [customRole, setCustomRole] = useState(!PRESET_ROLES.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
+  const [customRole, setCustomRole] = useState(!roleNames.includes(employee?.role ?? 'Staff') ? (employee?.role ?? '') : '');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
