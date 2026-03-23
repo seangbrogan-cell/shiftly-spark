@@ -214,14 +214,14 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
         <>
           <div className="rounded-lg border border-border bg-card overflow-x-auto">
             {/* Day Headers */}
-            <div className="grid grid-cols-[180px_repeat(7,1fr)] border-b border-border sticky top-0 bg-card z-10">
+            <div className="grid grid-cols-[180px_repeat(7,1fr)_80px] border-b border-border sticky top-0 bg-card z-10">
               <div className="p-3 border-r border-border">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
               </div>
               {weekDays.map((day) => (
                 <div
                   key={day.toISOString()}
-                  className={`p-3 text-center border-r border-border last:border-r-0 ${isToday(day) ? 'bg-primary-light/30' : ''}`}
+                  className={`p-3 text-center border-r border-border ${isToday(day) ? 'bg-primary-light/30' : ''}`}
                 >
                   <p className="text-xs font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
                   <p className={`text-lg font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
@@ -229,6 +229,9 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
                   </p>
                 </div>
               ))}
+              <div className="p-3 text-center">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hours</span>
+              </div>
             </div>
 
             {/* Employee Rows */}
