@@ -15,6 +15,9 @@ import { CalendarCell } from './CalendarCell';
 import { ShiftCard } from './ShiftCard';
 import { EditAssignmentModal } from './EditAssignmentModal';
 import { useToast } from '@/hooks/use-toast';
+import { StatusBadge } from '@/components/publish/StatusBadge';
+import { PublishPanel } from '@/components/publish/PublishPanel';
+import { useWeekPublishStatus } from '@/hooks/use-publish-data';
 import {
   AlertDialog,
   AlertDialogAction,
