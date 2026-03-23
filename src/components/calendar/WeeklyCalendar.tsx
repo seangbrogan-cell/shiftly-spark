@@ -47,6 +47,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
