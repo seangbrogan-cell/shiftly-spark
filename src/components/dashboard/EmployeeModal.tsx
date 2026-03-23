@@ -42,6 +42,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     if (!name.trim()) errs.name = 'Name is required';
     if (!email.trim()) errs.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = 'Invalid email format';
+    if (!role.trim()) errs.role = 'Role is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
