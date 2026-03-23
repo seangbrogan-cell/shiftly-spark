@@ -18,7 +18,7 @@ export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
     data: { assignment },
   });
 
-  const color = getColorForShift(assignment.shift_id);
+  const color = getShiftColor(assignment.shifts ?? {});
 
   const style = {
     transform: CSS.Translate.toString(transform),

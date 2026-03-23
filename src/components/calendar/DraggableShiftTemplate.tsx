@@ -3,23 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { format } from 'date-fns';
 import { GripVertical } from 'lucide-react';
 import type { Shift } from '@/hooks/use-dashboard-data';
-
-const SHIFT_COLORS = [
-  { bg: 'bg-blue-50 dark:bg-blue-950/40', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300', dot: 'bg-blue-500' },
-  { bg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200 dark:border-emerald-800', text: 'text-emerald-700 dark:text-emerald-300', dot: 'bg-emerald-500' },
-  { bg: 'bg-amber-50 dark:bg-amber-950/40', border: 'border-amber-200 dark:border-amber-800', text: 'text-amber-700 dark:text-amber-300', dot: 'bg-amber-500' },
-  { bg: 'bg-purple-50 dark:bg-purple-950/40', border: 'border-purple-200 dark:border-purple-800', text: 'text-purple-700 dark:text-purple-300', dot: 'bg-purple-500' },
-  { bg: 'bg-rose-50 dark:bg-rose-950/40', border: 'border-rose-200 dark:border-rose-800', text: 'text-rose-700 dark:text-rose-300', dot: 'bg-rose-500' },
-  { bg: 'bg-cyan-50 dark:bg-cyan-950/40', border: 'border-cyan-200 dark:border-cyan-800', text: 'text-cyan-700 dark:text-cyan-300', dot: 'bg-cyan-500' },
-];
-
-function getColorForShift(shiftId: string) {
-  let hash = 0;
-  for (let i = 0; i < shiftId.length; i++) {
-    hash = ((hash << 5) - hash + shiftId.charCodeAt(i)) | 0;
-  }
-  return SHIFT_COLORS[Math.abs(hash) % SHIFT_COLORS.length];
-}
+import { getShiftColor } from '@/lib/shift-colors';
 
 interface DraggableShiftTemplateProps {
   shift: Shift;
