@@ -363,7 +363,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
                         <ShiftCard
                           key={a.id}
                           assignment={a}
-                          onClick={() => handleAssignmentClick(a)}
                           onDelete={() => setDeletingAssignment(a)}
                         />
                       ))}
