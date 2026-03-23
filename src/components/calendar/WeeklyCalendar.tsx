@@ -91,11 +91,18 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
       const [newEmployeeId, newDate] = overId.split(':');
       if (!newEmployeeId || !newDate) return;
 
-      const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
-      let endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
-      // Handle overnight shifts
-      if (endDate <= startDate) {
-        endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+      const isAllDayShift = (shiftTemplate as any).is_all_day === true;
+      let actualStart: string | null = null;
+      let actualEnd: string | null = null;
+
+      if (!isAllDayShift && shiftTemplate.start_time && shiftTemplate.end_time) {
+        const startDate = new Date(`${newDate}T${new Date(shiftTemplate.start_time).toISOString().slice(11, 19)}`);
+        let endDate = new Date(`${newDate}T${new Date(shiftTemplate.end_time).toISOString().slice(11, 19)}`);
+        if (endDate <= startDate) {
+          endDate = new Date(endDate.getTime() + 24 * 60 * 60 * 1000);
+        }
+        actualStart = startDate.toISOString();
+        actualEnd = endDate.toISOString();
       }
 
       try {
@@ -104,8 +111,8 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
           employee_id: newEmployeeId,
           employer_id: employerId,
           assigned_date: newDate,
-          actual_start: startDate.toISOString(),
-          actual_end: endDate.toISOString(),
+          actual_start: actualStart,
+          actual_end: actualEnd,
         });
         toast({ title: 'Shift assigned' });
       } catch (err: any) {
