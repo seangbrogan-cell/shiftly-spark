@@ -51,11 +51,14 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
   const weekDays = useMemo(() => getWeekDays(currentWeek), [currentWeek]);
 
