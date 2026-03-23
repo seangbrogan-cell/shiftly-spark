@@ -29,7 +29,7 @@ export function useEmployeeAvailability(employeeId: string | undefined) {
         .select('*')
         .eq('employee_id', employeeId);
       if (error) throw error;
-      return data as EmployeeAvailabilityRow[];
+      return data as unknown as EmployeeAvailabilityRow[];
     },
     enabled: !!employeeId,
   });
@@ -43,7 +43,7 @@ export function useAllEmployeeAvailability() {
         .from('employee_availability' as any)
         .select('*');
       if (error) throw error;
-      return data as EmployeeAvailabilityRow[];
+      return data as unknown as EmployeeAvailabilityRow[];
     },
   });
 }
