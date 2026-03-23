@@ -170,7 +170,7 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () => void }) {
+function DashboardHeader({ email, onSignOut, companyName }: { email?: string; onSignOut: () => void; companyName?: string }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">
@@ -178,6 +178,9 @@ function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () =
           <Clock className="h-7 w-7 text-primary" />
           <span className="text-xl font-bold text-foreground">Shiftly</span>
         </div>
+        {companyName && (
+          <span className="text-sm font-semibold text-muted-foreground tracking-wide uppercase">{companyName}</span>
+        )}
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
           <Button variant="ghost" size="sm" onClick={onSignOut}>
