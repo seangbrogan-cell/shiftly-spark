@@ -86,6 +86,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         start_time: isAllDay ? null : new Date(`${refDate}T${startTime}:00`).toISOString(),
         end_time: isAllDay ? null : new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
         notes: notes.trim() || null,
+        color: color || null,
       };
 
       if (isEditing) {
