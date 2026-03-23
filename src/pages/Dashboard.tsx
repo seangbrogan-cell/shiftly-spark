@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
+  const [editingShift, setEditingShift] = useState<Shift | null>(null);
 
   const employerId = profile?.employer_id;
 
