@@ -122,6 +122,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
                 onChange={(e) => { setCustomRole(e.target.value); setRole(e.target.value); }}
               />
             )}
+            {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
