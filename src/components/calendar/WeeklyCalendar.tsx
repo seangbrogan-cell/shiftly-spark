@@ -241,7 +241,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
         <>
           <div className="rounded-lg border border-border bg-card overflow-x-auto">
             {/* Day Headers */}
-            <div className="grid grid-cols-[180px_repeat(7,1fr)_80px] border-b border-border sticky top-0 bg-card z-10">
+            <div className="grid grid-cols-[140px_repeat(7,1fr)_80px] border-b border-border sticky top-0 bg-card z-10">
               <div className="p-3 border-r border-border">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
               </div>
@@ -268,7 +268,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               if (aManager !== bManager) return aManager - bManager;
               return a.name.localeCompare(b.name);
             }).map((emp) => (
-              <div key={emp.id} className="grid grid-cols-[180px_repeat(7,1fr)_80px]">
+              <div key={emp.id} className="grid grid-cols-[140px_repeat(7,1fr)_80px]">
                 {/* Employee Name Cell */}
                 <div className="p-3 border-r border-b border-border flex items-start">
                   <div>
@@ -328,7 +328,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
             ))}
 
             {/* Daily Shift Category Summary Row */}
-            <div className="grid grid-cols-[180px_repeat(7,1fr)_80px] border-t border-border bg-muted/30">
+            <div className="grid grid-cols-[140px_repeat(7,1fr)_80px] border-t border-border bg-muted/30">
               <div className="p-2 border-r border-border">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Summary</span>
               </div>
