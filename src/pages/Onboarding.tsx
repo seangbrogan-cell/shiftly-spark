@@ -32,12 +32,11 @@ export default function Onboarding() {
     setLoading(true);
 
     try {
-      // 1. Create employer
-      const { data: employer, error: empError } = await supabase
+      // 1. Create employer (client-generated id avoids requiring SELECT permission immediately after INSERT)
+      const employerId = crypto.randomUUID();
+      const { error: empError } = await supabase
         .from('employers')
-        .insert({ name: companyName.trim() })
-        .select()
-        .single();
+        .insert({ id: employerId, name: companyName.trim() });
 
       if (empError) throw empError;
 
@@ -45,7 +44,7 @@ export default function Onboarding() {
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          employer_id: employer.id,
+          employer_id: employerId,
           display_name: displayName.trim(),
           role: 'employer',
         })
