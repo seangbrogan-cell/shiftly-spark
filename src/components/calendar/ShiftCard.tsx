@@ -8,11 +8,10 @@ import { getShiftColor } from '@/lib/shift-colors';
 
 interface ShiftCardProps {
   assignment: AssignmentWithDetails;
-  onClick: () => void;
   onDelete: () => void;
 }
 
-export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
+export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: assignment.id,
     data: { assignment },
@@ -37,19 +36,12 @@ export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group relative rounded border ${color.bg} ${color.border} px-1.5 py-1 @container cursor-pointer transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
-      onClick={onClick}
+      {...listeners}
+      {...attributes}
+      className={`group relative rounded border ${color.bg} ${color.border} px-1.5 py-1 @container cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
     >
       <div className="flex items-center gap-1">
-        <button
-          {...listeners}
-          {...attributes}
-          className="shrink-0 cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground hidden @[80px]:block"
-          onClick={(e) => e.stopPropagation()}
-          aria-label="Drag to reassign"
-        >
-          <GripVertical className="h-3 w-3" />
-        </button>
+        <GripVertical className="h-3 w-3 text-muted-foreground/40 shrink-0 hidden @[80px]:block" />
 
         <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
 
@@ -76,7 +68,8 @@ export function ShiftCard({ assignment, onClick, onDelete }: ShiftCardProps) {
           variant="ghost"
           size="icon"
           className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onDelete(); }}
+          onPointerDown={(e) => e.stopPropagation()}
           aria-label="Delete assignment"
         >
           <X className="h-2.5 w-2.5" />
