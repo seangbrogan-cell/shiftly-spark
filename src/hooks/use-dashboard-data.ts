@@ -7,6 +7,7 @@ export type EmployeeInsert = TablesInsert<'employees'>;
 export type EmployeeUpdate = TablesUpdate<'employees'>;
 export type Shift = Tables<'shifts'>;
 export type ShiftInsert = TablesInsert<'shifts'>;
+export type ShiftUpdate = TablesUpdate<'shifts'>;
 
 export function useEmployees() {
   return useQuery({
