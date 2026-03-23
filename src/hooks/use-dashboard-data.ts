@@ -26,8 +26,13 @@ export function useShifts() {
     queryFn: async () => {
       const { data, error } = await supabase.from('shifts').select('*');
       if (error) throw error;
-      // Sort by time-of-day (hours + minutes) regardless of reference date
+      // All-day shifts first, then sort by time-of-day
       return (data as Shift[]).sort((a, b) => {
+        const aAllDay = (a as any).is_all_day === true;
+        const bAllDay = (b as any).is_all_day === true;
+        if (aAllDay && !bAllDay) return -1;
+        if (!aAllDay && bAllDay) return 1;
+        if (aAllDay && bAllDay) return a.name.localeCompare(b.name);
         const timeA = new Date(a.start_time).getHours() * 60 + new Date(a.start_time).getMinutes();
         const timeB = new Date(b.start_time).getHours() * 60 + new Date(b.start_time).getMinutes();
         return timeA - timeB;
