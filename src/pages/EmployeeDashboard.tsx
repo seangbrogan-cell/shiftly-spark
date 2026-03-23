@@ -190,7 +190,7 @@ export default function EmployeeDashboard() {
   );
 }
 
-function EmployeeHeader({ email, displayName, onSignOut }: { email?: string; displayName?: string | null; onSignOut: () => void }) {
+function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -202,7 +202,7 @@ function EmployeeHeader({ email, displayName, onSignOut }: { email?: string; dis
           <span className="hidden sm:block text-sm text-muted-foreground">
             {displayName || email}
           </span>
-          <NotificationBell employeeId={undefined} />
+          <NotificationBell employeeId={employeeId} />
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>
