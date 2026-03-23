@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Clock, Pencil, Trash2, Sun, Sunrise, Moon } from 'lucide-react';
+import { Clock, Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
