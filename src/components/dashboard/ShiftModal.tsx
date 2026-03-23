@@ -46,6 +46,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         setEndTime(isoToTimeInput(editingShift.end_time));
       }
       setNotes(editingShift.notes ?? '');
+      setColor((editingShift as any).color ?? null);
     }
   }, [editingShift]);
 
