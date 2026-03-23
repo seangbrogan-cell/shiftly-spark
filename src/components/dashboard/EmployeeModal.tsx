@@ -69,7 +69,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           email: email.trim(),
           phone: phone.trim() || null,
           role,
-        });
+          availability,
+        } as any);
         toast({ title: 'Employee updated' });
       } else {
         await createEmployee.mutateAsync({
