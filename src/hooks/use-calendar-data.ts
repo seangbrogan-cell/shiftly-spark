@@ -7,7 +7,7 @@ export type ShiftAssignment = Tables<'shift_assignments'>;
 export type ShiftAssignmentInsert = TablesInsert<'shift_assignments'>;
 
 export interface AssignmentWithDetails extends ShiftAssignment {
-  shifts: { name: string; start_time: string; end_time: string; is_all_day: boolean } | null;
+  shifts: { name: string; start_time: string; end_time: string; is_all_day: boolean; color: string | null } | null;
   employees: { name: string } | null;
 }
 
