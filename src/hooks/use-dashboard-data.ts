@@ -24,9 +24,14 @@ export function useShifts() {
   return useQuery({
     queryKey: ['shifts'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('shifts').select('*').order('start_time', { ascending: true });
+      const { data, error } = await supabase.from('shifts').select('*');
       if (error) throw error;
-      return data as Shift[];
+      // Sort by time-of-day (hours + minutes) regardless of reference date
+      return (data as Shift[]).sort((a, b) => {
+        const timeA = new Date(a.start_time).getHours() * 60 + new Date(a.start_time).getMinutes();
+        const timeB = new Date(b.start_time).getHours() * 60 + new Date(b.start_time).getMinutes();
+        return timeA - timeB;
+      });
     },
   });
 }
