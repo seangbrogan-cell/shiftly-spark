@@ -47,11 +47,13 @@ export function ShiftModal({ open, onOpenChange, employerId }: ShiftModalProps) 
     try {
       // Store times using a fixed reference date (only hours/minutes matter)
       const refDate = '2000-01-01';
+      const nextDate = '2000-01-02';
+      const isOvernight = endTime <= startTime;
       await createShift.mutateAsync({
         employer_id: employerId,
         name: name.trim(),
         start_time: new Date(`${refDate}T${startTime}:00`).toISOString(),
-        end_time: new Date(`${refDate}T${endTime}:00`).toISOString(),
+        end_time: new Date(`${isOvernight ? nextDate : refDate}T${endTime}:00`).toISOString(),
         notes: notes.trim() || null,
       });
       toast({ title: 'Shift created' });
