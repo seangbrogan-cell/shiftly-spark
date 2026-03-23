@@ -10,6 +10,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 interface EmployeeTableProps {
   employees: Employee[];
   shiftCounts: Record<string, number>;
+  employerId?: string;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
 }
