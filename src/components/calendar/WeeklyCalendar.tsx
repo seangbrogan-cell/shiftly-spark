@@ -271,7 +271,7 @@ export function WeeklyCalendar({ employees, shifts, employerId }: WeeklyCalendar
               </div>
             </div>
 
-            {/* Employee Rows – Management roles first (alphabetical), then others (alphabetical) */}
+            {/* Employee Rows – Sorted by role order, then alphabetically */}
             {[...employees].sort((a, b) => {
               const priorityDiff = roleSortPriority(a.role) - roleSortPriority(b.role);
               if (priorityDiff !== 0) return priorityDiff;
