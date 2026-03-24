@@ -49,8 +49,6 @@ export function EditAssignmentModal({
   const [employeeId, setEmployeeId] = useState('');
   const [shiftId, setShiftId] = useState('');
   const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [conflictWarning, setConflictWarning] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -65,34 +63,19 @@ export function EditAssignmentModal({
         setEmployeeId(assignment.employee_id);
         setShiftId(assignment.shift_id);
         setDate(assignment.assigned_date);
-        setStartTime(assignment.actual_start ? assignment.actual_start.slice(0, 16) : '');
-        setEndTime(assignment.actual_end ? assignment.actual_end.slice(0, 16) : '');
       } else {
         setEmployeeId(defaultEmployeeId ?? '');
         setShiftId('');
         setDate(defaultDate ?? '');
-        setStartTime('');
-        setEndTime('');
       }
       setConflictWarning(false);
       setErrors({});
     }
   }, [open, assignment, defaultDate, defaultEmployeeId]);
 
-  // When a shift is selected, auto-fill start/end times using the selected date
   const handleShiftChange = (id: string) => {
     setShiftId(id);
-    const shift = shifts.find((s) => s.id === id);
-    if (shift) {
-      const currentDate = date || format(new Date(), 'yyyy-MM-dd');
-      const sDate = new Date(shift.start_time);
-      const eDate = new Date(shift.end_time);
-      const sHours = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
-      const eHours = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
-      setStartTime(`${currentDate}T${sHours}`);
-      setEndTime(`${currentDate}T${eHours}`);
-      if (!date) setDate(currentDate);
-    }
+    setConflictWarning(false);
   };
 
   const validate = () => {
@@ -100,11 +83,21 @@ export function EditAssignmentModal({
     if (!employeeId) errs.employeeId = 'Select an employee';
     if (!shiftId) errs.shiftId = 'Select a shift';
     if (!date) errs.date = 'Select a date';
-    if (!startTime) errs.startTime = 'Start time is required';
-    if (!endTime) errs.endTime = 'End time is required';
-    // Allow overnight shifts (end time before start time means next day)
     setErrors(errs);
     return Object.keys(errs).length === 0;
+  };
+
+  const getShiftTimes = (shiftId: string, assignedDate: string) => {
+    const shift = shifts.find((s) => s.id === shiftId);
+    if (!shift || !shift.start_time || !shift.end_time) return { start: null, end: null };
+    const sDate = new Date(shift.start_time);
+    const eDate = new Date(shift.end_time);
+    const sHours = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
+    const eHours = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
+    return {
+      start: new Date(`${assignedDate}T${sHours}`).toISOString(),
+      end: new Date(`${assignedDate}T${eHours}`).toISOString(),
+    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,13 +105,11 @@ export function EditAssignmentModal({
     if (!validate()) return;
 
     try {
-      const hasConflict = await checkConflict(
-        employeeId,
-        date,
-        new Date(startTime).toISOString(),
-        new Date(endTime).toISOString(),
-        assignment?.id
-      );
+      const { start, end } = getShiftTimes(shiftId, date);
+
+      const hasConflict = start && end
+        ? await checkConflict(employeeId, date, start, end, assignment?.id)
+        : false;
 
       if (hasConflict && !conflictWarning) {
         setConflictWarning(true);
@@ -131,8 +122,8 @@ export function EditAssignmentModal({
           employee_id: employeeId,
           shift_id: shiftId,
           assigned_date: date,
-          actual_start: new Date(startTime).toISOString(),
-          actual_end: new Date(endTime).toISOString(),
+          actual_start: start,
+          actual_end: end,
           conflict_resolved: hasConflict,
         });
         toast({ title: 'Assignment updated' });
@@ -142,8 +133,8 @@ export function EditAssignmentModal({
           employee_id: employeeId,
           shift_id: shiftId,
           assigned_date: date,
-          actual_start: new Date(startTime).toISOString(),
-          actual_end: new Date(endTime).toISOString(),
+          actual_start: start,
+          actual_end: end,
           conflict_resolved: hasConflict,
           workplace_id: workplaceId,
         } as any);
@@ -226,26 +217,6 @@ export function EditAssignmentModal({
             {errors.date && <p className="text-sm text-error">{errors.date}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Start Time *</Label>
-              <Input
-                type="datetime-local"
-                value={startTime}
-                onChange={(e) => { setStartTime(e.target.value); setConflictWarning(false); }}
-              />
-              {errors.startTime && <p className="text-sm text-error">{errors.startTime}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label>End Time *</Label>
-              <Input
-                type="datetime-local"
-                value={endTime}
-                onChange={(e) => { setEndTime(e.target.value); setConflictWarning(false); }}
-              />
-              {errors.endTime && <p className="text-sm text-error">{errors.endTime}</p>}
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
