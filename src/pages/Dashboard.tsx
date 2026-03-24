@@ -20,6 +20,7 @@ import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
 import { EmailEmployeesModal } from '@/components/dashboard/EmailEmployeesModal';
+import { TimeOffRequestsManager } from '@/components/dashboard/TimeOffRequestsManager';
 import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
