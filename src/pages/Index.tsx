@@ -10,7 +10,7 @@ export default function Index() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <Clock className="h-7 w-7 text-primary" />
-            <span className="text-xl font-bold text-foreground">Shiftly</span>
+            <span className="text-xl font-bold text-foreground">WorkSchedule</span>
           </div>
           <div className="flex items-center gap-3">
             <Link to="/auth/login">
@@ -36,7 +36,7 @@ export default function Index() {
             Stop juggling<br />spreadsheets.
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed">
-            Shiftly helps you create, manage, and share shift schedules in minutes — 
+            WorkSchedule helps you create, manage, and share shift schedules in minutes — 
             so your team always knows when and where to show up.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -84,9 +84,9 @@ export default function Index() {
         <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Shiftly</span>
+            <span className="text-sm font-medium text-muted-foreground">WorkSchedule</span>
           </div>
-          <p className="text-sm text-muted-foreground">© 2026 Shiftly. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 WorkSchedule. All rights reserved.</p>
         </div>
       </footer>
     </div>
