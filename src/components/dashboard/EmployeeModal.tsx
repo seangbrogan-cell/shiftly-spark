@@ -195,6 +195,28 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
 
+          {/* Workplaces Section */}
+          {workplaces.length > 0 && (
+            <div className="space-y-3">
+              <Label>Workplaces</Label>
+              <div className="space-y-2">
+                {workplaces.map((wp) => (
+                  <label key={wp.id} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={selectedWorkplaceIds.includes(wp.id)}
+                      onCheckedChange={(checked) => {
+                        setSelectedWorkplaceIds(prev =>
+                          checked ? [...prev, wp.id] : prev.filter(id => id !== wp.id)
+                        );
+                      }}
+                    />
+                    <span className="text-sm font-medium">{wp.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Availability Section */}
           <div className="space-y-3">
             <Label>Availability</Label>
