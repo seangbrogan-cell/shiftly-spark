@@ -31,9 +31,9 @@ export function StatusBadge({ status, publishedAt }: StatusBadgeProps) {
   const config = statusConfig[status];
   return (
     <div className="flex items-center gap-2">
-      <Badge variant="outline" className={config.className}>
+      <span className={`inline-flex items-center justify-center h-7 px-2.5 text-xs font-medium rounded-md border ${config.className}`}>
         {config.label}
-      </Badge>
+      </span>
       {publishedAt && (
         <span className="text-xs text-muted-foreground">
           Last published {format(new Date(publishedAt), 'MMM d, h:mm a')}
