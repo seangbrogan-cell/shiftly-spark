@@ -161,9 +161,14 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-foreground">Employees</h2>
                   <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
-                <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
-                  <Plus className="mr-2 h-4 w-4" /> Add Employee
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
+                    <Mail className="mr-2 h-4 w-4" /> Email All
+                  </Button>
+                  <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
+                    <Plus className="mr-2 h-4 w-4" /> Add Employee
+                  </Button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
