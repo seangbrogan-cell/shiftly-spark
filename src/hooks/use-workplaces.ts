@@ -40,10 +40,8 @@ export function useCreateWorkplace() {
 
       // Copy shifts from another workplace if requested
       if (copyFromWorkplaceId) {
-        const { data: sourceShifts, error: shiftErr } = await (supabase
-          .from('shifts')
-          .select('*')
-          .eq('workplace_id' as any, copyFromWorkplaceId) as any);
+        const query: any = supabase.from('shifts').select('*').eq('workplace_id', copyFromWorkplaceId);
+        const { data: sourceShifts, error: shiftErr } = await query;
         if (shiftErr) throw shiftErr;
 
         if (sourceShifts && sourceShifts.length > 0) {
