@@ -144,7 +144,8 @@ export function EditAssignmentModal({
           actual_start: new Date(startTime).toISOString(),
           actual_end: new Date(endTime).toISOString(),
           conflict_resolved: hasConflict,
-        });
+          workplace_id: (props as any).workplaceId,
+        } as any);
         toast({ title: 'Assignment created' });
       }
       onOpenChange(false);
