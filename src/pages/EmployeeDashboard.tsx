@@ -30,6 +30,7 @@ export default function EmployeeDashboard() {
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
 
   const employeeId = employee?.id;
   const employerId = profile?.employer_id;
