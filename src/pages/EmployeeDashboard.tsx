@@ -36,10 +36,11 @@ export default function EmployeeDashboard() {
   const employerId = profile?.employer_id;
 
   const weekDays = getWeekDays(currentWeek);
-  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek);
-  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth);
+  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, selectedWorkplaceId);
+  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, selectedWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
+  const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId);
 
   if (!employee) {
     return (
