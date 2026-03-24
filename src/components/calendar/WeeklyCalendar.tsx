@@ -57,11 +57,25 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek, workplaceId);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const { data: allAvailability = [] } = useAllEmployeeAvailability();
+  const { data: approvedTimeOff = [] } = useApprovedTimeOff(currentWeek);
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  // Build set of employee:date keys that have approved time off
+  const timeOffSet = useMemo(() => {
+    const set = new Set<string>();
+    approvedTimeOff.forEach((req) => {
+      const start = new Date(req.start_date + 'T00:00:00');
+      const end = new Date(req.end_date + 'T00:00:00');
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        set.add(`${req.employee_id}:${format(d, 'yyyy-MM-dd')}`);
+      }
+    });
+    return set;
+  }, [approvedTimeOff]);
 
   // Build availability map: employeeId -> day -> { start_time, end_time }
   const availabilityTimeMap = useMemo(() => {
