@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -20,6 +20,7 @@ import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
 import { EmailEmployeesModal } from '@/components/dashboard/EmailEmployeesModal';
+import { TimeOffRequestsManager } from '@/components/dashboard/TimeOffRequestsManager';
 import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
@@ -118,9 +119,12 @@ export default function Dashboard() {
                   <TabsTrigger value="employees" className="gap-2">
                     <Users className="h-4 w-4" /> Employees
                   </TabsTrigger>
-                  <TabsTrigger value="shifts" className="gap-2">
-                    <LayoutGrid className="h-4 w-4" /> Shifts
-                  </TabsTrigger>
+                   <TabsTrigger value="shifts" className="gap-2">
+                     <LayoutGrid className="h-4 w-4" /> Shifts
+                   </TabsTrigger>
+                   <TabsTrigger value="time-off" className="gap-2">
+                     <CalendarOff className="h-4 w-4" /> Time Off
+                   </TabsTrigger>
                 </TabsList>
                 {employerId && (
                   <WorkplaceSelector
@@ -216,6 +220,15 @@ export default function Dashboard() {
               ) : (
                 <ShiftList shifts={shifts} onEdit={(s) => { setEditingShift(s); setShiftModalOpen(true); }} />
               )}
+            </TabsContent>
+
+            {/* Time Off Tab */}
+            <TabsContent value="time-off">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-foreground">Time Off Requests</h2>
+                <p className="text-sm text-muted-foreground mt-1">Review and manage employee time-off requests.</p>
+              </div>
+              {employerId && <TimeOffRequestsManager employerId={employerId} />}
             </TabsContent>
           </Tabs>
         </main>
