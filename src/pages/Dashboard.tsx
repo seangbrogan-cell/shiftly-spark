@@ -86,6 +86,16 @@ export default function Dashboard() {
     if (!open) setEditingEmployee(null);
   };
 
+  const handleEmailEmployee = (emp: Employee) => {
+    setEmailPreselected([emp]);
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailAll = () => {
+    setEmailPreselected(employees);
+    setEmailModalOpen(true);
+  };
+
   if (profile && !employerId) {
     return <Navigate to="/onboarding" replace />;
   }
