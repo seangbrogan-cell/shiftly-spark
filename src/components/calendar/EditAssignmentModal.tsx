@@ -83,9 +83,6 @@ export function EditAssignmentModal({
     if (!employeeId) errs.employeeId = 'Select an employee';
     if (!shiftId) errs.shiftId = 'Select a shift';
     if (!date) errs.date = 'Select a date';
-    if (!startTime) errs.startTime = 'Start time is required';
-    if (!endTime) errs.endTime = 'End time is required';
-    // Allow overnight shifts (end time before start time means next day)
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
