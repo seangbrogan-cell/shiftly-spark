@@ -176,7 +176,7 @@ function DashboardHeader({ email, onSignOut, companyName }: { email?: string; on
       <div className="flex h-16 items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Clock className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold text-foreground">Shiftly</span>
+          <span className="text-xl font-bold text-foreground">WorkSchedule</span>
         </div>
         {companyName && (
           <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">

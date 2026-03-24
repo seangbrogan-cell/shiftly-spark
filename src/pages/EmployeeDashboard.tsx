@@ -44,7 +44,7 @@ export default function EmployeeDashboard() {
       <div className="min-h-screen bg-background">
         <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} />
         <main className="mx-auto max-w-xl px-6 py-24 text-center">
-          <h1 className="text-2xl font-bold text-foreground">Welcome to Shiftly</h1>
+          <h1 className="text-2xl font-bold text-foreground">Welcome to WorkSchedule</h1>
           <p className="mt-3 text-muted-foreground">
             Your account isn't linked to an employee record yet. Please contact your manager to get set up.
           </p>
@@ -196,7 +196,7 @@ function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?:
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Clock className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold text-foreground">Shiftly</span>
+          <span className="text-xl font-bold text-foreground">WorkSchedule</span>
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">

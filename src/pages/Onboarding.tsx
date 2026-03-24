@@ -67,7 +67,7 @@ export default function Onboarding() {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Clock className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-foreground">Shiftly</span>
+            <span className="text-2xl font-bold text-foreground">WorkSchedule</span>
           </div>
           <CardTitle className="text-2xl font-bold">Set up your organization</CardTitle>
           <CardDescription>Create your company to start managing shifts and employees.</CardDescription>

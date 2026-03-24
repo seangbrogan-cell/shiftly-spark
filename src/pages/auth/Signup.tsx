@@ -47,7 +47,7 @@ export default function Signup() {
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-primary p-12">
         <div className="flex items-center gap-3">
           <Clock className="h-8 w-8 text-primary-foreground" />
-          <span className="text-2xl font-bold text-primary-foreground">Shiftly</span>
+          <span className="text-2xl font-bold text-primary-foreground">WorkSchedule</span>
         </div>
         <div>
           <h1 className="text-4xl font-bold leading-tight text-primary-foreground">
@@ -57,7 +57,7 @@ export default function Signup() {
             Create your team, set availability, and publish shifts instantly.
           </p>
         </div>
-        <p className="text-sm text-primary-foreground/50">© 2026 Shiftly. All rights reserved.</p>
+        <p className="text-sm text-primary-foreground/50">© 2026 WorkSchedule. All rights reserved.</p>
       </div>
 
       {/* Right - Form */}
@@ -66,10 +66,10 @@ export default function Signup() {
           <CardHeader className="space-y-1 text-center lg:text-left">
             <div className="flex items-center gap-2 justify-center lg:justify-start lg:hidden mb-6">
               <Clock className="h-7 w-7 text-primary" />
-              <span className="text-xl font-bold text-foreground">Shiftly</span>
+              <span className="text-xl font-bold text-foreground">WorkSchedule</span>
             </div>
             <CardTitle className="text-2xl font-bold">Create your account</CardTitle>
-            <CardDescription>Get started with Shiftly for free</CardDescription>
+            <CardDescription>Get started with WorkSchedule for free</CardDescription>
           </CardHeader>
           <form onSubmit={handleSignup}>
             <CardContent className="space-y-4">
