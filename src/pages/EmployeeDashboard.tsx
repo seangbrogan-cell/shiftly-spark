@@ -198,6 +198,17 @@ export default function EmployeeDashboard() {
                 <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
                 </Button>
+
+                {fullScheduleAllowed && (
+                  <Button
+                    size="sm"
+                    variant={showFullSchedule ? 'default' : 'outline'}
+                    onClick={() => setShowFullSchedule(!showFullSchedule)}
+                  >
+                    <Users className="h-4 w-4 mr-1.5" />
+                    {showFullSchedule ? 'My Schedule' : 'Full Schedule'}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -209,7 +220,9 @@ export default function EmployeeDashboard() {
               }
             </p>
 
-            {calendarView === 'weekly' ? (
+            {showFullSchedule && fullScheduleAllowed && activeWorkplaceId ? (
+              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
+            ) : calendarView === 'weekly' ? (
               loadingWeek ? (
                 <div className="flex justify-center py-16">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
