@@ -18,6 +18,25 @@ interface EmployeeTableProps {
 }
 
 function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
+  const [inviting, setInviting] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleInvite = async (emp: Employee) => {
+    setInviting(emp.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-employee-account', {
+        body: { employeeId: emp.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: 'Invite sent', description: `Password reset email sent to ${emp.email}` });
+    } catch (err: any) {
+      toast({ title: 'Invite failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setInviting(null);
+    }
+  };
+
   return (
     <>
       {employees.map((emp) => (
@@ -33,6 +52,22 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
           <TableCell className="text-center">{shiftCounts[emp.id] || 0}</TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1">
+              {(emp as any).user_id ? (
+                <Button variant="ghost" size="icon" disabled aria-label="Account active" title="Account active">
+                  <Check className="h-4 w-4 text-green-500" />
+                </Button>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleInvite(emp)}
+                  disabled={inviting === emp.id}
+                  aria-label={`Invite ${emp.name}`}
+                  title="Create account & send invite"
+                >
+                  <Send className={`h-4 w-4 ${inviting === emp.id ? 'animate-pulse' : ''}`} />
+                </Button>
+              )}
               <Button variant="ghost" size="icon" onClick={() => onEdit(emp)} aria-label={`Edit ${emp.name}`}>
                 <Pencil className="h-4 w-4" />
               </Button>
