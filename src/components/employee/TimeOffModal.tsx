@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateTimeOffRequest } from '@/hooks/use-employee-data';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
 
 interface TimeOffModalProps {
   open: boolean;
