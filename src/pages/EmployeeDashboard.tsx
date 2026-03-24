@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/use-dashboard-data';
 import {
@@ -12,9 +14,10 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus } from 'lucide-react';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
+import { FullScheduleView } from '@/components/employee/FullScheduleView';
 import { TimeOffModal } from '@/components/employee/TimeOffModal';
 import { TimeOffHistory } from '@/components/employee/TimeOffHistory';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
