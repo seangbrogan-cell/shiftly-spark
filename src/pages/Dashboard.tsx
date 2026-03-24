@@ -221,6 +221,15 @@ export default function Dashboard() {
                 <ShiftList shifts={shifts} onEdit={(s) => { setEditingShift(s); setShiftModalOpen(true); }} />
               )}
             </TabsContent>
+
+            {/* Time Off Tab */}
+            <TabsContent value="time-off">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-foreground">Time Off Requests</h2>
+                <p className="text-sm text-muted-foreground mt-1">Review and manage employee time-off requests.</p>
+              </div>
+              {employerId && <TimeOffRequestsManager employerId={employerId} />}
+            </TabsContent>
           </Tabs>
         </main>
       </div>
