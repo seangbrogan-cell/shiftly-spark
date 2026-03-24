@@ -73,15 +73,14 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
           <TableCell className="text-center">{shiftCounts[emp.id] || 0}</TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1">
-              const cd = cooldowns[emp.id];
               {(emp as any).user_id ? (
                 <Button variant="ghost" size="icon" disabled aria-label="Account active" title="Account active">
-                  <Check className="h-4 w-4 text-green-500" />
+                  <Check className="h-4 w-4 text-primary" />
                 </Button>
-              ) : cd ? (
-                <Button variant="ghost" size="icon" disabled aria-label="Cooldown" title={`Resend available in ${cd}s`}>
+              ) : cooldowns[emp.id] ? (
+                <Button variant="ghost" size="icon" disabled aria-label="Cooldown" title={`Resend available in ${cooldowns[emp.id]}s`}>
                   <span className="flex items-center gap-0.5 text-xs text-muted-foreground tabular-nums">
-                    <Clock className="h-3.5 w-3.5" />{cd}
+                    <Clock className="h-3.5 w-3.5" />{cooldowns[emp.id]}
                   </span>
                 </Button>
               ) : (
