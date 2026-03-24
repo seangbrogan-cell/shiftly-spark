@@ -14,7 +14,7 @@ export interface EmployeeAssignment {
   shift_id: string;
   employee_id: string;
   workplace_id: string | null;
-  shifts: { name: string; start_time: string; end_time: string } | null;
+  shifts: { name: string; start_time: string; end_time: string; color: string | null; is_all_day: boolean } | null;
   workplaces: { name: string } | null;
 }
 
