@@ -116,21 +116,28 @@ export function useScheduleLastUpdated(employerId: string | undefined) {
   });
 }
 
-// Find the employee record linked to the current auth user's email
+// Find the employee record linked to the current auth user
 export function useCurrentEmployee() {
   return useQuery({
     queryKey: ['current-employee'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
-      // Find employee by matching email
-      const { data, error } = await supabase
+      // Try matching by user_id first, then fall back to email
+      const { data: byUserId, error: e1 } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (e1) throw e1;
+      if (byUserId) return byUserId;
+      const { data: byEmail, error: e2 } = await supabase
         .from('employees')
         .select('*')
         .eq('email', user.email!)
         .maybeSingle();
-      if (error) throw error;
-      return data;
+      if (e2) throw e2;
+      return byEmail;
     },
   });
 }

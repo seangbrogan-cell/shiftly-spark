@@ -1,0 +1,1 @@
+ALTER TABLE public.employees ADD COLUMN user_id uuid UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL;

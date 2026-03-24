@@ -60,6 +60,7 @@ export type Database = {
           phone: string | null
           role: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           availability?: string[]
@@ -71,6 +72,7 @@ export type Database = {
           phone?: string | null
           role?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           availability?: string[]
@@ -82,6 +84,7 @@ export type Database = {
           phone?: string | null
           role?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
