@@ -23,7 +23,7 @@ function isoToTimeInput(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-export function ShiftModal({ open, onOpenChange, employerId, editingShift }: ShiftModalProps) {
+export function ShiftModal({ open, onOpenChange, employerId, editingShift, workplaceId }: ShiftModalProps) {
   const [name, setName] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
   const [startTime, setStartTime] = useState('06:00');
