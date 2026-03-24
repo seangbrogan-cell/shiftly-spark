@@ -87,18 +87,29 @@ export function EditAssignmentModal({
     return Object.keys(errs).length === 0;
   };
 
+  const getShiftTimes = (shiftId: string, assignedDate: string) => {
+    const shift = shifts.find((s) => s.id === shiftId);
+    if (!shift || !shift.start_time || !shift.end_time) return { start: null, end: null };
+    const sDate = new Date(shift.start_time);
+    const eDate = new Date(shift.end_time);
+    const sHours = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
+    const eHours = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
+    return {
+      start: new Date(`${assignedDate}T${sHours}`).toISOString(),
+      end: new Date(`${assignedDate}T${eHours}`).toISOString(),
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     try {
-      const hasConflict = await checkConflict(
-        employeeId,
-        date,
-        new Date(startTime).toISOString(),
-        new Date(endTime).toISOString(),
-        assignment?.id
-      );
+      const { start, end } = getShiftTimes(shiftId, date);
+
+      const hasConflict = start && end
+        ? await checkConflict(employeeId, date, start, end, assignment?.id)
+        : false;
 
       if (hasConflict && !conflictWarning) {
         setConflictWarning(true);
@@ -111,8 +122,8 @@ export function EditAssignmentModal({
           employee_id: employeeId,
           shift_id: shiftId,
           assigned_date: date,
-          actual_start: new Date(startTime).toISOString(),
-          actual_end: new Date(endTime).toISOString(),
+          actual_start: start,
+          actual_end: end,
           conflict_resolved: hasConflict,
         });
         toast({ title: 'Assignment updated' });
@@ -122,8 +133,8 @@ export function EditAssignmentModal({
           employee_id: employeeId,
           shift_id: shiftId,
           assigned_date: date,
-          actual_start: new Date(startTime).toISOString(),
-          actual_end: new Date(endTime).toISOString(),
+          actual_start: start,
+          actual_end: end,
           conflict_resolved: hasConflict,
           workplace_id: workplaceId,
         } as any);
