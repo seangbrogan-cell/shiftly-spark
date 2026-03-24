@@ -98,12 +98,16 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                     {format(day, 'd')}
                   </p>
                   {dayAssignments.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {dayAssignments.slice(0, 3).map((a) => (
-                        <div key={a.id} className={`h-2 w-2 rounded-full ${getColor(a.shift_id).dot}`} />
+                    <div className="flex flex-col gap-0.5 mt-0.5">
+                      {dayAssignments.slice(0, 2).map((a) => (
+                        <span key={a.id} className="text-[9px] leading-tight text-muted-foreground truncate">
+                          {a.actual_start && a.actual_end
+                            ? `${format(new Date(a.actual_start), 'h:mma')}–${format(new Date(a.actual_end), 'h:mma')}`
+                            : a.shifts?.name ?? 'Shift'}
+                        </span>
                       ))}
-                      {dayAssignments.length > 3 && (
-                        <span className="text-[9px] text-muted-foreground">+{dayAssignments.length - 3}</span>
+                      {dayAssignments.length > 2 && (
+                        <span className="text-[9px] text-muted-foreground">+{dayAssignments.length - 2}</span>
                       )}
                     </div>
                   )}
