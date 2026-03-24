@@ -232,6 +232,68 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift, workp
             <Label htmlFor="shift-notes">Notes</Label>
             <Textarea id="shift-notes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Optional notes..." rows={3} />
           </div>
+          {/* Copy from another workplace */}
+          {!isEditing && otherWorkplaces.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCopyFrom(!showCopyFrom)}
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy shifts from another workplace
+                </button>
+                {showCopyFrom && (
+                  <div className="space-y-3 rounded-lg border border-border p-3 bg-muted/30">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="copy-source">Source Workplace</Label>
+                      <select
+                        id="copy-source"
+                        value={copySourceWorkplace}
+                        onChange={(e) => setCopySourceWorkplace(e.target.value)}
+                        className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">Select a workplace...</option>
+                        {otherWorkplaces.map((wp) => (
+                          <option key={wp.id} value={wp.id}>{wp.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {copySourceWorkplace && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">
+                          {sourceShifts.length === 0 ? 'No shifts in this workplace.' : `${sourceShifts.length} shift(s) will be copied.`}
+                        </p>
+                        {sourceShifts.length > 0 && (
+                          <ul className="text-xs text-muted-foreground space-y-0.5 max-h-24 overflow-y-auto">
+                            {sourceShifts.map((s: any) => (
+                              <li key={s.id} className="flex items-center gap-1">
+                                <Check className="h-3 w-3 text-primary" />
+                                {s.name}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleCopyShifts}
+                          disabled={copying || sourceShifts.length === 0}
+                          className="w-full"
+                        >
+                          <Copy className="h-3.5 w-3.5 mr-1.5" />
+                          {copying ? 'Copying...' : `Copy ${sourceShifts.length} Shift(s)`}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => { onOpenChange(false); resetForm(); }}>
               Cancel
