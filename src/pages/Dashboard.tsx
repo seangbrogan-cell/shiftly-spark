@@ -244,6 +244,13 @@ export default function Dashboard() {
         onOpenChange={(open) => { if (!open) setDeletingEmployee(null); }}
         employee={deletingEmployee}
       />
+      <EmailEmployeesModal
+        open={emailModalOpen}
+        onOpenChange={setEmailModalOpen}
+        employees={employees}
+        preselected={emailPreselected}
+        senderName={profile?.display_name || undefined}
+      />
     </div>
   );
 }
