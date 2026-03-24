@@ -70,11 +70,6 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
                           {a.shifts?.name ?? 'Shift'}
                         </p>
                       </div>
-                      {a.workplaces?.name && (
-                        <p className="text-[10px] text-muted-foreground truncate mt-0.5 pl-3">
-                          {a.workplaces.name}
-                        </p>
-                      )}
                       {a.actual_start && a.actual_end && (
                         <div className="flex items-center gap-1 mt-1">
                           <Clock className="h-3 w-3 text-muted-foreground" />
