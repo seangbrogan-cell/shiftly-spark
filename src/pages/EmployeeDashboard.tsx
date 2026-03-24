@@ -61,6 +61,23 @@ export default function EmployeeDashboard() {
   const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
   const scheduleEmployeeId = activeWorkplaceId ? employeeId : undefined;
 
+  // Check if the active workplace has full_schedule_visible enabled
+  const { data: workplaceSettings } = useQuery({
+    queryKey: ['workplace-settings', activeWorkplaceId],
+    queryFn: async () => {
+      if (!activeWorkplaceId) return null;
+      const { data, error } = await supabase
+        .from('workplaces')
+        .select('full_schedule_visible')
+        .eq('id', activeWorkplaceId)
+        .single();
+      if (error) throw error;
+      return data as { full_schedule_visible: boolean };
+    },
+    enabled: !!activeWorkplaceId,
+  });
+  const fullScheduleAllowed = workplaceSettings?.full_schedule_visible ?? false;
+
   const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(scheduleEmployeeId, currentWeek, activeWorkplaceId);
   const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(scheduleEmployeeId, currentMonth, activeWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
