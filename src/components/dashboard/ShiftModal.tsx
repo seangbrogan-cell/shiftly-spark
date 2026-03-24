@@ -36,9 +36,28 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift, workp
   const [notes, setNotes] = useState('');
   const [color, setColor] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showCopyFrom, setShowCopyFrom] = useState(false);
+  const [copySourceWorkplace, setCopySourceWorkplace] = useState<string>('');
+  const [copying, setCopying] = useState(false);
   const { toast } = useToast();
   const createShift = useCreateShift();
   const updateShift = useUpdateShift();
+  const queryClient = useQueryClient();
+
+  const { data: workplaces = [] } = useWorkplaces(employerId);
+  const otherWorkplaces = workplaces.filter((wp) => wp.id !== workplaceId);
+
+  // Fetch shifts from the selected source workplace
+  const { data: sourceShifts = [] } = useQuery({
+    queryKey: ['shifts', copySourceWorkplace],
+    queryFn: async () => {
+      if (!copySourceWorkplace) return [];
+      const { data, error } = await supabase.from('shifts').select('*').eq('workplace_id', copySourceWorkplace).order('start_time');
+      if (error) throw error;
+      return data as Shift[];
+    },
+    enabled: !!copySourceWorkplace,
+  });
 
   const isEditing = !!editingShift;
 
