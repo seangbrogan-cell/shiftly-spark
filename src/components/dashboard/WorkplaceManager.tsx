@@ -86,6 +86,14 @@ export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
             ) : (
               <>
                 <span className="text-sm flex-1 truncate">{wp.name}</span>
+                <div className="flex items-center gap-1.5" title="Allow employees to view full schedule">
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">Full schedule</span>
+                  <Switch
+                    checked={wp.full_schedule_visible}
+                    onCheckedChange={(checked) => toggleVisible.mutate({ id: wp.id, visible: checked })}
+                    className="scale-75"
+                  />
+                </div>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(wp)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
