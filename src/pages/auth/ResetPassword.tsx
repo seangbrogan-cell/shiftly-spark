@@ -84,7 +84,7 @@ export default function ResetPassword() {
                   <Label htmlFor="password">New password</Label>
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
