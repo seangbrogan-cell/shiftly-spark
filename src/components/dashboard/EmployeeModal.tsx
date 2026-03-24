@@ -15,6 +15,8 @@ import {
   buildDayTimeRanges,
   type DayTimeRange,
 } from '@/hooks/use-employee-availability';
+import { useWorkplaces } from '@/hooks/use-workplaces';
+import { useEmployeeWorkplaces, useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
