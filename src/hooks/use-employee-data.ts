@@ -13,7 +13,9 @@ export interface EmployeeAssignment {
   actual_end: string | null;
   shift_id: string;
   employee_id: string;
+  workplace_id: string | null;
   shifts: { name: string; start_time: string; end_time: string } | null;
+  workplaces: { name: string } | null;
 }
 
 export function useEmployeeWeeklySchedule(employeeId: string | undefined, weekStart: Date) {
