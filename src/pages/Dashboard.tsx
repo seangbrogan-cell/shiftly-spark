@@ -55,17 +55,24 @@ export default function Dashboard() {
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Tabs defaultValue="schedule" className="w-full">
             <div className="flex items-center justify-between gap-4 mb-6 flex-wrap print:hidden">
-              <TabsList>
-                <TabsTrigger value="schedule" className="gap-2">
-                  <Calendar className="h-4 w-4" /> Schedule
-                </TabsTrigger>
+              <div className="flex items-center gap-4">
+                {(profile as any)?.employers?.name && (
+                  <h1 className="text-lg font-bold text-foreground whitespace-nowrap">
+                    {(profile as any).employers.name} Schedule
+                  </h1>
+                )}
+                <TabsList>
+                  <TabsTrigger value="schedule" className="gap-2">
+                    <Calendar className="h-4 w-4" /> Schedule
+                  </TabsTrigger>
                 <TabsTrigger value="employees" className="gap-2">
                   <Users className="h-4 w-4" /> Employees
                 </TabsTrigger>
                 <TabsTrigger value="shifts" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Shifts
                 </TabsTrigger>
-              </TabsList>
+                </TabsList>
+              </div>
               {employerId && (
                 <PublishPanel
                   employerId={employerId}
@@ -178,12 +185,6 @@ function DashboardHeader({ email, onSignOut, companyName }: { email?: string; on
           <Clock className="h-7 w-7 text-primary" />
           <span className="text-xl font-bold text-foreground">WorkSchedule</span>
         </div>
-        {companyName && (
-          <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
-            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-semibold text-primary tracking-wide">{companyName}</span>
-          </div>
-        )}
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
           <Button variant="ghost" size="sm" onClick={onSignOut}>
