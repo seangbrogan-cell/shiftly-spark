@@ -89,6 +89,22 @@ export function useUpdateWorkplace() {
   });
 }
 
+export function useToggleFullScheduleVisible() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, visible }: { id: string; visible: boolean }) => {
+      const { error } = await supabase
+        .from('workplaces' as any)
+        .update({ full_schedule_visible: visible } as any)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['workplaces'] });
+    },
+  });
+}
+
 export function useDeleteWorkplace() {
   const qc = useQueryClient();
   return useMutation({
