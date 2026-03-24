@@ -151,7 +151,7 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
   );
 }
 
-export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete }: EmployeeTableProps) {
+export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete, onEmail }: EmployeeTableProps) {
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
