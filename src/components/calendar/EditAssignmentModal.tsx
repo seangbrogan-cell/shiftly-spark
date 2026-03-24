@@ -73,20 +73,9 @@ export function EditAssignmentModal({
     }
   }, [open, assignment, defaultDate, defaultEmployeeId]);
 
-  // When a shift is selected, auto-fill start/end times using the selected date
   const handleShiftChange = (id: string) => {
     setShiftId(id);
-    const shift = shifts.find((s) => s.id === id);
-    if (shift) {
-      const currentDate = date || format(new Date(), 'yyyy-MM-dd');
-      const sDate = new Date(shift.start_time);
-      const eDate = new Date(shift.end_time);
-      const sHours = `${String(sDate.getHours()).padStart(2, '0')}:${String(sDate.getMinutes()).padStart(2, '0')}`;
-      const eHours = `${String(eDate.getHours()).padStart(2, '0')}:${String(eDate.getMinutes()).padStart(2, '0')}`;
-      setStartTime(`${currentDate}T${sHours}`);
-      setEndTime(`${currentDate}T${eHours}`);
-      if (!date) setDate(currentDate);
-    }
+    setConflictWarning(false);
   };
 
   const validate = () => {
