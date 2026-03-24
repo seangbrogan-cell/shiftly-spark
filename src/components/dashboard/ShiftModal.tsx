@@ -15,6 +15,7 @@ interface ShiftModalProps {
   onOpenChange: (open: boolean) => void;
   employerId: string;
   editingShift?: Shift | null;
+  workplaceId?: string;
 }
 
 function isoToTimeInput(iso: string): string {
@@ -22,7 +23,7 @@ function isoToTimeInput(iso: string): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-export function ShiftModal({ open, onOpenChange, employerId, editingShift }: ShiftModalProps) {
+export function ShiftModal({ open, onOpenChange, employerId, editingShift, workplaceId }: ShiftModalProps) {
   const [name, setName] = useState('');
   const [isAllDay, setIsAllDay] = useState(false);
   const [startTime, setStartTime] = useState('06:00');
@@ -93,7 +94,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift }: Shi
         await updateShift.mutateAsync({ id: editingShift.id, ...shiftData });
         toast({ title: 'Shift updated' });
       } else {
-        await createShift.mutateAsync({ employer_id: employerId, ...shiftData });
+        await createShift.mutateAsync({ employer_id: employerId, workplace_id: workplaceId, ...shiftData } as any);
         toast({ title: 'Shift created' });
       }
       onOpenChange(false);

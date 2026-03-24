@@ -426,6 +426,7 @@ export type Database = {
           published_at: string | null
           shift_id: string
           updated_at: string
+          workplace_id: string | null
         }
         Insert: {
           actual_end?: string | null
@@ -439,6 +440,7 @@ export type Database = {
           published_at?: string | null
           shift_id: string
           updated_at?: string
+          workplace_id?: string | null
         }
         Update: {
           actual_end?: string | null
@@ -452,6 +454,7 @@ export type Database = {
           published_at?: string | null
           shift_id?: string
           updated_at?: string
+          workplace_id?: string | null
         }
         Relationships: [
           {
@@ -475,6 +478,13 @@ export type Database = {
             referencedRelation: "shifts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "shift_assignments_workplace_id_fkey"
+            columns: ["workplace_id"]
+            isOneToOne: false
+            referencedRelation: "workplaces"
+            referencedColumns: ["id"]
+          },
         ]
       }
       shifts: {
@@ -488,6 +498,7 @@ export type Database = {
           name: string
           notes: string | null
           start_time: string | null
+          workplace_id: string | null
         }
         Insert: {
           color?: string | null
@@ -499,6 +510,7 @@ export type Database = {
           name: string
           notes?: string | null
           start_time?: string | null
+          workplace_id?: string | null
         }
         Update: {
           color?: string | null
@@ -510,6 +522,7 @@ export type Database = {
           name?: string
           notes?: string | null
           start_time?: string | null
+          workplace_id?: string | null
         }
         Relationships: [
           {
@@ -517,6 +530,13 @@ export type Database = {
             columns: ["employer_id"]
             isOneToOne: false
             referencedRelation: "employers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shifts_workplace_id_fkey"
+            columns: ["workplace_id"]
+            isOneToOne: false
+            referencedRelation: "workplaces"
             referencedColumns: ["id"]
           },
         ]
@@ -605,6 +625,38 @@ export type Database = {
             columns: ["suggested_replacement_id"]
             isOneToOne: false
             referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workplaces: {
+        Row: {
+          created_at: string
+          employer_id: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          employer_id: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          employer_id?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workplaces_employer_id_fkey"
+            columns: ["employer_id"]
+            isOneToOne: false
+            referencedRelation: "employers"
             referencedColumns: ["id"]
           },
         ]

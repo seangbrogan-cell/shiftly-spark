@@ -24,6 +24,7 @@ interface EditAssignmentModalProps {
   employerId: string;
   defaultDate?: string;
   defaultEmployeeId?: string;
+  workplaceId?: string;
 }
 
 function formatShiftTime(shift: Shift): string {
@@ -42,6 +43,7 @@ export function EditAssignmentModal({
   employerId,
   defaultDate,
   defaultEmployeeId,
+  workplaceId,
 }: EditAssignmentModalProps) {
   const isEdit = !!assignment;
   const [employeeId, setEmployeeId] = useState('');
@@ -143,7 +145,8 @@ export function EditAssignmentModal({
           actual_start: new Date(startTime).toISOString(),
           actual_end: new Date(endTime).toISOString(),
           conflict_resolved: hasConflict,
-        });
+          workplace_id: workplaceId,
+        } as any);
         toast({ title: 'Assignment created' });
       }
       onOpenChange(false);

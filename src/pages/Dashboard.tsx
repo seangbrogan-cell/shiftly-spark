@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
+import { useWorkplaces } from '@/hooks/use-workplaces';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
@@ -14,22 +15,40 @@ import { ShiftModal } from '@/components/dashboard/ShiftModal';
 import { ShiftList } from '@/components/dashboard/ShiftList';
 import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
 import { PublishPanel } from '@/components/publish/PublishPanel';
+import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
+import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
 import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
-  const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
-  const { data: shifts = [], isLoading: loadingShifts } = useShifts();
-  const { data: shiftCounts = {} } = useShiftAssignmentCounts();
   const { data: profile } = useProfile();
+  const employerId = profile?.employer_id;
+
+  const { data: workplaces = [] } = useWorkplaces(employerId ?? undefined);
+  const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>();
+
+  // Auto-select first workplace
+  useEffect(() => {
+    if (workplaces.length > 0 && !selectedWorkplaceId) {
+      setSelectedWorkplaceId(workplaces[0].id);
+    }
+    // If selected workplace was deleted, switch to first
+    if (selectedWorkplaceId && workplaces.length > 0 && !workplaces.find(w => w.id === selectedWorkplaceId)) {
+      setSelectedWorkplaceId(workplaces[0].id);
+    }
+  }, [workplaces, selectedWorkplaceId]);
+
+  const selectedWorkplace = workplaces.find(w => w.id === selectedWorkplaceId);
+
+  const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
+  const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
+  const { data: shiftCounts = {} } = useShiftAssignmentCounts();
 
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
-
-  const employerId = profile?.employer_id;
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
@@ -47,7 +66,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader email={user?.email} onSignOut={signOut} companyName={(profile as any)?.employers?.name} />
+      <DashboardHeader email={user?.email} onSignOut={signOut} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
@@ -55,17 +74,27 @@ export default function Dashboard() {
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Tabs defaultValue="schedule" className="w-full">
             <div className="flex items-center justify-between gap-4 mb-6 flex-wrap print:hidden">
-              <TabsList>
-                <TabsTrigger value="schedule" className="gap-2">
-                  <Calendar className="h-4 w-4" /> Schedule
-                </TabsTrigger>
-                <TabsTrigger value="employees" className="gap-2">
-                  <Users className="h-4 w-4" /> Employees
-                </TabsTrigger>
-                <TabsTrigger value="shifts" className="gap-2">
-                  <LayoutGrid className="h-4 w-4" /> Shifts
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex items-center gap-4">
+                <TabsList>
+                  <TabsTrigger value="schedule" className="gap-2">
+                    <Calendar className="h-4 w-4" /> Schedule
+                  </TabsTrigger>
+                  <TabsTrigger value="employees" className="gap-2">
+                    <Users className="h-4 w-4" /> Employees
+                  </TabsTrigger>
+                  <TabsTrigger value="shifts" className="gap-2">
+                    <LayoutGrid className="h-4 w-4" /> Shifts
+                  </TabsTrigger>
+                </TabsList>
+                {employerId && (
+                  <WorkplaceSelector
+                    workplaces={workplaces}
+                    selectedId={selectedWorkplaceId}
+                    onSelect={setSelectedWorkplaceId}
+                    employerId={employerId}
+                  />
+                )}
+              </div>
               {employerId && (
                 <PublishPanel
                   employerId={employerId}
@@ -78,12 +107,13 @@ export default function Dashboard() {
 
             {/* Schedule Tab - Weekly Calendar */}
             <TabsContent value="schedule">
-              {employerId && (
+              {employerId && selectedWorkplaceId && (
                 <WeeklyCalendar
                   employees={employees}
                   shifts={shifts}
                   employerId={employerId}
-                  companyName={(profile as any)?.employers?.name ?? ''}
+                  companyName={selectedWorkplace?.name ?? ''}
+                  workplaceId={selectedWorkplaceId}
                 />
               )}
             </TabsContent>
@@ -116,7 +146,10 @@ export default function Dashboard() {
                     />
                   )}
                 </div>
-                {employerId && <RoleManager employerId={employerId} />}
+                <div className="space-y-6">
+                  {employerId && <RoleManager employerId={employerId} />}
+                  {workplaces.length > 0 && <WorkplaceManager workplaces={workplaces} />}
+                </div>
               </div>
             </TabsContent>
 
@@ -125,9 +158,11 @@ export default function Dashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-foreground">Shifts</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Create and manage your team's shifts.</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {selectedWorkplace ? `Shifts for ${selectedWorkplace.name}` : 'Create and manage your team\'s shifts.'}
+                  </p>
                 </div>
-                <Button onClick={() => { setEditingShift(null); setShiftModalOpen(true); }} disabled={!employerId}>
+                <Button onClick={() => { setEditingShift(null); setShiftModalOpen(true); }} disabled={!employerId || !selectedWorkplaceId}>
                   <CalendarPlus className="mr-2 h-4 w-4" /> Add Shift
                 </Button>
               </div>
@@ -158,6 +193,7 @@ export default function Dashboard() {
             onOpenChange={(o) => { setShiftModalOpen(o); if (!o) setEditingShift(null); }}
             employerId={employerId}
             editingShift={editingShift}
+            workplaceId={selectedWorkplaceId}
           />
         </>
       )}
@@ -170,7 +206,7 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, onSignOut, companyName }: { email?: string; onSignOut: () => void; companyName?: string }) {
+function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () => void }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">

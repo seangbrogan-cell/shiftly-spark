@@ -20,11 +20,15 @@ export function useEmployees() {
   });
 }
 
-export function useShifts() {
+export function useShifts(workplaceId?: string) {
   return useQuery({
-    queryKey: ['shifts'],
+    queryKey: ['shifts', workplaceId],
     queryFn: async () => {
-      const { data, error } = await supabase.from('shifts').select('*');
+      let query: any = supabase.from('shifts').select('*');
+      if (workplaceId) {
+        query = query.eq('workplace_id', workplaceId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       // All-day shifts first, then sort by time-of-day
       return (data as Shift[]).sort((a, b) => {

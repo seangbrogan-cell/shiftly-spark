@@ -40,9 +40,10 @@ interface WeeklyCalendarProps {
   shifts: Shift[];
   employerId: string;
   companyName?: string;
+  workplaceId?: string;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
@@ -52,7 +53,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
   const [activeId, setActiveId] = useState<string | null>(null);
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
-  const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek, workplaceId);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const { data: allAvailability = [] } = useAllEmployeeAvailability();
   const createAssignment = useCreateAssignment();
@@ -161,7 +162,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
           assigned_date: newDate,
           actual_start: actualStart,
           actual_end: actualEnd,
-        });
+          workplace_id: workplaceId,
+        } as any);
         toast({ title: 'Shift assigned' });
       } catch (err: any) {
         toast({ title: 'Error', description: err.message, variant: 'destructive' });
@@ -490,6 +492,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
         employerId={employerId}
         defaultDate={defaultDate}
         defaultEmployeeId={defaultEmployeeId}
+        workplaceId={workplaceId}
       />
 
       {/* Delete Confirmation */}
