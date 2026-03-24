@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Send, Check, Clock, RefreshCw } from 'lucide-react';
+import { Pencil, Trash2, Send, Check, Clock, RefreshCw, Mail } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -15,6 +15,7 @@ interface EmployeeTableProps {
   employerId?: string;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
+  onEmail?: (employee: Employee) => void;
 }
 
 function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
