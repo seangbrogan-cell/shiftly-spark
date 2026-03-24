@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Pencil, Check, X, Trash2, Building2 } from 'lucide-react';
-import { useUpdateWorkplace, useDeleteWorkplace, type Workplace } from '@/hooks/use-workplaces';
+import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, type Workplace } from '@/hooks/use-workplaces';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
