@@ -162,7 +162,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
           assigned_date: newDate,
           actual_start: actualStart,
           actual_end: actualEnd,
-        });
+          workplace_id: workplaceId,
+        } as any);
         toast({ title: 'Shift assigned' });
       } catch (err: any) {
         toast({ title: 'Error', description: err.message, variant: 'destructive' });
