@@ -124,7 +124,10 @@ export default function EmployeeDashboard() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
                   <h1 className="text-2xl font-bold text-foreground">
-                    {activeTab === 'full-schedule' ? 'Full Schedule' : 'My Schedule'}
+                    {(() => {
+                      const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
+                      return activeTab === 'full-schedule' ? `${wpName} Full Schedule` : `${wpName} Schedule`;
+                    })()}
                   </h1>
                   {scheduleUpdated && (
                     <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
