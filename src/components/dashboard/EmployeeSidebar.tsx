@@ -16,7 +16,7 @@ export function EmployeeSidebar({ employees, shiftCounts }: EmployeeSidebarProps
   return (
     <aside className={cn(
       'hidden lg:flex flex-col shrink-0 border-r border-border bg-card overflow-y-auto transition-all duration-200',
-      collapsed ? 'w-12' : 'w-44'
+      collapsed ? 'w-12' : 'w-52'
     )}>
       <div className="p-3 border-b border-border flex items-center justify-between gap-2">
         {!collapsed && (
