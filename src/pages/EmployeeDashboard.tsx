@@ -14,7 +14,7 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users } from 'lucide-react';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users, Printer } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
 import { FullScheduleView } from '@/components/employee/FullScheduleView';
@@ -194,6 +194,10 @@ export default function EmployeeDashboard() {
                     </Button>
                   </>
                 )}
+
+                <Button size="sm" variant="outline" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-1.5" /> Print
+                </Button>
 
                 <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
