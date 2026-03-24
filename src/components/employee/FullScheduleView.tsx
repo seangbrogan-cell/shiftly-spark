@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 import { getShiftColor } from '@/lib/shift-colors';
+import { cn } from '@/lib/utils';
 
 interface FullScheduleViewProps {
   workplaceId: string;
@@ -15,7 +16,8 @@ interface FullAssignment {
   actual_start: string | null;
   actual_end: string | null;
   employee_id: string;
-  shifts: { name: string; start_time: string; end_time: string } | null;
+  shift_id: string;
+  shifts: { name: string; start_time: string | null; end_time: string | null; color: string | null; is_all_day: boolean } | null;
   employees: { name: string } | null;
 }
 
@@ -29,7 +31,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, employee_id, shifts(name, start_time, end_time), employees(name)')
+        .select('id, assigned_date, actual_start, actual_end, employee_id, shift_id, shifts(name, start_time, end_time, color, is_all_day), employees(name)')
         .eq('workplace_id', workplaceId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
@@ -92,12 +94,15 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                 return (
                   <td key={dateStr} className="p-1 text-center align-top">
                     {dayShifts.map((s) => {
-                      const color = getShiftColor(s.shifts?.name ?? '');
+                      const colorDef = getShiftColor({
+                        color: s.shifts?.color ?? null,
+                        is_all_day: s.shifts?.is_all_day ?? false,
+                        start_time: s.shifts?.start_time ?? null,
+                      });
                       return (
                         <div
                           key={s.id}
-                          className="rounded px-1.5 py-0.5 text-xs mb-0.5"
-                          style={{ backgroundColor: `${color}20`, color, borderLeft: `3px solid ${color}` }}
+                          className={cn('rounded px-1.5 py-0.5 text-xs mb-0.5 border', colorDef.bg, colorDef.border, colorDef.text)}
                         >
                           <div className="font-medium truncate">{s.shifts?.name}</div>
                           {s.actual_start && s.actual_end && (
