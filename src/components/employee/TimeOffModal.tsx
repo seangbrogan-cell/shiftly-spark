@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateTimeOffRequest } from '@/hooks/use-employee-data';
+import { supabase } from '@/integrations/supabase/client';
+import { format, parseISO } from 'date-fns';
 
 interface TimeOffModalProps {
   open: boolean;
@@ -47,7 +49,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
     if (!validate()) return;
 
     try {
-      await createRequest.mutateAsync({
+      const result = await createRequest.mutateAsync({
         employee_id: employeeId,
         employer_id: employerId,
         start_date: startDate,
@@ -56,6 +58,37 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         notes: notes.trim() || null,
         status: 'pending',
       });
+
+      // Send email notification to employer (best-effort)
+      try {
+        const [empRes, emailRes] = await Promise.all([
+          supabase.from('employees').select('name').eq('id', employeeId).single(),
+          supabase.rpc('get_employer_email', { _employer_id: employerId }),
+        ]);
+
+        const employeeName = empRes.data?.name || 'An employee';
+        const employerEmail = emailRes.data;
+
+        if (employerEmail) {
+          await supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'time-off-request',
+              recipientEmail: employerEmail,
+              idempotencyKey: `time-off-${result.id}`,
+              templateData: {
+                employeeName,
+                startDate: format(parseISO(startDate), 'MMM d, yyyy'),
+                endDate: format(parseISO(endDate), 'MMM d, yyyy'),
+                reason: reason.trim(),
+                notes: notes.trim() || undefined,
+              },
+            },
+          });
+        }
+      } catch (emailErr) {
+        console.error('Failed to send time-off notification email:', emailErr);
+      }
+
       toast({ title: 'Request submitted', description: 'Your time-off request is pending approval.' });
       onOpenChange(false);
       resetForm();

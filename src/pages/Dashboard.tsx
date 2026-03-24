@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -47,6 +47,22 @@ export default function Dashboard() {
   const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
   const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
   const { data: shiftCounts = {} } = useShiftAssignmentCounts();
+
+  // Pending time-off request count
+  const { data: pendingTimeOffCount = 0 } = useQuery({
+    queryKey: ['pending-time-off-count', employerId],
+    queryFn: async () => {
+      if (!employerId) return 0;
+      const { count, error } = await supabase
+        .from('time_off_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('employer_id', employerId)
+        .eq('status', 'pending');
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!employerId,
+  });
 
   // Fetch employee-workplace assignments for the selected workplace
   const { data: workplaceEmployeeIds } = useQuery({
@@ -122,8 +138,13 @@ export default function Dashboard() {
                    <TabsTrigger value="shifts" className="gap-2">
                      <LayoutGrid className="h-4 w-4" /> Shifts
                    </TabsTrigger>
-                   <TabsTrigger value="time-off" className="gap-2">
+                   <TabsTrigger value="time-off" className="gap-2 relative">
                      <CalendarOff className="h-4 w-4" /> Time Off
+                     {pendingTimeOffCount > 0 && (
+                       <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground px-1 animate-pulse">
+                         {pendingTimeOffCount}
+                       </span>
+                     )}
                    </TabsTrigger>
                 </TabsList>
                 {employerId && (
