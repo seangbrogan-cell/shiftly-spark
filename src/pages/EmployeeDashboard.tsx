@@ -34,7 +34,7 @@ export default function EmployeeDashboard() {
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
-  const [showFullSchedule, setShowFullSchedule] = useState(false);
+  
 
   const employeeId = employee?.id;
   const employerId = employee?.employer_id ?? profile?.employer_id;
@@ -107,6 +107,11 @@ export default function EmployeeDashboard() {
             <TabsTrigger value="schedule" className="gap-2">
               <CalendarDays className="h-4 w-4" /> My Schedule
             </TabsTrigger>
+            {fullScheduleAllowed && (
+              <TabsTrigger value="full-schedule" className="gap-2">
+                <Users className="h-4 w-4" /> Full Schedule
+              </TabsTrigger>
+            )}
             <TabsTrigger value="time-off" className="gap-2">
               <History className="h-4 w-4" /> Time Off
             </TabsTrigger>
@@ -199,17 +204,6 @@ export default function EmployeeDashboard() {
                   <Printer className="h-4 w-4 mr-1.5" /> Print
                 </Button>
 
-
-                {fullScheduleAllowed && (
-                  <Button
-                    size="sm"
-                    variant={showFullSchedule ? 'default' : 'outline'}
-                    onClick={() => setShowFullSchedule(!showFullSchedule)}
-                  >
-                    <Users className="h-4 w-4 mr-1.5" />
-                    {showFullSchedule ? 'My Schedule' : 'Full Schedule'}
-                  </Button>
-                )}
               </div>
             </div>
 
@@ -221,9 +215,7 @@ export default function EmployeeDashboard() {
               }
             </p>
 
-            {showFullSchedule && fullScheduleAllowed && activeWorkplaceId ? (
-              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
-            ) : calendarView === 'weekly' ? (
+            {calendarView === 'weekly' ? (
               loadingWeek ? (
                 <div className="flex justify-center py-16">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -241,6 +233,13 @@ export default function EmployeeDashboard() {
               )
             )}
           </TabsContent>
+
+          {/* Full Schedule Tab */}
+          {fullScheduleAllowed && activeWorkplaceId && (
+            <TabsContent value="full-schedule">
+              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
+            </TabsContent>
+          )}
 
           {/* Time Off Tab */}
           <TabsContent value="time-off">
