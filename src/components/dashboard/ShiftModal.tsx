@@ -5,10 +5,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateShift, useUpdateShift, type Shift } from '@/hooks/use-dashboard-data';
+import { useWorkplaces, type Workplace } from '@/hooks/use-workplaces';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { SHIFT_COLOR_OPTIONS } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
+import { Copy, Check } from 'lucide-react';
 
 interface ShiftModalProps {
   open: boolean;
