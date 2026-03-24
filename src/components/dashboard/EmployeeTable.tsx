@@ -18,7 +18,7 @@ interface EmployeeTableProps {
   onEmail?: (employee: Employee) => void;
 }
 
-function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
+function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: EmployeeTableProps) {
   const [inviting, setInviting] = useState<string | null>(null);
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const { toast } = useToast();
