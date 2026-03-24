@@ -57,12 +57,36 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status, request }: { id: string; status: string; request: TimeOffRequest }) => {
       const { error } = await supabase
         .from('time_off_requests')
         .update({ status })
         .eq('id', id);
       if (error) throw error;
+
+      // Send decision email to employee (best-effort)
+      try {
+        const employeeEmail = request.employees?.email;
+        const employeeName = request.employees?.name;
+        if (employeeEmail) {
+          await supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'time-off-decision',
+              recipientEmail: employeeEmail,
+              idempotencyKey: `time-off-decision-${id}-${status}`,
+              templateData: {
+                employeeName: employeeName || undefined,
+                startDate: format(parseISO(request.start_date), 'MMM d, yyyy'),
+                endDate: format(parseISO(request.end_date), 'MMM d, yyyy'),
+                reason: request.reason,
+                decision: status === 'approved' ? 'approved' : 'rejected',
+              },
+            },
+          });
+        }
+      } catch (emailErr) {
+        console.error('Failed to send time-off decision email:', emailErr);
+      }
     },
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ['employer-time-off-requests'] });
