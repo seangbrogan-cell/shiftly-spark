@@ -56,6 +56,11 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
       <p className="text-xs text-muted-foreground mb-3">
         {isOver ? 'Drop to unassign shift' : 'Drag a shift onto the calendar to assign it.'}
       </p>
+      {onAssignShift && (
+        <Button size="sm" className="w-full mb-3" onClick={onAssignShift}>
+          <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
+        </Button>
+      )}
       {shifts.length === 0 ? (
         <p className="text-xs text-muted-foreground italic">
           No shifts created yet. Add shifts in the Shifts tab.
