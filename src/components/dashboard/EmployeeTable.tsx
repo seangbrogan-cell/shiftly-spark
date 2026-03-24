@@ -132,6 +132,11 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
                   <Send className={`h-4 w-4 ${inviting === emp.id ? 'animate-pulse' : ''}`} />
                 </Button>
               )}
+              {onEmail && (
+                <Button variant="ghost" size="icon" onClick={() => onEmail(emp)} aria-label={`Email ${emp.name}`} title="Send email">
+                  <Mail className="h-4 w-4" />
+                </Button>
+              )}
               <Button variant="ghost" size="icon" onClick={() => onEdit(emp)} aria-label={`Edit ${emp.name}`}>
                 <Pencil className="h-4 w-4" />
               </Button>
