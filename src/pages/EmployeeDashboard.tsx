@@ -204,17 +204,6 @@ export default function EmployeeDashboard() {
                   <Printer className="h-4 w-4 mr-1.5" /> Print
                 </Button>
 
-
-                {fullScheduleAllowed && (
-                  <Button
-                    size="sm"
-                    variant={showFullSchedule ? 'default' : 'outline'}
-                    onClick={() => setShowFullSchedule(!showFullSchedule)}
-                  >
-                    <Users className="h-4 w-4 mr-1.5" />
-                    {showFullSchedule ? 'My Schedule' : 'Full Schedule'}
-                  </Button>
-                )}
               </div>
             </div>
 
