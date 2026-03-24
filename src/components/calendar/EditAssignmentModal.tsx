@@ -24,6 +24,7 @@ interface EditAssignmentModalProps {
   employerId: string;
   defaultDate?: string;
   defaultEmployeeId?: string;
+  workplaceId?: string;
 }
 
 function formatShiftTime(shift: Shift): string {
