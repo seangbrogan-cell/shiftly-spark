@@ -185,12 +185,6 @@ function DashboardHeader({ email, onSignOut, companyName }: { email?: string; on
           <Clock className="h-7 w-7 text-primary" />
           <span className="text-xl font-bold text-foreground">WorkSchedule</span>
         </div>
-        {companyName && (
-          <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
-            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-sm font-semibold text-primary tracking-wide">{companyName}</span>
-          </div>
-        )}
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
           <Button variant="ghost" size="sm" onClick={onSignOut}>
