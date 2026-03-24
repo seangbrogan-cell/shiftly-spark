@@ -34,6 +34,7 @@ export default function EmployeeDashboard() {
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'schedule' | 'full-schedule' | 'time-off'>('schedule');
   
 
   const employeeId = employee?.id;
