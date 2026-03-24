@@ -100,13 +100,17 @@ export default function Signup() {
                 <Label htmlFor="confirmPassword">Confirm password</Label>
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
                 />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox id="showPassword" checked={showPassword} onCheckedChange={(v) => setShowPassword(!!v)} />
+                <Label htmlFor="showPassword" className="text-sm font-normal text-muted-foreground cursor-pointer">Show password</Label>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
