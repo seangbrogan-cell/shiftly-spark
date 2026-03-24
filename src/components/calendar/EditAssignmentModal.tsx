@@ -43,6 +43,7 @@ export function EditAssignmentModal({
   employerId,
   defaultDate,
   defaultEmployeeId,
+  workplaceId,
 }: EditAssignmentModalProps) {
   const isEdit = !!assignment;
   const [employeeId, setEmployeeId] = useState('');
