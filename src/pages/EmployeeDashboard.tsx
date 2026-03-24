@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/use-dashboard-data';
@@ -12,7 +12,6 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
@@ -38,6 +37,21 @@ export default function EmployeeDashboard() {
 
   const weekDays = getWeekDays(currentWeek);
   const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
+
+  useEffect(() => {
+    if (!selectedWorkplaceId && employeeWorkplaces.length > 0) {
+      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+      return;
+    }
+
+    if (
+      selectedWorkplaceId &&
+      employeeWorkplaces.length > 0 &&
+      !employeeWorkplaces.some((wp) => wp.id === selectedWorkplaceId)
+    ) {
+      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+    }
+  }, [employeeWorkplaces, selectedWorkplaceId]);
 
   // Always lock schedule view to a single selected workplace (no combined/all view)
   const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
@@ -92,28 +106,28 @@ export default function EmployeeDashboard() {
 
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Workplace dropdown */}
-                <Select
-                  value={activeWorkplaceId}
-                  onValueChange={setSelectedWorkplaceId}
-                  disabled={employeeWorkplaces.length === 0}
-                >
-                  <SelectTrigger className="h-8 w-[220px]">
-                    <SelectValue placeholder="Select workplace" />
-                  </SelectTrigger>
-                  <SelectContent>
+                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2 py-1">
+                  <label htmlFor="employee-workplace" className="text-xs font-medium text-muted-foreground">
+                    Workplace
+                  </label>
+                  <select
+                    id="employee-workplace"
+                    value={activeWorkplaceId ?? ''}
+                    onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
+                    disabled={employeeWorkplaces.length === 0}
+                    className="h-6 min-w-[160px] bg-transparent text-sm text-foreground outline-none"
+                  >
                     {employeeWorkplaces.length === 0 ? (
-                      <SelectItem value="no-workplaces" disabled>
-                        No workplaces assigned
-                      </SelectItem>
+                      <option value="">No workplaces assigned</option>
                     ) : (
                       employeeWorkplaces.map((wp) => (
-                        <SelectItem key={wp.id} value={wp.id}>
+                        <option key={wp.id} value={wp.id}>
                           {wp.name}
-                        </SelectItem>
+                        </option>
                       ))
                     )}
-                  </SelectContent>
-                </Select>
+                  </select>
+                </div>
 
                 {/* View toggle */}
                 <div className="flex rounded-md border border-border overflow-hidden">
