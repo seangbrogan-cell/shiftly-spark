@@ -11,19 +11,23 @@ export interface AssignmentWithDetails extends ShiftAssignment {
   employees: { name: string } | null;
 }
 
-export function useWeeklyAssignments(weekStart: Date) {
+export function useWeeklyAssignments(weekStart: Date, workplaceId?: string) {
   const start = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const end = format(endOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['assignments', start],
+    queryKey: ['assignments', start, workplaceId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query: any = supabase
         .from('shift_assignments')
-.select('*, shifts(name, start_time, end_time, is_all_day, color), employees(name)')
+        .select('*, shifts(name, start_time, end_time, is_all_day, color), employees(name)')
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .order('actual_start', { ascending: true });
+      if (workplaceId) {
+        query = query.eq('workplace_id', workplaceId);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data as AssignmentWithDetails[];
     },

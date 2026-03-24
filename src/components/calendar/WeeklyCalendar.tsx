@@ -53,7 +53,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
   const [activeId, setActiveId] = useState<string | null>(null);
   const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
 
-  const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek);
+  const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek, workplaceId);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const { data: allAvailability = [] } = useAllEmployeeAvailability();
   const createAssignment = useCreateAssignment();
