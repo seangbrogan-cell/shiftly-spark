@@ -78,6 +78,10 @@ export function PublishPanel({ employerId, currentWeek, employees, shifts }: Pub
         >
           <Eye className="h-3 w-3" /> Preview
         </Button>
+        <StatusBadge
+          status={status}
+          publishedAt={publishStatus?.publishedAt ?? null}
+        />
         <Button
           size="sm"
           className="h-7 px-2.5 gap-1 text-xs"
