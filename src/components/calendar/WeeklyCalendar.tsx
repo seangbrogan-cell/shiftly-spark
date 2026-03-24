@@ -492,6 +492,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         employerId={employerId}
         defaultDate={defaultDate}
         defaultEmployeeId={defaultEmployeeId}
+        workplaceId={workplaceId}
       />
 
       {/* Delete Confirmation */}
