@@ -1,11 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { Employee } from '@/hooks/use-dashboard-data';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { buildRoleSortPriority } from '@/lib/roles';
+import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Pencil, Trash2, Send, Check } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
