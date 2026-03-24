@@ -27,6 +27,7 @@ export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
   const [deletingWp, setDeletingWp] = useState<Workplace | null>(null);
   const updateWorkplace = useUpdateWorkplace();
   const deleteWorkplace = useDeleteWorkplace();
+  const toggleVisible = useToggleFullScheduleVisible();
   const { toast } = useToast();
 
   const startEdit = (wp: Workplace) => {
