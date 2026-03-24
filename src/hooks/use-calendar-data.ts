@@ -109,3 +109,23 @@ export function getWeekDays(weekStart: Date): Date[] {
   const monday = startOfWeek(weekStart, { weekStartsOn: 1 });
   return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 }
+
+// Fetch approved time-off requests that overlap a given week
+export function useApprovedTimeOff(weekStart: Date) {
+  const start = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const end = format(endOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+
+  return useQuery({
+    queryKey: ['approved-time-off', start],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('time_off_requests')
+        .select('employee_id, start_date, end_date')
+        .eq('status', 'approved')
+        .lte('start_date', end)
+        .gte('end_date', start);
+      if (error) throw error;
+      return data as { employee_id: string; start_date: string; end_date: string }[];
+    },
+  });
+}
