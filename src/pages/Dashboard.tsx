@@ -67,7 +67,6 @@ export default function Dashboard() {
                   <LayoutGrid className="h-4 w-4" /> Shifts
                 </TabsTrigger>
                 </TabsList>
-              </div>
               {employerId && (
                 <PublishPanel
                   employerId={employerId}
