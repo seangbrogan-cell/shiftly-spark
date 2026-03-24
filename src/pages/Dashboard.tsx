@@ -26,7 +26,76 @@ export default function Dashboard() {
   const { user, signOut } = useAuth();
   const { data: profile, isFetching: profileIsFetching } = useProfile();
   const employerId = profile?.employer_id;
-...
+
+  const { data: workplaces = [] } = useWorkplaces(employerId ?? undefined);
+  const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>();
+
+  // Auto-select first workplace
+  useEffect(() => {
+    if (workplaces.length > 0 && !selectedWorkplaceId) {
+      setSelectedWorkplaceId(workplaces[0].id);
+    }
+    // If selected workplace was deleted, switch to first
+    if (selectedWorkplaceId && workplaces.length > 0 && !workplaces.find(w => w.id === selectedWorkplaceId)) {
+      setSelectedWorkplaceId(workplaces[0].id);
+    }
+  }, [workplaces, selectedWorkplaceId]);
+
+  const selectedWorkplace = workplaces.find(w => w.id === selectedWorkplaceId);
+
+  const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
+  const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
+  const { data: shiftCounts = {} } = useShiftAssignmentCounts();
+
+  // Fetch employee-workplace assignments for the selected workplace
+  const { data: workplaceEmployeeIds } = useQuery({
+    queryKey: ['employee-workplaces-for-workplace', selectedWorkplaceId],
+    queryFn: async () => {
+      if (!selectedWorkplaceId) return null;
+      const { data, error } = await supabase
+        .from('employee_workplaces' as any)
+        .select('employee_id')
+        .eq('workplace_id', selectedWorkplaceId);
+      if (error) throw error;
+      return new Set((data as any[]).map(r => r.employee_id));
+    },
+    enabled: !!selectedWorkplaceId,
+  });
+
+  // Filter employees to those assigned to the selected workplace
+  const workplaceEmployees = useMemo(() => {
+    if (!workplaceEmployeeIds) return employees;
+    return employees.filter(e => workplaceEmployeeIds.has(e.id));
+  }, [employees, workplaceEmployeeIds]);
+
+  const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
+  const [shiftModalOpen, setShiftModalOpen] = useState(false);
+  const [editingShift, setEditingShift] = useState<Shift | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
+
+  const handleEdit = (emp: Employee) => {
+    setEditingEmployee(emp);
+    setEmployeeModalOpen(true);
+  };
+
+  const handleCloseEmployeeModal = (open: boolean) => {
+    setEmployeeModalOpen(open);
+    if (!open) setEditingEmployee(null);
+  };
+
+  const handleEmailEmployee = (emp: Employee) => {
+    setEmailPreselected([emp]);
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailAll = () => {
+    setEmailPreselected(employees);
+    setEmailModalOpen(true);
+  };
+
   if (profile && !employerId && !profileIsFetching) {
     return <Navigate to="/onboarding" replace />;
   }
