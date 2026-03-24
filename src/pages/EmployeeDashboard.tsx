@@ -107,6 +107,11 @@ export default function EmployeeDashboard() {
             <TabsTrigger value="schedule" className="gap-2">
               <CalendarDays className="h-4 w-4" /> My Schedule
             </TabsTrigger>
+            {fullScheduleAllowed && (
+              <TabsTrigger value="full-schedule" className="gap-2">
+                <Users className="h-4 w-4" /> Full Schedule
+              </TabsTrigger>
+            )}
             <TabsTrigger value="time-off" className="gap-2">
               <History className="h-4 w-4" /> Time Off
             </TabsTrigger>
