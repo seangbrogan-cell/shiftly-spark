@@ -7,6 +7,7 @@ export interface Workplace {
   name: string;
   created_at: string;
   updated_at: string;
+  full_schedule_visible: boolean;
 }
 
 export function useWorkplaces(employerId: string | undefined) {
