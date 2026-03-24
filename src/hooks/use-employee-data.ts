@@ -13,48 +13,54 @@ export interface EmployeeAssignment {
   actual_end: string | null;
   shift_id: string;
   employee_id: string;
+  workplace_id: string | null;
   shifts: { name: string; start_time: string; end_time: string } | null;
+  workplaces: { name: string } | null;
 }
 
-export function useEmployeeWeeklySchedule(employeeId: string | undefined, weekStart: Date) {
+export function useEmployeeWeeklySchedule(employeeId: string | undefined, weekStart: Date, workplaceId?: string) {
   const start = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const end = format(endOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['employee-schedule-week', employeeId, start],
+    queryKey: ['employee-schedule-week', employeeId, start, workplaceId],
     queryFn: async () => {
       if (!employeeId) return [];
-      const { data, error } = await supabase
+      let query = supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, shifts(name, start_time, end_time)')
+        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time), workplaces(name)')
         .eq('employee_id', employeeId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .order('actual_start', { ascending: true });
+      if (workplaceId) query = query.eq('workplace_id', workplaceId);
+      const { data, error } = await query;
       if (error) throw error;
-      return data as EmployeeAssignment[];
+      return data as unknown as EmployeeAssignment[];
     },
     enabled: !!employeeId,
   });
 }
 
-export function useEmployeeMonthlySchedule(employeeId: string | undefined, monthDate: Date) {
+export function useEmployeeMonthlySchedule(employeeId: string | undefined, monthDate: Date, workplaceId?: string) {
   const start = format(startOfMonth(monthDate), 'yyyy-MM-dd');
   const end = format(endOfMonth(monthDate), 'yyyy-MM-dd');
 
   return useQuery({
-    queryKey: ['employee-schedule-month', employeeId, start],
+    queryKey: ['employee-schedule-month', employeeId, start, workplaceId],
     queryFn: async () => {
       if (!employeeId) return [];
-      const { data, error } = await supabase
+      let query = supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, shifts(name, start_time, end_time)')
+        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time), workplaces(name)')
         .eq('employee_id', employeeId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .order('actual_start', { ascending: true });
+      if (workplaceId) query = query.eq('workplace_id', workplaceId);
+      const { data, error } = await query;
       if (error) throw error;
-      return data as EmployeeAssignment[];
+      return data as unknown as EmployeeAssignment[];
     },
     enabled: !!employeeId,
   });
@@ -139,5 +145,25 @@ export function useCurrentEmployee() {
       if (e2) throw e2;
       return byEmail;
     },
+  });
+}
+
+// Fetch workplaces assigned to the current employee
+export function useEmployeeWorkplacesList(employeeId: string | undefined) {
+  return useQuery({
+    queryKey: ['employee-workplaces-list', employeeId],
+    queryFn: async () => {
+      if (!employeeId) return [];
+      const { data, error } = await supabase
+        .from('employee_workplaces')
+        .select('workplace_id, workplaces(id, name)')
+        .eq('employee_id', employeeId);
+      if (error) throw error;
+      return (data as any[]).map((d: any) => ({
+        id: d.workplaces.id as string,
+        name: d.workplaces.name as string,
+      }));
+    },
+    enabled: !!employeeId,
   });
 }
