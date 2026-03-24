@@ -217,26 +217,6 @@ export function EditAssignmentModal({
             {errors.date && <p className="text-sm text-error">{errors.date}</p>}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label>Start Time *</Label>
-              <Input
-                type="datetime-local"
-                value={startTime}
-                onChange={(e) => { setStartTime(e.target.value); setConflictWarning(false); }}
-              />
-              {errors.startTime && <p className="text-sm text-error">{errors.startTime}</p>}
-            </div>
-            <div className="space-y-1.5">
-              <Label>End Time *</Label>
-              <Input
-                type="datetime-local"
-                value={endTime}
-                onChange={(e) => { setEndTime(e.target.value); setConflictWarning(false); }}
-              />
-              {errors.endTime && <p className="text-sm text-error">{errors.endTime}</p>}
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
