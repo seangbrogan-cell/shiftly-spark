@@ -544,7 +544,12 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 <PanelRightClose className="h-4 w-4" />
               </Button>
             </div>
-            <ShiftTemplateSidebar shifts={shifts} />
+            <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
+              setEditingAssignment(null);
+              setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+              setDefaultEmployeeId('');
+              setModalOpen(true);
+            }} />
           </>
         )}
       </div>
