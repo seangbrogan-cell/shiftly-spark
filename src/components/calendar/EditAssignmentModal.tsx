@@ -63,14 +63,10 @@ export function EditAssignmentModal({
         setEmployeeId(assignment.employee_id);
         setShiftId(assignment.shift_id);
         setDate(assignment.assigned_date);
-        setStartTime(assignment.actual_start ? assignment.actual_start.slice(0, 16) : '');
-        setEndTime(assignment.actual_end ? assignment.actual_end.slice(0, 16) : '');
       } else {
         setEmployeeId(defaultEmployeeId ?? '');
         setShiftId('');
         setDate(defaultDate ?? '');
-        setStartTime('');
-        setEndTime('');
       }
       setConflictWarning(false);
       setErrors({});
