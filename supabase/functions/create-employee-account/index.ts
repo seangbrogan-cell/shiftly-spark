@@ -127,19 +127,27 @@ Deno.serve(async (req) => {
     // Send password reset email so employee can set their own password
     // We need to use the site URL for the redirect
     const siteUrl = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || supabaseUrl;
-    await supabaseAdmin.auth.admin.generateLink({
-      type: "recovery",
-      email: employee.email,
-      options: {
-        redirectTo: `${siteUrl}/reset-password`,
-      },
-    });
 
-    // Actually send the recovery email via the normal flow
+    // Send the recovery email via the normal auth flow (single request to avoid rate-limit collisions)
     const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
-    await anonClient.auth.resetPasswordForEmail(employee.email, {
+    const { error: recoveryError } = await anonClient.auth.resetPasswordForEmail(employee.email, {
       redirectTo: `${siteUrl}/reset-password`,
     });
+
+    if (recoveryError) {
+      const isRateLimited = recoveryError.message?.toLowerCase().includes("only request this after") || recoveryError.message?.includes("429");
+      return new Response(
+        JSON.stringify({
+          error: isRateLimited
+            ? "A reset email was requested too recently for this address. Please wait about a minute and try again."
+            : recoveryError.message,
+        }),
+        {
+          status: isRateLimited ? 429 : 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     return new Response(
       JSON.stringify({ success: true, message: `Account created for ${employee.email}. A password reset email has been sent.` }),
