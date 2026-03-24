@@ -72,12 +72,19 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setErrors({});
   };
 
-  // Always hydrate form from current modal mode (Add/Edit) when opened.
+  // Hydrate form only when the modal first opens or the target employee changes.
+  // We track a "key" so that data-dependency changes (roleNames, workplaces, etc.)
+  // do NOT reset user input mid-typing.
+  const [lastInitKey, setLastInitKey] = useState('');
+  const initKey = `${open}-${employee?.id ?? 'new'}`;
+
   useEffect(() => {
     if (!open) return;
+    if (initKey === lastInitKey) return;
+    setLastInitKey(initKey);
     initializeForm(employee);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, employee?.id, roleNames, empWorkplaces, workplaces]);
+  }, [open, initKey]);
 
   // Sync time ranges when availability data loads
   useEffect(() => {
