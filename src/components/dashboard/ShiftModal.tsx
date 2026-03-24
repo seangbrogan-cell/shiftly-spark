@@ -94,7 +94,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift, workp
         await updateShift.mutateAsync({ id: editingShift.id, ...shiftData });
         toast({ title: 'Shift updated' });
       } else {
-        await createShift.mutateAsync({ employer_id: employerId, ...shiftData });
+        await createShift.mutateAsync({ employer_id: employerId, workplace_id: workplaceId, ...shiftData } as any);
         toast({ title: 'Shift created' });
       }
       onOpenChange(false);
