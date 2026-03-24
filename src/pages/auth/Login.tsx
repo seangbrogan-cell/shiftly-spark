@@ -24,7 +24,25 @@ export default function Login() {
     if (error) {
       toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
     } else {
-      navigate('/dashboard');
+      // Determine role-based redirect
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role, employer_id')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!profile?.employer_id) {
+          navigate('/onboarding');
+        } else if (profile.role === 'employee') {
+          navigate('/employee');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        navigate('/dashboard');
+      }
     }
     setLoading(false);
   };
