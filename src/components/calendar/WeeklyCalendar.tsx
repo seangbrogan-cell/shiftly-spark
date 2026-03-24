@@ -247,10 +247,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName }: W
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h2 className="text-2xl font-bold text-foreground">{companyName ? `${companyName} Schedule` : 'Schedule'}</h2>
-            <StatusBadge
-              status={publishStatus?.status ?? 'no_schedule'}
-              publishedAt={publishStatus?.publishedAt ?? null}
-            />
           </div>
           <p className="text-sm text-muted-foreground">
             {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
