@@ -78,11 +78,10 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
                   <Check className="h-4 w-4 text-primary" />
                 </Button>
               ) : cooldowns[emp.id] ? (
-                <Button variant="ghost" size="icon" disabled aria-label="Cooldown" title={`Resend available in ${cooldowns[emp.id]}s`}>
-                  <span className="flex items-center gap-0.5 text-xs text-muted-foreground tabular-nums">
-                    <Clock className="h-3.5 w-3.5" />{cooldowns[emp.id]}
-                  </span>
-                </Button>
+                <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
+                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                  <span>{cooldowns[emp.id]}s</span>
+                </span>
               ) : (
                 <Button
                   variant="ghost"
