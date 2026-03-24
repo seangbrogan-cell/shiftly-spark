@@ -12,7 +12,8 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Building2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
 import { TimeOffModal } from '@/components/employee/TimeOffModal';
@@ -38,11 +39,12 @@ export default function EmployeeDashboard() {
   const weekDays = getWeekDays(currentWeek);
   const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
 
-  // Default to first workplace once loaded
+  // Always lock schedule view to a single selected workplace (no combined/all view)
   const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
+  const scheduleEmployeeId = activeWorkplaceId ? employeeId : undefined;
 
-  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, activeWorkplaceId);
-  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, activeWorkplaceId);
+  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(scheduleEmployeeId, currentWeek, activeWorkplaceId);
+  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(scheduleEmployeeId, currentMonth, activeWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
 
@@ -89,19 +91,23 @@ export default function EmployeeDashboard() {
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                {/* Workplace filter */}
+                {/* Workplace dropdown */}
                 {employeeWorkplaces.length > 0 && (
-                  <div className="flex rounded-md border border-border overflow-hidden">
-                    {employeeWorkplaces.map((wp) => (
-                      <button
-                        key={wp.id}
-                        onClick={() => setSelectedWorkplaceId(wp.id)}
-                        className={`px-3 py-1.5 text-xs font-medium transition-colors border-l first:border-l-0 border-border ${activeWorkplaceId === wp.id ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
-                      >
-                        {wp.name}
-                      </button>
-                    ))}
-                  </div>
+                  <Select
+                    value={activeWorkplaceId}
+                    onValueChange={setSelectedWorkplaceId}
+                  >
+                    <SelectTrigger className="h-8 w-[220px]">
+                      <SelectValue placeholder="Select workplace" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employeeWorkplaces.map((wp) => (
+                        <SelectItem key={wp.id} value={wp.id}>
+                          {wp.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
 
                 {/* View toggle */}
