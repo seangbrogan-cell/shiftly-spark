@@ -201,7 +201,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
             <Table>
               {headers}
               <TableBody>
-                <EmployeeRows employees={management} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} />
+                <EmployeeRows employees={management} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} onEmail={onEmail} />
               </TableBody>
             </Table>
           </div>
