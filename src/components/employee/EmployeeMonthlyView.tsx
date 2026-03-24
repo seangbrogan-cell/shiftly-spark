@@ -2,21 +2,7 @@ import { useMemo, useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay } from 'date-fns';
 import { Clock, X } from 'lucide-react';
 import type { EmployeeAssignment } from '@/hooks/use-employee-data';
-
-const SHIFT_COLORS = [
-  { dot: 'bg-blue-500' },
-  { dot: 'bg-emerald-500' },
-  { dot: 'bg-amber-500' },
-  { dot: 'bg-purple-500' },
-  { dot: 'bg-rose-500' },
-  { dot: 'bg-cyan-500' },
-];
-
-function getColor(shiftId: string) {
-  let hash = 0;
-  for (let i = 0; i < shiftId.length; i++) hash = ((hash << 5) - hash + shiftId.charCodeAt(i)) | 0;
-  return SHIFT_COLORS[Math.abs(hash) % SHIFT_COLORS.length];
-}
+import { getShiftColor } from '@/lib/shift-colors';
 
 interface EmployeeMonthlyViewProps {
   assignments: EmployeeAssignment[];
@@ -31,7 +17,6 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
   const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
   const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
-  // Build array of weeks
   const weeks: Date[][] = useMemo(() => {
     const result: Date[][] = [];
     let current = calendarStart;
@@ -87,27 +72,45 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                   type="button"
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={`
-                    p-2 min-h-[72px] border-r border-b border-border last:border-r-0 text-left transition-colors
+                    p-1.5 min-h-[85px] border-r border-b border-border last:border-r-0 text-left transition-colors
                     ${!inMonth ? 'opacity-40' : ''}
                     ${today ? 'bg-primary-light/30' : 'bg-card'}
                     ${isSelected ? 'ring-2 ring-inset ring-primary/40' : ''}
                     hover:bg-muted/50
                   `}
                 >
-                  <p className={`text-sm font-medium ${today ? 'text-primary' : 'text-foreground'}`}>
+                  <p className={`text-sm font-medium mb-1 ${today ? 'text-primary' : 'text-foreground'}`}>
                     {format(day, 'd')}
                   </p>
                   {dayAssignments.length > 0 && (
-                    <div className="flex flex-col gap-0.5 mt-0.5">
-                      {dayAssignments.slice(0, 2).map((a) => (
-                        <span key={a.id} className="text-[9px] leading-tight text-muted-foreground truncate">
-                          {a.actual_start && a.actual_end
-                            ? `${format(new Date(a.actual_start), 'h:mma')}–${format(new Date(a.actual_end), 'h:mma')}`
-                            : a.shifts?.name ?? 'Shift'}
-                        </span>
-                      ))}
+                    <div className="flex flex-col gap-0.5">
+                      {dayAssignments.slice(0, 2).map((a) => {
+                        const color = getShiftColor({
+                          color: a.shifts?.color,
+                          is_all_day: a.shifts?.is_all_day,
+                          start_time: a.shifts?.start_time,
+                        });
+                        return (
+                          <div
+                            key={a.id}
+                            className={`rounded border px-1 py-0.5 ${color.bg} ${color.border}`}
+                          >
+                            <div className="flex items-center gap-1">
+                              <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
+                              <span className={`text-[9px] font-semibold leading-tight truncate ${color.text}`}>
+                                {a.shifts?.name ?? 'Shift'}
+                              </span>
+                            </div>
+                            {a.actual_start && a.actual_end && (
+                              <p className="text-[8px] leading-tight text-muted-foreground truncate pl-2.5">
+                                {format(new Date(a.actual_start), 'h:mma')}–{format(new Date(a.actual_end), 'h:mma')}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                       {dayAssignments.length > 2 && (
-                        <span className="text-[9px] text-muted-foreground">+{dayAssignments.length - 2}</span>
+                        <span className="text-[9px] text-muted-foreground pl-1">+{dayAssignments.length - 2} more</span>
                       )}
                     </div>
                   )}
@@ -133,22 +136,29 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
             <p className="text-sm text-muted-foreground">No shifts scheduled.</p>
           ) : (
             <div className="space-y-2">
-              {selectedAssignments.map((a) => (
-                <div key={a.id} className="flex items-center gap-3 rounded-md bg-muted/50 p-3">
-                  <div className={`h-2.5 w-2.5 rounded-full ${getColor(a.shift_id).dot} shrink-0`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{a.shifts?.name ?? 'Shift'}</p>
-                    {a.actual_start && a.actual_end && (
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(a.actual_start), 'h:mm a')} – {format(new Date(a.actual_end), 'h:mm a')}
-                        </p>
-                      </div>
-                    )}
+              {selectedAssignments.map((a) => {
+                const color = getShiftColor({
+                  color: a.shifts?.color,
+                  is_all_day: a.shifts?.is_all_day,
+                  start_time: a.shifts?.start_time,
+                });
+                return (
+                  <div key={a.id} className={`flex items-center gap-3 rounded-md border ${color.bg} ${color.border} p-3`}>
+                    <div className={`h-2.5 w-2.5 rounded-full ${color.dot} shrink-0`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm font-medium ${color.text}`}>{a.shifts?.name ?? 'Shift'}</p>
+                      {a.actual_start && a.actual_end && (
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(a.actual_start), 'h:mm a')} – {format(new Date(a.actual_end), 'h:mm a')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

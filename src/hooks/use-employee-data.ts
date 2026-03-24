@@ -14,7 +14,7 @@ export interface EmployeeAssignment {
   shift_id: string;
   employee_id: string;
   workplace_id: string | null;
-  shifts: { name: string; start_time: string; end_time: string } | null;
+  shifts: { name: string; start_time: string; end_time: string; color: string | null; is_all_day: boolean } | null;
   workplaces: { name: string } | null;
 }
 
@@ -28,7 +28,7 @@ export function useEmployeeWeeklySchedule(employeeId: string | undefined, weekSt
       if (!employeeId) return [];
       let query = supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time), workplaces(name)')
+        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time, color, is_all_day), workplaces(name)')
         .eq('employee_id', employeeId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
@@ -52,7 +52,7 @@ export function useEmployeeMonthlySchedule(employeeId: string | undefined, month
       if (!employeeId) return [];
       let query = supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time), workplaces(name)')
+        .select('id, assigned_date, actual_start, actual_end, shift_id, employee_id, workplace_id, shifts(name, start_time, end_time, color, is_all_day), workplaces(name)')
         .eq('employee_id', employeeId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
