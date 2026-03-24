@@ -15,6 +15,7 @@ interface ShiftModalProps {
   onOpenChange: (open: boolean) => void;
   employerId: string;
   editingShift?: Shift | null;
+  workplaceId?: string;
 }
 
 function isoToTimeInput(iso: string): string {

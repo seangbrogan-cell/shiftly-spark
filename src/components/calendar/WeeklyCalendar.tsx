@@ -40,9 +40,10 @@ interface WeeklyCalendarProps {
   shifts: Shift[];
   employerId: string;
   companyName?: string;
+  workplaceId?: string;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
