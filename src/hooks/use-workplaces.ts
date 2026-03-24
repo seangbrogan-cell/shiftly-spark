@@ -30,14 +30,13 @@ export function useCreateWorkplace() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ employerId, name, copyFromWorkplaceId }: { employerId: string; name: string; copyFromWorkplaceId?: string }) => {
-      // Create the workplace
-      const { data: workplace, error } = await supabase
+      const { data: workplace, error } = await (supabase
         .from('workplaces' as any)
         .insert({ employer_id: employerId, name } as any)
         .select()
-        .single();
+        .single() as any);
       if (error) throw error;
-      const wp = workplace as unknown as Workplace;
+      const wp = workplace as Workplace;
 
       // Copy shifts from another workplace if requested
       if (copyFromWorkplaceId) {
