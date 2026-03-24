@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "shiftly-spark"
+const SITE_NAME = "WorkSchedule"
 const SENDER_DOMAIN = "notify.workschedule.uk"
 const ROOT_DOMAIN = "workschedule.uk"
 const FROM_DOMAIN = "workschedule.uk" // Domain shown in From address (may be root or sender subdomain)
