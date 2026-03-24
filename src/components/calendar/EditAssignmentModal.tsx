@@ -49,8 +49,6 @@ export function EditAssignmentModal({
   const [employeeId, setEmployeeId] = useState('');
   const [shiftId, setShiftId] = useState('');
   const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
   const [conflictWarning, setConflictWarning] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
