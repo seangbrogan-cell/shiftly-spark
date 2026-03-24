@@ -31,6 +31,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const isEdit = !!employee;
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleNames = useMemo(() => getRoleNames(dbRoles), [dbRoles]);
+  const { data: workplaces = [] } = useWorkplaces(employerId);
+  const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -40,12 +42,14 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [dayTimeRanges, setDayTimeRanges] = useState<DayTimeRange[]>(
     DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
   );
+  const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
   const saveAvailability = useSaveEmployeeAvailability();
-  const isSaving = createEmployee.isPending || updateEmployee.isPending || saveAvailability.isPending;
+  const saveWorkplaces = useSaveEmployeeWorkplaces();
+  const isSaving = createEmployee.isPending || updateEmployee.isPending || saveAvailability.isPending || saveWorkplaces.isPending;
 
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
