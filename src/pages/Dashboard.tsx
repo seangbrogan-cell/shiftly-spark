@@ -48,6 +48,22 @@ export default function Dashboard() {
   const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
   const { data: shiftCounts = {} } = useShiftAssignmentCounts();
 
+  // Pending time-off request count
+  const { data: pendingTimeOffCount = 0 } = useQuery({
+    queryKey: ['pending-time-off-count', employerId],
+    queryFn: async () => {
+      if (!employerId) return 0;
+      const { count, error } = await supabase
+        .from('time_off_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('employer_id', employerId)
+        .eq('status', 'pending');
+      if (error) throw error;
+      return count ?? 0;
+    },
+    enabled: !!employerId,
+  });
+
   // Fetch employee-workplace assignments for the selected workplace
   const { data: workplaceEmployeeIds } = useQuery({
     queryKey: ['employee-workplaces-for-workplace', selectedWorkplaceId],
