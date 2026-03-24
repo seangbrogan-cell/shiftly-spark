@@ -1,0 +1,1 @@
+ALTER TABLE public.workplaces ADD COLUMN full_schedule_visible boolean NOT NULL DEFAULT false;

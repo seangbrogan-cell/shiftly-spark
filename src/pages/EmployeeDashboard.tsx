@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/use-dashboard-data';
 import {
@@ -12,9 +14,10 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus } from 'lucide-react';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
+import { FullScheduleView } from '@/components/employee/FullScheduleView';
 import { TimeOffModal } from '@/components/employee/TimeOffModal';
 import { TimeOffHistory } from '@/components/employee/TimeOffHistory';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
@@ -31,6 +34,7 @@ export default function EmployeeDashboard() {
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
+  const [showFullSchedule, setShowFullSchedule] = useState(false);
 
   const employeeId = employee?.id;
   const employerId = employee?.employer_id ?? profile?.employer_id;
@@ -56,6 +60,23 @@ export default function EmployeeDashboard() {
   // Always lock schedule view to a single selected workplace (no combined/all view)
   const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
   const scheduleEmployeeId = activeWorkplaceId ? employeeId : undefined;
+
+  // Check if the active workplace has full_schedule_visible enabled
+  const { data: workplaceSettings } = useQuery({
+    queryKey: ['workplace-settings', activeWorkplaceId],
+    queryFn: async () => {
+      if (!activeWorkplaceId) return null;
+      const { data, error } = await supabase
+        .from('workplaces')
+        .select('full_schedule_visible')
+        .eq('id', activeWorkplaceId)
+        .single();
+      if (error) throw error;
+      return data as { full_schedule_visible: boolean };
+    },
+    enabled: !!activeWorkplaceId,
+  });
+  const fullScheduleAllowed = workplaceSettings?.full_schedule_visible ?? false;
 
   const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(scheduleEmployeeId, currentWeek, activeWorkplaceId);
   const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(scheduleEmployeeId, currentMonth, activeWorkplaceId);
@@ -177,6 +198,17 @@ export default function EmployeeDashboard() {
                 <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
                 </Button>
+
+                {fullScheduleAllowed && (
+                  <Button
+                    size="sm"
+                    variant={showFullSchedule ? 'default' : 'outline'}
+                    onClick={() => setShowFullSchedule(!showFullSchedule)}
+                  >
+                    <Users className="h-4 w-4 mr-1.5" />
+                    {showFullSchedule ? 'My Schedule' : 'Full Schedule'}
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -188,7 +220,9 @@ export default function EmployeeDashboard() {
               }
             </p>
 
-            {calendarView === 'weekly' ? (
+            {showFullSchedule && fullScheduleAllowed && activeWorkplaceId ? (
+              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
+            ) : calendarView === 'weekly' ? (
               loadingWeek ? (
                 <div className="flex justify-center py-16">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />

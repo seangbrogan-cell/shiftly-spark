@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { Pencil, Check, X, Trash2, Building2 } from 'lucide-react';
-import { useUpdateWorkplace, useDeleteWorkplace, type Workplace } from '@/hooks/use-workplaces';
+import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, type Workplace } from '@/hooks/use-workplaces';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -26,6 +27,7 @@ export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
   const [deletingWp, setDeletingWp] = useState<Workplace | null>(null);
   const updateWorkplace = useUpdateWorkplace();
   const deleteWorkplace = useDeleteWorkplace();
+  const toggleVisible = useToggleFullScheduleVisible();
   const { toast } = useToast();
 
   const startEdit = (wp: Workplace) => {
@@ -84,6 +86,14 @@ export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
             ) : (
               <>
                 <span className="text-sm flex-1 truncate">{wp.name}</span>
+                <div className="flex items-center gap-1.5" title="Allow employees to view full schedule">
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">Full schedule</span>
+                  <Switch
+                    checked={wp.full_schedule_visible}
+                    onCheckedChange={(checked) => toggleVisible.mutate({ id: wp.id, visible: checked })}
+                    className="scale-75"
+                  />
+                </div>
                 <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(wp)}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
