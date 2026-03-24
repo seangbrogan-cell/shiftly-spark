@@ -15,6 +15,8 @@ import {
   buildDayTimeRanges,
   type DayTimeRange,
 } from '@/hooks/use-employee-availability';
+import { useWorkplaces } from '@/hooks/use-workplaces';
+import { useEmployeeWorkplaces, useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
@@ -29,6 +31,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const isEdit = !!employee;
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleNames = useMemo(() => getRoleNames(dbRoles), [dbRoles]);
+  const { data: workplaces = [] } = useWorkplaces(employerId);
+  const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -38,12 +42,14 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
   const [dayTimeRanges, setDayTimeRanges] = useState<DayTimeRange[]>(
     DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
   );
+  const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
   const updateEmployee = useUpdateEmployee();
   const saveAvailability = useSaveEmployeeAvailability();
-  const isSaving = createEmployee.isPending || updateEmployee.isPending || saveAvailability.isPending;
+  const saveWorkplaces = useSaveEmployeeWorkplaces();
+  const isSaving = createEmployee.isPending || updateEmployee.isPending || saveAvailability.isPending || saveWorkplaces.isPending;
 
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
@@ -58,6 +64,11 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setCustomRole(!roleNames.includes(nextRole) ? nextRole : '');
     setAvailability(nextAvailability);
     setDayTimeRanges(buildDayTimeRanges(nextAvailability, targetEmployee ? availabilityRows : []));
+    setSelectedWorkplaceIds(
+      targetEmployee
+        ? empWorkplaces.map(ew => ew.workplace_id)
+        : workplaces.map(w => w.id) // new employees default to all workplaces
+    );
     setErrors({});
   };
 
@@ -66,7 +77,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     if (!open) return;
     initializeForm(employee);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, employee?.id, roleNames]);
+  }, [open, employee?.id, roleNames, empWorkplaces, workplaces]);
 
   // Sync time ranges when availability data loads
   useEffect(() => {
@@ -110,6 +121,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           availability,
           dayAvailability: dayTimeRanges,
         });
+        await saveWorkplaces.mutateAsync({ employeeId: employee.id, workplaceIds: selectedWorkplaceIds });
         toast({ title: 'Employee updated' });
       } else {
         const created = await createEmployee.mutateAsync({
@@ -126,6 +138,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             availability,
             dayAvailability: dayTimeRanges,
           });
+          await saveWorkplaces.mutateAsync({ employeeId: created.id, workplaceIds: selectedWorkplaceIds });
         }
         toast({ title: 'Employee added' });
       }
@@ -181,6 +194,28 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             )}
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
+
+          {/* Workplaces Section */}
+          {workplaces.length > 0 && (
+            <div className="space-y-3">
+              <Label>Workplaces</Label>
+              <div className="space-y-2">
+                {workplaces.map((wp) => (
+                  <label key={wp.id} className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={selectedWorkplaceIds.includes(wp.id)}
+                      onCheckedChange={(checked) => {
+                        setSelectedWorkplaceIds(prev =>
+                          checked ? [...prev, wp.id] : prev.filter(id => id !== wp.id)
+                        );
+                      }}
+                    />
+                    <span className="text-sm font-medium">{wp.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Availability Section */}
           <div className="space-y-3">

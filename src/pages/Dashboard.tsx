@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
 import { useWorkplaces } from '@/hooks/use-workplaces';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
@@ -43,6 +45,27 @@ export default function Dashboard() {
   const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
   const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
   const { data: shiftCounts = {} } = useShiftAssignmentCounts();
+
+  // Fetch employee-workplace assignments for the selected workplace
+  const { data: workplaceEmployeeIds } = useQuery({
+    queryKey: ['employee-workplaces-for-workplace', selectedWorkplaceId],
+    queryFn: async () => {
+      if (!selectedWorkplaceId) return null;
+      const { data, error } = await supabase
+        .from('employee_workplaces' as any)
+        .select('employee_id')
+        .eq('workplace_id', selectedWorkplaceId);
+      if (error) throw error;
+      return new Set((data as any[]).map(r => r.employee_id));
+    },
+    enabled: !!selectedWorkplaceId,
+  });
+
+  // Filter employees to those assigned to the selected workplace
+  const workplaceEmployees = useMemo(() => {
+    if (!workplaceEmployeeIds) return employees;
+    return employees.filter(e => workplaceEmployeeIds.has(e.id));
+  }, [employees, workplaceEmployeeIds]);
 
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
@@ -109,7 +132,7 @@ export default function Dashboard() {
             <TabsContent value="schedule">
               {employerId && selectedWorkplaceId && (
                 <WeeklyCalendar
-                  employees={employees}
+                  employees={workplaceEmployees}
                   shifts={shifts}
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}

@@ -136,6 +136,42 @@ export type Database = {
           },
         ]
       }
+      employee_workplaces: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          workplace_id: string
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          workplace_id: string
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          workplace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_workplaces_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_workplaces_workplace_id_fkey"
+            columns: ["workplace_id"]
+            isOneToOne: false
+            referencedRelation: "workplaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           availability: string[]
