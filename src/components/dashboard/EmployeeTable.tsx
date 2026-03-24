@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Send, Check, Clock } from 'lucide-react';
+import { Pencil, Trash2, Send, Check, Clock, RefreshCw } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -21,6 +21,8 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
   const [inviting, setInviting] = useState<string | null>(null);
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const { toast } = useToast();
+
+  const [resending, setResending] = useState<string | null>(null);
 
   const startCooldown = (empId: string) => {
     setCooldowns((prev) => ({ ...prev, [empId]: 60 }));
@@ -58,6 +60,27 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
     }
   };
 
+  const handleResendReset = async (emp: Employee) => {
+    setResending(emp.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('resend-reset-link', {
+        body: { employeeId: emp.id },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({ title: 'Reset link sent', description: `Password reset email sent to ${emp.email}` });
+      startCooldown(emp.id);
+    } catch (err: any) {
+      const msg = err.message || '';
+      if (msg.includes('wait') || msg.includes('too recently') || msg.includes('429')) {
+        startCooldown(emp.id);
+      }
+      toast({ title: 'Resend failed', description: msg, variant: 'destructive' });
+    } finally {
+      setResending(null);
+    }
+  };
+
   return (
     <>
       {employees.map((emp) => (
@@ -74,9 +97,23 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
           <TableCell className="text-right">
             <div className="flex justify-end gap-1">
               {(emp as any).user_id ? (
-                <Button variant="ghost" size="icon" disabled aria-label="Account active" title="Account active">
-                  <Check className="h-4 w-4 text-emerald-500" />
-                </Button>
+                cooldowns[emp.id] ? (
+                  <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
+                    <Clock className="h-3.5 w-3.5 shrink-0" />
+                    <span>{cooldowns[emp.id]}s</span>
+                  </span>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleResendReset(emp)}
+                    disabled={resending === emp.id}
+                    aria-label={`Resend reset link to ${emp.name}`}
+                    title="Resend password reset link"
+                  >
+                    <RefreshCw className={`h-4 w-4 ${resending === emp.id ? 'animate-spin' : ''}`} />
+                  </Button>
+                )
               ) : cooldowns[emp.id] ? (
                 <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
                   <Clock className="h-3.5 w-3.5 shrink-0" />
