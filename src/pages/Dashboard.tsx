@@ -138,8 +138,13 @@ export default function Dashboard() {
                    <TabsTrigger value="shifts" className="gap-2">
                      <LayoutGrid className="h-4 w-4" /> Shifts
                    </TabsTrigger>
-                   <TabsTrigger value="time-off" className="gap-2">
+                   <TabsTrigger value="time-off" className="gap-2 relative">
                      <CalendarOff className="h-4 w-4" /> Time Off
+                     {pendingTimeOffCount > 0 && (
+                       <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground px-1 animate-pulse">
+                         {pendingTimeOffCount}
+                       </span>
+                     )}
                    </TabsTrigger>
                 </TabsList>
                 {employerId && (
