@@ -64,6 +64,11 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setCustomRole(!roleNames.includes(nextRole) ? nextRole : '');
     setAvailability(nextAvailability);
     setDayTimeRanges(buildDayTimeRanges(nextAvailability, targetEmployee ? availabilityRows : []));
+    setSelectedWorkplaceIds(
+      targetEmployee
+        ? empWorkplaces.map(ew => ew.workplace_id)
+        : workplaces.map(w => w.id) // new employees default to all workplaces
+    );
     setErrors({});
   };
 
