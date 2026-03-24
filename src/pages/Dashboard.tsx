@@ -119,9 +119,12 @@ export default function Dashboard() {
                   <TabsTrigger value="employees" className="gap-2">
                     <Users className="h-4 w-4" /> Employees
                   </TabsTrigger>
-                  <TabsTrigger value="shifts" className="gap-2">
-                    <LayoutGrid className="h-4 w-4" /> Shifts
-                  </TabsTrigger>
+                   <TabsTrigger value="shifts" className="gap-2">
+                     <LayoutGrid className="h-4 w-4" /> Shifts
+                   </TabsTrigger>
+                   <TabsTrigger value="time-off" className="gap-2">
+                     <CalendarOff className="h-4 w-4" /> Time Off
+                   </TabsTrigger>
                 </TabsList>
                 {employerId && (
                   <WorkplaceSelector
