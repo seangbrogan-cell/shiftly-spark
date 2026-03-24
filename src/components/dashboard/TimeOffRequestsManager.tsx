@@ -121,7 +121,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
         ) : (
           <div className="space-y-3">
             {pending.map(r => (
-              <RequestCard key={r.id} request={r} onAction={(status) => updateStatus.mutate({ id: r.id, status })} />
+              <RequestCard key={r.id} request={r} onAction={(status) => updateStatus.mutate({ id: r.id, status, request: r })} />
             ))}
           </div>
         )}
