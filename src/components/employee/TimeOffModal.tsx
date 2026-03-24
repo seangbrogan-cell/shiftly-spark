@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateTimeOffRequest } from '@/hooks/use-employee-data';
 import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 interface TimeOffModalProps {
   open: boolean;
@@ -59,68 +59,33 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         status: 'pending',
       });
 
-      // Send email notification to employer
+      // Send email notification to employer (best-effort)
       try {
-        // Fetch employer's email via profiles
-        const { data: employerProfiles } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('employer_id', employerId)
-          .eq('role', 'employer');
+        const [empRes, emailRes] = await Promise.all([
+          supabase.from('employees').select('name').eq('id', employeeId).single(),
+          supabase.rpc('get_employer_email', { _employer_id: employerId }),
+        ]);
 
-        if (employerProfiles && employerProfiles.length > 0) {
-          // Get the employee's name for the email
-          const { data: empRecord } = await supabase
-            .from('employees')
-            .select('name')
-            .eq('id', employeeId)
-            .single();
+        const employeeName = empRes.data?.name || 'An employee';
+        const employerEmail = emailRes.data;
 
-          for (const profile of employerProfiles) {
-            // Get the auth user email
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('display_name')
-              .eq('user_id', profile.user_id)
-              .single();
-
-            // We need the email from auth - use the user_id to look up via a different approach
-            // Since we can't query auth.users, we'll get it from the profiles join
-            const { data: { user } } = await supabase.auth.getUser();
-            // The employer is the current user's employer, but the employer user is different
-            // Instead, look up the employer's email from the employees or profiles table
-          }
-        }
-
-        // Simpler approach: fetch employer profile email via their user record
-        // Since we're the employee, we can't directly get the employer's email
-        // But we can use the edge function with the employer_id to look it up
-        const { data: empData } = await supabase
-          .from('employees')
-          .select('name')
-          .eq('id', employeeId)
-          .single();
-
-        const employeeName = empData?.name || 'An employee';
-
-        // Get employer user email from profiles
-        const { data: employerProfile } = await supabase
-          .from('profiles')
-          .select('user_id')
-          .eq('employer_id', employerId)
-          .eq('role', 'employer')
-          .limit(1)
-          .maybeSingle();
-
-        if (employerProfile?.user_id) {
-          // We need to find the employer's email. Since employees table might have it or 
-          // we can query auth admin, let's use a simpler pattern - check if there's a 
-          // way to get email. The auth.users table isn't queryable from client.
-          // Use the profiles approach - employers sign up so we can't get their email directly.
-          // Let's store this differently - query from the employees table where user_id matches
+        if (employerEmail) {
+          await supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'time-off-request',
+              recipientEmail: employerEmail,
+              idempotencyKey: `time-off-${result.id}`,
+              templateData: {
+                employeeName,
+                startDate: format(parseISO(startDate), 'MMM d, yyyy'),
+                endDate: format(parseISO(endDate), 'MMM d, yyyy'),
+                reason: reason.trim(),
+                notes: notes.trim() || undefined,
+              },
+            },
+          });
         }
       } catch (emailErr) {
-        // Don't fail the request if email fails
         console.error('Failed to send time-off notification email:', emailErr);
       }
 
