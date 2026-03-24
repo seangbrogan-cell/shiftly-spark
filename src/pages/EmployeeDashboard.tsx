@@ -240,7 +240,6 @@ export default function EmployeeDashboard() {
               <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
             </TabsContent>
           )}
-          </TabsContent>
 
           {/* Time Off Tab */}
           <TabsContent value="time-off">
