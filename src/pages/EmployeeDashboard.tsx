@@ -195,6 +195,10 @@ export default function EmployeeDashboard() {
                   </>
                 )}
 
+                <Button size="sm" variant="outline" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 mr-1.5" /> Print
+                </Button>
+
                 <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
                 </Button>
