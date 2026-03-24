@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
     });
 
     // Actually send the recovery email via the normal flow
-    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!);
+    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
     await anonClient.auth.resetPasswordForEmail(employee.email, {
       redirectTo: `${siteUrl}/reset-password`,
     });
