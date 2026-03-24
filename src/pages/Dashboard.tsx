@@ -184,6 +184,7 @@ export default function Dashboard() {
                       employerId={employerId}
                       onEdit={handleEdit}
                       onDelete={setDeletingEmployee}
+                      onEmail={handleEmailEmployee}
                     />
                   )}
                 </div>
