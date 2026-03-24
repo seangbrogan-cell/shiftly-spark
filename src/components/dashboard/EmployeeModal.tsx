@@ -77,7 +77,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     if (!open) return;
     initializeForm(employee);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, employee?.id, roleNames]);
+  }, [open, employee?.id, roleNames, empWorkplaces, workplaces]);
 
   // Sync time ranges when availability data loads
   useEffect(() => {
