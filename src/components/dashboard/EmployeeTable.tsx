@@ -75,7 +75,7 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
             <div className="flex justify-end gap-1">
               {(emp as any).user_id ? (
                 <Button variant="ghost" size="icon" disabled aria-label="Account active" title="Account active">
-                  <Check className="h-4 w-4 text-primary" />
+                  <Check className="h-4 w-4 text-emerald-500" />
                 </Button>
               ) : cooldowns[emp.id] ? (
                 <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
