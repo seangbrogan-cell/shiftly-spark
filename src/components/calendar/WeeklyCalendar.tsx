@@ -347,7 +347,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   const cellId = `${emp.id}:${dateStr}`;
                   const cellAssignments = assignmentMap[cellId] ?? [];
                   const dayAbbr = format(day, 'EEE');
-                  const isUnavailable = emp.availability && !emp.availability.includes(dayAbbr);
+                  const hasApprovedTimeOff = timeOffSet.has(cellId);
+                  const isUnavailable = hasApprovedTimeOff || (emp.availability && !emp.availability.includes(dayAbbr));
 
                   const empTimeAvail = availabilityTimeMap[emp.id]?.[dayAbbr];
                   const hasTimeRestriction = empTimeAvail && (empTimeAvail.start_time !== '00:00' || empTimeAvail.end_time !== '23:59');
