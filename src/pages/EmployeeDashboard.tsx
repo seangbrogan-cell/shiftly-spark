@@ -33,14 +33,18 @@ export default function EmployeeDashboard() {
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
 
   const employeeId = employee?.id;
-  const employerId = profile?.employer_id;
+  const employerId = employee?.employer_id ?? profile?.employer_id;
 
   const weekDays = getWeekDays(currentWeek);
-  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, selectedWorkplaceId);
-  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, selectedWorkplaceId);
+  const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
+
+  // Default to first workplace once loaded
+  const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
+
+  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, activeWorkplaceId);
+  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, activeWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
-  const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId);
 
   if (!employee) {
     return (
