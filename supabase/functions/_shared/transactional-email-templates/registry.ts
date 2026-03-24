@@ -10,7 +10,9 @@ export interface TemplateEntry {
 }
 
 import { template as employeeMessage } from './employee-message.tsx'
+import { template as timeOffRequest } from './time-off-request.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'employee-message': employeeMessage,
+  'time-off-request': timeOffRequest,
 }
