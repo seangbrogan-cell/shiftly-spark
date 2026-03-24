@@ -154,18 +154,44 @@ export function useEmployeeWorkplacesList(employeeId: string | undefined, employ
     queryKey: ['employee-workplaces-list', employeeId, employerId],
     queryFn: async () => {
       if (!employeeId || !employerId) return [];
-      // First try employee_workplaces assignments
-      const { data: assigned } = await supabase
+
+      // 1) Preferred source: explicit employee↔workplace assignments
+      const { data: assignedRows, error: assignedErr } = await supabase
         .from('employee_workplaces')
-        .select('workplace_id, workplaces(id, name)')
+        .select('workplace_id')
         .eq('employee_id', employeeId);
-      if (assigned && assigned.length > 0) {
-        return (assigned as any[]).map((d: any) => ({
-          id: d.workplaces.id as string,
-          name: d.workplaces.name as string,
-        }));
+      if (assignedErr) throw assignedErr;
+
+      let workplaceIds = Array.from(
+        new Set((assignedRows ?? []).map((r) => r.workplace_id).filter(Boolean))
+      ) as string[];
+
+      // 2) Fallback source: workplaces where this employee actually has shifts
+      if (workplaceIds.length === 0) {
+        const { data: shiftRows, error: shiftErr } = await supabase
+          .from('shift_assignments')
+          .select('workplace_id')
+          .eq('employee_id', employeeId)
+          .not('workplace_id', 'is', null);
+        if (shiftErr) throw shiftErr;
+
+        workplaceIds = Array.from(
+          new Set((shiftRows ?? []).map((r) => r.workplace_id).filter(Boolean))
+        ) as string[];
       }
-      // Fallback: get all workplaces for the employer
+
+      if (workplaceIds.length > 0) {
+        const { data: scopedWorkplaces, error: scopedErr } = await supabase
+          .from('workplaces')
+          .select('id, name, created_at')
+          .eq('employer_id', employerId)
+          .in('id', workplaceIds)
+          .order('created_at');
+        if (scopedErr) throw scopedErr;
+        return (scopedWorkplaces ?? []).map((w) => ({ id: w.id, name: w.name }));
+      }
+
+      // 3) Last fallback: all employer workplaces (avoids empty selector)
       const { data: allWp, error } = await supabase
         .from('workplaces')
         .select('id, name')
