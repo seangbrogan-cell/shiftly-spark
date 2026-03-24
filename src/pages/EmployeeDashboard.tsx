@@ -105,15 +105,15 @@ export default function EmployeeDashboard() {
       <main className="mx-auto max-w-6xl px-6 py-8">
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           <TabsList className="mb-6 print:hidden">
-            <TabsTrigger value="schedule" className="gap-2">
+            <TabsTrigger value="schedule" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <CalendarDays className="h-4 w-4" /> My Schedule
             </TabsTrigger>
             {fullScheduleAllowed && (
-              <TabsTrigger value="full-schedule" className="gap-2">
+              <TabsTrigger value="full-schedule" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                 <Users className="h-4 w-4" /> Full Schedule
               </TabsTrigger>
             )}
-            <TabsTrigger value="time-off" className="gap-2">
+            <TabsTrigger value="time-off" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <History className="h-4 w-4" /> Time Off
             </TabsTrigger>
           </TabsList>
