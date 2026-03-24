@@ -34,6 +34,7 @@ export default function EmployeeDashboard() {
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'schedule' | 'full-schedule' | 'time-off'>('schedule');
   
 
   const employeeId = employee?.id;
@@ -102,7 +103,7 @@ export default function EmployeeDashboard() {
       <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} />
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <Tabs defaultValue="schedule">
+        <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           <TabsList className="mb-6">
             <TabsTrigger value="schedule" className="gap-2">
               <CalendarDays className="h-4 w-4" /> My Schedule
@@ -117,104 +118,112 @@ export default function EmployeeDashboard() {
             </TabsTrigger>
           </TabsList>
 
+          {/* Shared schedule header – visible for My Schedule & Full Schedule */}
+          {(activeTab === 'schedule' || activeTab === 'full-schedule') && (
+            <>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">
+                    {activeTab === 'full-schedule' ? 'Full Schedule' : 'My Schedule'}
+                  </h1>
+                  {scheduleUpdated && (
+                    <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                      <CalendarClock className="h-3 w-3" />
+                      Schedule last updated {format(new Date(scheduleUpdated), 'MMM d, yyyy · h:mm a')}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Workplace dropdown */}
+                  <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2 py-1">
+                    <label htmlFor="employee-workplace" className="text-xs font-medium text-muted-foreground">
+                      Workplace
+                    </label>
+                    <select
+                      id="employee-workplace"
+                      value={activeWorkplaceId ?? ''}
+                      onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
+                      disabled={employeeWorkplaces.length === 0}
+                      className="h-6 min-w-[160px] bg-transparent text-sm text-foreground outline-none"
+                    >
+                      {employeeWorkplaces.length === 0 ? (
+                        <option value="">No workplaces assigned</option>
+                      ) : (
+                        employeeWorkplaces.map((wp) => (
+                          <option key={wp.id} value={wp.id}>
+                            {wp.name}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
+
+                  {/* View toggle – only for My Schedule */}
+                  {activeTab === 'schedule' && (
+                    <div className="flex rounded-md border border-border overflow-hidden">
+                      <button
+                        onClick={() => setCalendarView('weekly')}
+                        className={`px-3 py-1.5 text-xs font-medium transition-colors ${calendarView === 'weekly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
+                      >
+                        <CalendarDays className="h-3.5 w-3.5 inline mr-1" />
+                        Week
+                      </button>
+                      <button
+                        onClick={() => setCalendarView('monthly')}
+                        className={`px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${calendarView === 'monthly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
+                      >
+                        <CalendarRange className="h-3.5 w-3.5 inline mr-1" />
+                        Month
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  {(activeTab === 'full-schedule' || calendarView === 'weekly') ? (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
+                        Today
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
+                        Today
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </>
+                  )}
+
+                  <Button size="sm" variant="outline" onClick={() => window.print()}>
+                    <Printer className="h-4 w-4 mr-1.5" /> Print
+                  </Button>
+                </div>
+              </div>
+
+              {/* Date range label */}
+              <p className="text-sm font-medium text-muted-foreground mb-4">
+                {(activeTab === 'full-schedule' || calendarView === 'weekly')
+                  ? `${format(weekDays[0], 'MMM d')} – ${format(weekDays[6], 'MMM d, yyyy')}`
+                  : format(currentMonth, 'MMMM yyyy')
+                }
+              </p>
+            </>
+          )}
+
           {/* Schedule Tab */}
           <TabsContent value="schedule">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">My Schedule</h1>
-                {scheduleUpdated && (
-                  <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                    <CalendarClock className="h-3 w-3" />
-                    Schedule last updated {format(new Date(scheduleUpdated), 'MMM d, yyyy · h:mm a')}
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Workplace dropdown */}
-                <div className="flex items-center gap-2 rounded-md border border-input bg-background px-2 py-1">
-                  <label htmlFor="employee-workplace" className="text-xs font-medium text-muted-foreground">
-                    Workplace
-                  </label>
-                  <select
-                    id="employee-workplace"
-                    value={activeWorkplaceId ?? ''}
-                    onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
-                    disabled={employeeWorkplaces.length === 0}
-                    className="h-6 min-w-[160px] bg-transparent text-sm text-foreground outline-none"
-                  >
-                    {employeeWorkplaces.length === 0 ? (
-                      <option value="">No workplaces assigned</option>
-                    ) : (
-                      employeeWorkplaces.map((wp) => (
-                        <option key={wp.id} value={wp.id}>
-                          {wp.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </div>
-
-                {/* View toggle */}
-                <div className="flex rounded-md border border-border overflow-hidden">
-                  <button
-                    onClick={() => setCalendarView('weekly')}
-                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${calendarView === 'weekly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
-                  >
-                    <CalendarDays className="h-3.5 w-3.5 inline mr-1" />
-                    Week
-                  </button>
-                  <button
-                    onClick={() => setCalendarView('monthly')}
-                    className={`px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${calendarView === 'monthly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
-                  >
-                    <CalendarRange className="h-3.5 w-3.5 inline mr-1" />
-                    Month
-                  </button>
-                </div>
-
-                {/* Navigation */}
-                {calendarView === 'weekly' ? (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
-                      Today
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
-                      Today
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-
-                <Button size="sm" variant="outline" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 mr-1.5" /> Print
-                </Button>
-
-              </div>
-            </div>
-
-            {/* Date range label */}
-            <p className="text-sm font-medium text-muted-foreground mb-4">
-              {calendarView === 'weekly'
-                ? `${format(weekDays[0], 'MMM d')} – ${format(weekDays[6], 'MMM d, yyyy')}`
-                : format(currentMonth, 'MMMM yyyy')
-              }
-            </p>
-
             {calendarView === 'weekly' ? (
               loadingWeek ? (
                 <div className="flex justify-center py-16">
