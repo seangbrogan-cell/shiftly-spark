@@ -71,7 +71,8 @@ export default function Dashboard() {
                 <TabsTrigger value="shifts" className="gap-2">
                   <LayoutGrid className="h-4 w-4" /> Shifts
                 </TabsTrigger>
-              </TabsList>
+                </TabsList>
+              </div>
               {employerId && (
                 <PublishPanel
                   employerId={employerId}
