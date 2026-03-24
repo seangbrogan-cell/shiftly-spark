@@ -55,6 +55,7 @@ export default function Onboarding() {
       if (profileError) throw profileError;
 
       toast({ title: 'Organization created!', description: `Welcome to ${companyName.trim()}` });
+      await queryClient.invalidateQueries({ queryKey: ['profile'] });
       navigate('/dashboard');
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
