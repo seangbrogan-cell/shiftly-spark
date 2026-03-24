@@ -46,6 +46,27 @@ export default function Dashboard() {
   const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
   const { data: shiftCounts = {} } = useShiftAssignmentCounts();
 
+  // Fetch employee-workplace assignments for the selected workplace
+  const { data: workplaceEmployeeIds } = useQuery({
+    queryKey: ['employee-workplaces-for-workplace', selectedWorkplaceId],
+    queryFn: async () => {
+      if (!selectedWorkplaceId) return null;
+      const { data, error } = await supabase
+        .from('employee_workplaces' as any)
+        .select('employee_id')
+        .eq('workplace_id', selectedWorkplaceId);
+      if (error) throw error;
+      return new Set((data as any[]).map(r => r.employee_id));
+    },
+    enabled: !!selectedWorkplaceId,
+  });
+
+  // Filter employees to those assigned to the selected workplace
+  const workplaceEmployees = useMemo(() => {
+    if (!workplaceEmployeeIds) return employees;
+    return employees.filter(e => workplaceEmployeeIds.has(e.id));
+  }, [employees, workplaceEmployeeIds]);
+
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
