@@ -83,6 +83,35 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift, workp
     setNotes('');
     setColor(null);
     setErrors({});
+    setShowCopyFrom(false);
+    setCopySourceWorkplace('');
+  };
+
+  const handleCopyShifts = async () => {
+    if (!copySourceWorkplace || sourceShifts.length === 0 || !workplaceId) return;
+    setCopying(true);
+    try {
+      const newShifts = sourceShifts.map((s: any) => ({
+        employer_id: employerId,
+        workplace_id: workplaceId,
+        name: s.name,
+        start_time: s.start_time,
+        end_time: s.end_time,
+        is_all_day: s.is_all_day,
+        color: s.color,
+        notes: s.notes,
+      }));
+      const { error } = await supabase.from('shifts').insert(newShifts as any);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ['shifts'] });
+      toast({ title: 'Shifts copied', description: `${sourceShifts.length} shift(s) copied successfully.` });
+      onOpenChange(false);
+      resetForm();
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    } finally {
+      setCopying(false);
+    }
   };
 
   const validate = () => {
