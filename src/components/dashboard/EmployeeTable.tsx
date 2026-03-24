@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Send, Check } from 'lucide-react';
+import { Pencil, Trash2, Send, Check, Clock } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -19,7 +19,23 @@ interface EmployeeTableProps {
 
 function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
   const [inviting, setInviting] = useState<string | null>(null);
+  const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const { toast } = useToast();
+
+  const startCooldown = (empId: string) => {
+    setCooldowns((prev) => ({ ...prev, [empId]: 60 }));
+    const interval = setInterval(() => {
+      setCooldowns((prev) => {
+        const remaining = (prev[empId] ?? 0) - 1;
+        if (remaining <= 0) {
+          clearInterval(interval);
+          const { [empId]: _, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [empId]: remaining };
+      });
+    }, 1000);
+  };
 
   const handleInvite = async (emp: Employee) => {
     setInviting(emp.id);
@@ -30,8 +46,13 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       toast({ title: 'Invite sent', description: `Password reset email sent to ${emp.email}` });
+      startCooldown(emp.id);
     } catch (err: any) {
-      toast({ title: 'Invite failed', description: err.message, variant: 'destructive' });
+      const msg = err.message || '';
+      if (msg.includes('wait') || msg.includes('too recently') || msg.includes('429')) {
+        startCooldown(emp.id);
+      }
+      toast({ title: 'Invite failed', description: msg, variant: 'destructive' });
     } finally {
       setInviting(null);
     }
@@ -52,9 +73,16 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
           <TableCell className="text-center">{shiftCounts[emp.id] || 0}</TableCell>
           <TableCell className="text-right">
             <div className="flex justify-end gap-1">
+              const cd = cooldowns[emp.id];
               {(emp as any).user_id ? (
                 <Button variant="ghost" size="icon" disabled aria-label="Account active" title="Account active">
                   <Check className="h-4 w-4 text-green-500" />
+                </Button>
+              ) : cd ? (
+                <Button variant="ghost" size="icon" disabled aria-label="Cooldown" title={`Resend available in ${cd}s`}>
+                  <span className="flex items-center gap-0.5 text-xs text-muted-foreground tabular-nums">
+                    <Clock className="h-3.5 w-3.5" />{cd}
+                  </span>
                 </Button>
               ) : (
                 <Button
