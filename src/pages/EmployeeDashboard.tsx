@@ -215,9 +215,7 @@ export default function EmployeeDashboard() {
               }
             </p>
 
-            {showFullSchedule && fullScheduleAllowed && activeWorkplaceId ? (
-              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
-            ) : calendarView === 'weekly' ? (
+            {calendarView === 'weekly' ? (
               loadingWeek ? (
                 <div className="flex justify-center py-16">
                   <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -234,6 +232,14 @@ export default function EmployeeDashboard() {
                 <EmployeeMonthlyView assignments={monthlyAssignments} monthDate={currentMonth} />
               )
             )}
+          </TabsContent>
+
+          {/* Full Schedule Tab */}
+          {fullScheduleAllowed && activeWorkplaceId && (
+            <TabsContent value="full-schedule">
+              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
+            </TabsContent>
+          )}
           </TabsContent>
 
           {/* Time Off Tab */}
