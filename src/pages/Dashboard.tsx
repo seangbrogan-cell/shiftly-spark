@@ -73,6 +73,8 @@ export default function Dashboard() {
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
