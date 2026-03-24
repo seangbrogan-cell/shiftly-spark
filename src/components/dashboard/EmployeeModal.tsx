@@ -121,6 +121,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           availability,
           dayAvailability: dayTimeRanges,
         });
+        await saveWorkplaces.mutateAsync({ employeeId: employee.id, workplaceIds: selectedWorkplaceIds });
         toast({ title: 'Employee updated' });
       } else {
         const created = await createEmployee.mutateAsync({
@@ -137,6 +138,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             availability,
             dayAvailability: dayTimeRanges,
           });
+          await saveWorkplaces.mutateAsync({ employeeId: created.id, workplaceIds: selectedWorkplaceIds });
         }
         toast({ title: 'Employee added' });
       }
