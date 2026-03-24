@@ -104,7 +104,7 @@ export default function EmployeeDashboard() {
 
       <main className="mx-auto max-w-6xl px-6 py-8">
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 print:hidden">
             <TabsTrigger value="schedule" className="gap-2">
               <CalendarDays className="h-4 w-4" /> My Schedule
             </TabsTrigger>
@@ -282,7 +282,7 @@ export default function EmployeeDashboard() {
 
 function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string }) {
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-40">
+    <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Clock className="h-7 w-7 text-primary" />
