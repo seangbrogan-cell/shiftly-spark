@@ -59,34 +59,54 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         status: 'pending',
       });
 
-      // Send email notification to employer (best-effort)
+      // Send email notifications (best-effort)
       try {
-        const [empRes, emailRes] = await Promise.all([
-          supabase.from('employees').select('name').eq('id', employeeId).single(),
-          supabase.rpc('get_employer_email', { _employer_id: employerId }),
-        ]);
-
+        const empRes = await supabase.from('employees').select('name, email').eq('id', employeeId).single();
         const employeeName = empRes.data?.name || 'An employee';
-        const employerEmail = emailRes.data;
+        const employeeEmail = empRes.data?.email;
 
+        const formattedStart = format(parseISO(startDate), 'MMM d, yyyy');
+        const formattedEnd = format(parseISO(endDate), 'MMM d, yyyy');
+        const trimmedReason = reason.trim();
+
+        // Send confirmation to employee
+        if (employeeEmail) {
+          supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'time-off-confirmation',
+              recipientEmail: employeeEmail,
+              idempotencyKey: `time-off-confirm-${result.id}`,
+              templateData: {
+                employeeName,
+                startDate: formattedStart,
+                endDate: formattedEnd,
+                reason: trimmedReason,
+              },
+            },
+          }).catch(err => console.error('Failed to send employee confirmation email:', err));
+        }
+
+        // Send notification to employer
+        const emailRes = await supabase.rpc('get_employer_email', { _employer_id: employerId });
+        const employerEmail = emailRes.data;
         if (employerEmail) {
-          await supabase.functions.invoke('send-transactional-email', {
+          supabase.functions.invoke('send-transactional-email', {
             body: {
               templateName: 'time-off-request',
               recipientEmail: employerEmail,
               idempotencyKey: `time-off-${result.id}`,
               templateData: {
                 employeeName,
-                startDate: format(parseISO(startDate), 'MMM d, yyyy'),
-                endDate: format(parseISO(endDate), 'MMM d, yyyy'),
-                reason: reason.trim(),
+                startDate: formattedStart,
+                endDate: formattedEnd,
+                reason: trimmedReason,
                 notes: notes.trim() || undefined,
               },
             },
-          });
+          }).catch(err => console.error('Failed to send employer notification email:', err));
         }
       } catch (emailErr) {
-        console.error('Failed to send time-off notification email:', emailErr);
+        console.error('Failed to send time-off notification emails:', emailErr);
       }
 
       toast({ title: 'Request submitted', description: 'Your time-off request is pending approval.' });
