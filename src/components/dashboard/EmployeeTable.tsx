@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Send, Check, Clock, RefreshCw } from 'lucide-react';
+import { Pencil, Trash2, Send, Check, Clock, RefreshCw, Mail } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -15,9 +15,10 @@ interface EmployeeTableProps {
   employerId?: string;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
+  onEmail?: (employee: Employee) => void;
 }
 
-function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTableProps) {
+function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: EmployeeTableProps) {
   const [inviting, setInviting] = useState<string | null>(null);
   const [cooldowns, setCooldowns] = useState<Record<string, number>>({});
   const { toast } = useToast();
@@ -131,6 +132,11 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
                   <Send className={`h-4 w-4 ${inviting === emp.id ? 'animate-pulse' : ''}`} />
                 </Button>
               )}
+              {onEmail && (
+                <Button variant="ghost" size="icon" onClick={() => onEmail(emp)} aria-label={`Email ${emp.name}`} title="Send email">
+                  <Mail className="h-4 w-4" />
+                </Button>
+              )}
               <Button variant="ghost" size="icon" onClick={() => onEdit(emp)} aria-label={`Edit ${emp.name}`}>
                 <Pencil className="h-4 w-4" />
               </Button>
@@ -145,7 +151,7 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete }: EmployeeTabl
   );
 }
 
-export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete }: EmployeeTableProps) {
+export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete, onEmail }: EmployeeTableProps) {
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
@@ -195,7 +201,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
             <Table>
               {headers}
               <TableBody>
-                <EmployeeRows employees={management} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} />
+                <EmployeeRows employees={management} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} onEmail={onEmail} />
               </TableBody>
             </Table>
           </div>
@@ -208,7 +214,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
             <Table>
               {headers}
               <TableBody>
-                <EmployeeRows employees={staff} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} />
+                <EmployeeRows employees={staff} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} onEmail={onEmail} />
               </TableBody>
             </Table>
           </div>

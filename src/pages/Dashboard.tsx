@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -19,6 +19,7 @@ import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
 import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
+import { EmailEmployeesModal } from '@/components/dashboard/EmailEmployeesModal';
 import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
@@ -72,6 +73,8 @@ export default function Dashboard() {
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
@@ -81,6 +84,16 @@ export default function Dashboard() {
   const handleCloseEmployeeModal = (open: boolean) => {
     setEmployeeModalOpen(open);
     if (!open) setEditingEmployee(null);
+  };
+
+  const handleEmailEmployee = (emp: Employee) => {
+    setEmailPreselected([emp]);
+    setEmailModalOpen(true);
+  };
+
+  const handleEmailAll = () => {
+    setEmailPreselected(employees);
+    setEmailModalOpen(true);
   };
 
   if (profile && !employerId) {
@@ -148,9 +161,14 @@ export default function Dashboard() {
                   <h2 className="text-2xl font-bold text-foreground">Employees</h2>
                   <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
-                <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
-                  <Plus className="mr-2 h-4 w-4" /> Add Employee
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
+                    <Mail className="mr-2 h-4 w-4" /> Email All
+                  </Button>
+                  <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
+                    <Plus className="mr-2 h-4 w-4" /> Add Employee
+                  </Button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
@@ -166,6 +184,7 @@ export default function Dashboard() {
                       employerId={employerId}
                       onEdit={handleEdit}
                       onDelete={setDeletingEmployee}
+                      onEmail={handleEmailEmployee}
                     />
                   )}
                 </div>
@@ -224,6 +243,13 @@ export default function Dashboard() {
         open={!!deletingEmployee}
         onOpenChange={(open) => { if (!open) setDeletingEmployee(null); }}
         employee={deletingEmployee}
+      />
+      <EmailEmployeesModal
+        open={emailModalOpen}
+        onOpenChange={setEmailModalOpen}
+        employees={employees}
+        preselected={emailPreselected}
+        senderName={profile?.display_name || undefined}
       />
     </div>
   );
