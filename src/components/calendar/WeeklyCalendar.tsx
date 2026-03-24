@@ -12,6 +12,7 @@ import {
   useCreateAssignment,
   useUpdateAssignment,
   useDeleteAssignment,
+  useApprovedTimeOff,
   getWeekDays,
   type AssignmentWithDetails,
 } from '@/hooks/use-calendar-data';
@@ -56,11 +57,25 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek, workplaceId);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const { data: allAvailability = [] } = useAllEmployeeAvailability();
+  const { data: approvedTimeOff = [] } = useApprovedTimeOff(currentWeek);
   const createAssignment = useCreateAssignment();
   const updateAssignment = useUpdateAssignment();
   const deleteAssignment = useDeleteAssignment();
   const { toast } = useToast();
   const { data: publishStatus } = useWeekPublishStatus(currentWeek);
+
+  // Build set of employee:date keys that have approved time off
+  const timeOffSet = useMemo(() => {
+    const set = new Set<string>();
+    approvedTimeOff.forEach((req) => {
+      const start = new Date(req.start_date + 'T00:00:00');
+      const end = new Date(req.end_date + 'T00:00:00');
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        set.add(`${req.employee_id}:${format(d, 'yyyy-MM-dd')}`);
+      }
+    });
+    return set;
+  }, [approvedTimeOff]);
 
   // Build availability map: employeeId -> day -> { start_time, end_time }
   const availabilityTimeMap = useMemo(() => {
@@ -332,7 +347,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   const cellId = `${emp.id}:${dateStr}`;
                   const cellAssignments = assignmentMap[cellId] ?? [];
                   const dayAbbr = format(day, 'EEE');
-                  const isUnavailable = emp.availability && !emp.availability.includes(dayAbbr);
+                  const hasApprovedTimeOff = timeOffSet.has(cellId);
+                  const isUnavailable = hasApprovedTimeOff || (emp.availability && !emp.availability.includes(dayAbbr));
 
                   const empTimeAvail = availabilityTimeMap[emp.id]?.[dayAbbr];
                   const hasTimeRestriction = empTimeAvail && (empTimeAvail.start_time !== '00:00' || empTimeAvail.end_time !== '23:59');
@@ -343,6 +359,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                       id={cellId}
                       isToday={isToday(day)}
                       unavailable={isUnavailable}
+                      unavailableLabel={hasApprovedTimeOff ? 'Time Off' : undefined}
                       timeRestriction={hasTimeRestriction && cellAssignments.length === 0 ? `${empTimeAvail.start_time}–${empTimeAvail.end_time}` : undefined}
                       onClick={() => handleCellClick(emp.id, dateStr)}
                     >
