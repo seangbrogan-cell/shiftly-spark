@@ -92,23 +92,28 @@ export default function EmployeeDashboard() {
 
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Workplace dropdown */}
-                {employeeWorkplaces.length > 0 && (
-                  <Select
-                    value={activeWorkplaceId}
-                    onValueChange={setSelectedWorkplaceId}
-                  >
-                    <SelectTrigger className="h-8 w-[220px]">
-                      <SelectValue placeholder="Select workplace" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employeeWorkplaces.map((wp) => (
+                <Select
+                  value={activeWorkplaceId}
+                  onValueChange={setSelectedWorkplaceId}
+                  disabled={employeeWorkplaces.length === 0}
+                >
+                  <SelectTrigger className="h-8 w-[220px]">
+                    <SelectValue placeholder="Select workplace" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employeeWorkplaces.length === 0 ? (
+                      <SelectItem value="no-workplaces" disabled>
+                        No workplaces assigned
+                      </SelectItem>
+                    ) : (
+                      employeeWorkplaces.map((wp) => (
                         <SelectItem key={wp.id} value={wp.id}>
                           {wp.name}
                         </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
 
                 {/* View toggle */}
                 <div className="flex rounded-md border border-border overflow-hidden">

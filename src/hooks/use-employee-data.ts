@@ -149,57 +149,56 @@ export function useCurrentEmployee() {
 }
 
 // Fetch workplaces available to the current employee
-export function useEmployeeWorkplacesList(employeeId: string | undefined, employerId: string | undefined) {
+export function useEmployeeWorkplacesList(employeeId: string | undefined, employerId?: string) {
   return useQuery({
     queryKey: ['employee-workplaces-list', employeeId, employerId],
     queryFn: async () => {
-      if (!employeeId || !employerId) return [];
+      if (!employeeId) return [];
 
-      // 1) Preferred source: explicit employee↔workplace assignments
-      const { data: assignedRows, error: assignedErr } = await supabase
+      const workplaceMap = new Map<string, { id: string; name: string }>();
+
+      // 1) Explicit employee-workplace links
+      const { data: linkedRows, error: linkedErr } = await supabase
         .from('employee_workplaces')
-        .select('workplace_id')
+        .select('workplaces(id, name)')
         .eq('employee_id', employeeId);
-      if (assignedErr) throw assignedErr;
+      if (linkedErr) throw linkedErr;
 
-      let workplaceIds = Array.from(
-        new Set((assignedRows ?? []).map((r) => r.workplace_id).filter(Boolean))
-      ) as string[];
+      (linkedRows ?? []).forEach((row: any) => {
+        const wp = row.workplaces;
+        if (wp?.id) workplaceMap.set(wp.id, { id: wp.id, name: wp.name });
+      });
 
-      // 2) Fallback source: workplaces where this employee actually has shifts
-      if (workplaceIds.length === 0) {
-        const { data: shiftRows, error: shiftErr } = await supabase
-          .from('shift_assignments')
-          .select('workplace_id')
-          .eq('employee_id', employeeId)
-          .not('workplace_id', 'is', null);
-        if (shiftErr) throw shiftErr;
+      // 2) Workplaces where the employee actually has scheduled shifts
+      const { data: scheduledRows, error: scheduledErr } = await supabase
+        .from('shift_assignments')
+        .select('workplaces(id, name)')
+        .eq('employee_id', employeeId)
+        .not('workplace_id', 'is', null);
+      if (scheduledErr) throw scheduledErr;
 
-        workplaceIds = Array.from(
-          new Set((shiftRows ?? []).map((r) => r.workplace_id).filter(Boolean))
-        ) as string[];
+      (scheduledRows ?? []).forEach((row: any) => {
+        const wp = row.workplaces;
+        if (wp?.id) workplaceMap.set(wp.id, { id: wp.id, name: wp.name });
+      });
+
+      if (workplaceMap.size > 0) {
+        return Array.from(workplaceMap.values());
       }
 
-      if (workplaceIds.length > 0) {
-        const { data: scopedWorkplaces, error: scopedErr } = await supabase
+      // 3) Last fallback: employer workplaces
+      if (employerId) {
+        const { data: allWp, error } = await supabase
           .from('workplaces')
-          .select('id, name, created_at')
+          .select('id, name')
           .eq('employer_id', employerId)
-          .in('id', workplaceIds)
           .order('created_at');
-        if (scopedErr) throw scopedErr;
-        return (scopedWorkplaces ?? []).map((w) => ({ id: w.id, name: w.name }));
+        if (error) throw error;
+        return (allWp ?? []).map((w) => ({ id: w.id, name: w.name }));
       }
 
-      // 3) Last fallback: all employer workplaces (avoids empty selector)
-      const { data: allWp, error } = await supabase
-        .from('workplaces')
-        .select('id, name')
-        .eq('employer_id', employerId)
-        .order('created_at');
-      if (error) throw error;
-      return (allWp ?? []).map((w) => ({ id: w.id, name: w.name }));
+      return [];
     },
-    enabled: !!employeeId && !!employerId,
+    enabled: !!employeeId,
   });
 }
