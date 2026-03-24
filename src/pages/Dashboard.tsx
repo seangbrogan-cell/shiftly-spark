@@ -132,7 +132,7 @@ export default function Dashboard() {
             <TabsContent value="schedule">
               {employerId && selectedWorkplaceId && (
                 <WeeklyCalendar
-                  employees={employees}
+                  employees={workplaceEmployees}
                   shifts={shifts}
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}
