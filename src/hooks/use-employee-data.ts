@@ -148,22 +148,32 @@ export function useCurrentEmployee() {
   });
 }
 
-// Fetch workplaces assigned to the current employee
-export function useEmployeeWorkplacesList(employeeId: string | undefined) {
+// Fetch workplaces available to the current employee
+export function useEmployeeWorkplacesList(employeeId: string | undefined, employerId: string | undefined) {
   return useQuery({
-    queryKey: ['employee-workplaces-list', employeeId],
+    queryKey: ['employee-workplaces-list', employeeId, employerId],
     queryFn: async () => {
-      if (!employeeId) return [];
-      const { data, error } = await supabase
+      if (!employeeId || !employerId) return [];
+      // First try employee_workplaces assignments
+      const { data: assigned } = await supabase
         .from('employee_workplaces')
         .select('workplace_id, workplaces(id, name)')
         .eq('employee_id', employeeId);
+      if (assigned && assigned.length > 0) {
+        return (assigned as any[]).map((d: any) => ({
+          id: d.workplaces.id as string,
+          name: d.workplaces.name as string,
+        }));
+      }
+      // Fallback: get all workplaces for the employer
+      const { data: allWp, error } = await supabase
+        .from('workplaces')
+        .select('id, name')
+        .eq('employer_id', employerId)
+        .order('created_at');
       if (error) throw error;
-      return (data as any[]).map((d: any) => ({
-        id: d.workplaces.id as string,
-        name: d.workplaces.name as string,
-      }));
+      return (allWp ?? []).map((w) => ({ id: w.id, name: w.name }));
     },
-    enabled: !!employeeId,
+    enabled: !!employeeId && !!employerId,
   });
 }

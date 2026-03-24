@@ -33,14 +33,18 @@ export default function EmployeeDashboard() {
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
 
   const employeeId = employee?.id;
-  const employerId = profile?.employer_id;
+  const employerId = employee?.employer_id ?? profile?.employer_id;
 
   const weekDays = getWeekDays(currentWeek);
-  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, selectedWorkplaceId);
-  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, selectedWorkplaceId);
+  const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
+
+  // Default to first workplace once loaded
+  const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
+
+  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(employeeId, currentWeek, activeWorkplaceId);
+  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(employeeId, currentMonth, activeWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
-  const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId);
 
   if (!employee) {
     return (
@@ -86,20 +90,13 @@ export default function EmployeeDashboard() {
 
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Workplace filter */}
-                {employeeWorkplaces.length > 1 && (
+                {employeeWorkplaces.length > 0 && (
                   <div className="flex rounded-md border border-border overflow-hidden">
-                    <button
-                      onClick={() => setSelectedWorkplaceId(undefined)}
-                      className={`px-3 py-1.5 text-xs font-medium transition-colors ${!selectedWorkplaceId ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
-                    >
-                      <Building2 className="h-3.5 w-3.5 inline mr-1" />
-                      All
-                    </button>
                     {employeeWorkplaces.map((wp) => (
                       <button
                         key={wp.id}
                         onClick={() => setSelectedWorkplaceId(wp.id)}
-                        className={`px-3 py-1.5 text-xs font-medium transition-colors border-l border-border ${selectedWorkplaceId === wp.id ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
+                        className={`px-3 py-1.5 text-xs font-medium transition-colors border-l first:border-l-0 border-border ${activeWorkplaceId === wp.id ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
                       >
                         {wp.name}
                       </button>
