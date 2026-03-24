@@ -147,3 +147,23 @@ export function useCurrentEmployee() {
     },
   });
 }
+
+// Fetch workplaces assigned to the current employee
+export function useEmployeeWorkplacesList(employeeId: string | undefined) {
+  return useQuery({
+    queryKey: ['employee-workplaces-list', employeeId],
+    queryFn: async () => {
+      if (!employeeId) return [];
+      const { data, error } = await supabase
+        .from('employee_workplaces')
+        .select('workplace_id, workplaces(id, name)')
+        .eq('employee_id', employeeId);
+      if (error) throw error;
+      return (data as any[]).map((d: any) => ({
+        id: d.workplaces.id as string,
+        name: d.workplaces.name as string,
+      }));
+    },
+    enabled: !!employeeId,
+  });
+}
