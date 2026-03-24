@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -82,7 +84,7 @@ export default function ResetPassword() {
                   <Label htmlFor="password">New password</Label>
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -94,13 +96,17 @@ export default function ResetPassword() {
                   <Label htmlFor="confirmPassword">Confirm new password</Label>
                   <Input
                     id="confirmPassword"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     minLength={6}
                   />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="showPassword" checked={showPassword} onCheckedChange={(v) => setShowPassword(!!v)} />
+                  <Label htmlFor="showPassword" className="text-sm font-normal text-muted-foreground cursor-pointer">Show password</Label>
                 </div>
               </CardContent>
               <CardFooter>
