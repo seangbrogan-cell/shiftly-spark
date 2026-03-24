@@ -42,21 +42,40 @@ export default function Onboarding() {
 
       if (empError) throw empError;
 
-      // 2. Update profile with employer_id and display_name
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          employer_id: employerId,
-          display_name: displayName.trim(),
-          role: 'employer',
-        })
-        .eq('user_id', user.id);
+      // 2. Update (or create) profile with employer_id and display_name
+      const profilePayload = {
+        employer_id: employerId,
+        display_name: displayName.trim(),
+        role: 'employer',
+      };
 
-      if (profileError) throw profileError;
+      const { data: updatedProfiles, error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update(profilePayload)
+        .eq('user_id', user.id)
+        .select('*, employers(*)')
+        .limit(1);
+
+      if (profileUpdateError) throw profileUpdateError;
+
+      let nextProfile = updatedProfiles?.[0] ?? null;
+
+      if (!nextProfile) {
+        const { data: insertedProfile, error: profileInsertError } = await supabase
+          .from('profiles')
+          .insert({ ...profilePayload, user_id: user.id })
+          .select('*, employers(*)')
+          .single();
+
+        if (profileInsertError) throw profileInsertError;
+        nextProfile = insertedProfile;
+      }
+
+      queryClient.setQueryData(['profile'], nextProfile);
 
       toast({ title: 'Organization created!', description: `Welcome to ${companyName.trim()}` });
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      navigate('/dashboard');
+      navigate('/dashboard', { replace: true });
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     } finally {

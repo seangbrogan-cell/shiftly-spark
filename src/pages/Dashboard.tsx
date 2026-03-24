@@ -24,7 +24,7 @@ import { startOfWeek } from 'date-fns';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
-  const { data: profile } = useProfile();
+  const { data: profile, isFetching: profileIsFetching } = useProfile();
   const employerId = profile?.employer_id;
 
   const { data: workplaces = [] } = useWorkplaces(employerId ?? undefined);
@@ -96,7 +96,7 @@ export default function Dashboard() {
     setEmailModalOpen(true);
   };
 
-  if (profile && !employerId) {
+  if (profile && !employerId && !profileIsFetching) {
     return <Navigate to="/onboarding" replace />;
   }
 
