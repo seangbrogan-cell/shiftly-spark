@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isToday } from 'date-fns';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
@@ -18,7 +19,7 @@ interface FullAssignment {
   employee_id: string;
   shift_id: string;
   shifts: { name: string; start_time: string | null; end_time: string | null; color: string | null; is_all_day: boolean } | null;
-  employees: { name: string } | null;
+  employees: { name: string; role: string } | null;
 }
 
 export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewProps) {
@@ -31,7 +32,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
     queryFn: async () => {
       const { data, error } = await supabase
         .from('shift_assignments')
-        .select('id, assigned_date, actual_start, actual_end, employee_id, shift_id, shifts(name, start_time, end_time, color, is_all_day), employees(name)')
+        .select('id, assigned_date, actual_start, actual_end, employee_id, shift_id, shifts(name, start_time, end_time, color, is_all_day), employees(name, role)')
         .eq('workplace_id', workplaceId)
         .gte('assigned_date', start)
         .lte('assigned_date', end)
@@ -43,16 +44,34 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
   });
 
   // Group by employee
-  const employeeMap = new Map<string, { name: string; assignments: FullAssignment[] }>();
-  assignments.forEach((a) => {
-    const name = a.employees?.name ?? 'Unknown';
-    if (!employeeMap.has(a.employee_id)) {
-      employeeMap.set(a.employee_id, { name, assignments: [] });
-    }
-    employeeMap.get(a.employee_id)!.assignments.push(a);
-  });
+  const employees = useMemo(() => {
+    const employeeMap = new Map<string, { name: string; role: string; assignments: FullAssignment[] }>();
+    assignments.forEach((a) => {
+      const name = a.employees?.name ?? 'Unknown';
+      const role = a.employees?.role ?? '';
+      if (!employeeMap.has(a.employee_id)) {
+        employeeMap.set(a.employee_id, { name, role, assignments: [] });
+      }
+      employeeMap.get(a.employee_id)!.assignments.push(a);
+    });
+    return Array.from(employeeMap.entries()).sort((a, b) => a[1].name.localeCompare(b[1].name));
+  }, [assignments]);
 
-  const employees = Array.from(employeeMap.entries()).sort((a, b) => a[1].name.localeCompare(b[1].name));
+  // Build assignment map: empId:date -> assignments[]
+  const assignmentMap = useMemo(() => {
+    const map: Record<string, FullAssignment[]> = {};
+    assignments.forEach((a) => {
+      const key = `${a.employee_id}:${a.assigned_date}`;
+      if (!map[key]) map[key] = [];
+      map[key].push(a);
+    });
+    return map;
+  }, [assignments]);
+
+  const formatTime = (ts: string | null) => {
+    if (!ts) return '';
+    return format(new Date(ts), 'h:mma').toLowerCase();
+  };
 
   if (isLoading) {
     return (
@@ -66,59 +85,113 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
     return <p className="text-center text-muted-foreground py-8">No shifts scheduled this week.</p>;
   }
 
-  const formatTime = (ts: string | null) => {
-    if (!ts) return '';
-    return format(new Date(ts), 'h:mm a');
-  };
-
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm border-collapse">
-        <thead>
-          <tr>
-            <th className="text-left p-2 border-b border-border font-medium text-muted-foreground w-36">Employee</th>
-            {weekDays.map((d) => (
-              <th key={d.toISOString()} className="text-center p-2 border-b border-border font-medium text-muted-foreground">
-                {format(d, 'EEE d')}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map(([empId, { name, assignments: empAssignments }]) => (
-            <tr key={empId} className="border-b border-border/50">
-              <td className="p-2 font-medium text-foreground whitespace-nowrap">{name}</td>
-              {weekDays.map((d) => {
-                const dateStr = format(d, 'yyyy-MM-dd');
-                const dayShifts = empAssignments.filter((a) => a.assigned_date === dateStr);
-                return (
-                  <td key={dateStr} className="p-1 text-center align-top">
-                    {dayShifts.map((s) => {
-                      const colorDef = getShiftColor({
-                        color: s.shifts?.color ?? null,
-                        is_all_day: s.shifts?.is_all_day ?? false,
-                        start_time: s.shifts?.start_time ?? null,
-                      });
-                      return (
-                        <div
-                          key={s.id}
-                          className={cn('rounded px-1.5 py-0.5 text-xs mb-0.5 border', colorDef.bg, colorDef.border, colorDef.text)}
-                        >
-                          {s.actual_start && s.actual_end ? (
-                            <div className="text-[10px] font-bold">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</div>
-                          ) : (
-                            <div className="font-medium truncate">{s.shifts?.name}</div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="rounded-lg border border-border bg-card overflow-x-auto">
+      {/* Day Headers - matching dashboard grid */}
+      <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
+        <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
+        </div>
+        {weekDays.map((day) => (
+          <div
+            key={day.toISOString()}
+            className={cn(
+              'px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border',
+              isToday(day) && 'bg-primary-light/30'
+            )}
+          >
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+            <p className={cn('text-xs font-bold', isToday(day) ? 'text-primary' : 'text-foreground')}>
+              {format(day, 'd')}
+            </p>
+          </div>
+        ))}
+        <div className="px-0.5 sm:px-1 py-1 sm:py-1.5 text-center flex items-center justify-center">
+          <span className="text-[10px] text-muted-foreground/50">Hrs</span>
+        </div>
+      </div>
+
+      {/* Employee Rows */}
+      {employees.map(([empId, { name, role }]) => (
+        <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
+          {/* Employee Name Cell */}
+          <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
+            <div>
+              <p className="text-xs font-medium text-foreground truncate">{name}</p>
+              {role && <p className="text-[10px] text-muted-foreground">{role}</p>}
+            </div>
+          </div>
+
+          {/* Day Cells */}
+          {weekDays.map((day) => {
+            const dateStr = format(day, 'yyyy-MM-dd');
+            const cellId = `${empId}:${dateStr}`;
+            const dayShifts = assignmentMap[cellId] ?? [];
+            return (
+              <div
+                key={dateStr}
+                className={cn(
+                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] align-top',
+                  isToday(day) && 'bg-primary-light/10'
+                )}
+              >
+                {dayShifts.map((s) => {
+                  const colorDef = getShiftColor({
+                    color: s.shifts?.color ?? null,
+                    is_all_day: s.shifts?.is_all_day ?? false,
+                    start_time: s.shifts?.start_time ?? null,
+                  });
+                  return (
+                    <div
+                      key={s.id}
+                      className={cn(
+                        'rounded px-1 py-0.5 text-xs mb-0.5 border',
+                        colorDef.bg,
+                        colorDef.border,
+                        colorDef.text
+                      )}
+                    >
+                      {s.actual_start && s.actual_end ? (
+                        <span className="text-[10px] font-bold lg:hidden">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                      ) : (
+                        <span className="font-medium truncate text-[10px]">{s.shifts?.name}</span>
+                      )}
+                      {s.actual_start && s.actual_end && (
+                        <span className="text-[10px] font-bold hidden lg:inline">
+                          {format(new Date(s.actual_start), 'h:mma').toLowerCase()} – {format(new Date(s.actual_end), 'h:mma').toLowerCase()}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+
+          {/* Total Hours Cell */}
+          <div className="px-2 py-1 border-b border-border flex items-center justify-center">
+            {(() => {
+              let totalMinutes = 0;
+              weekDays.forEach((day) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const cellAssignments = assignmentMap[`${empId}:${dateStr}`] ?? [];
+                cellAssignments.forEach((a) => {
+                  if (a.actual_start && a.actual_end) {
+                    totalMinutes += (new Date(a.actual_end).getTime() - new Date(a.actual_start).getTime()) / 60000;
+                  }
+                });
+              });
+              const hours = Math.floor(totalMinutes / 60);
+              const mins = Math.round(totalMinutes % 60);
+              return (
+                <span className="text-[10px] text-muted-foreground/50">
+                  {totalMinutes > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : '0h'}
+                </span>
+              );
+            })()}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
