@@ -10,9 +10,14 @@ interface EmployeeMonthlyViewProps {
   monthDate: Date;
 }
 
-const formatTime = (ts: string | null) => {
+const formatTime = (ts: string | null, short = false) => {
   if (!ts) return '';
-  return format(new Date(ts), 'h:mma').toLowerCase();
+  const d = new Date(ts);
+  const minutes = d.getMinutes();
+  const formatted = minutes === 0
+    ? format(d, 'ha').toLowerCase()
+    : format(d, 'h:mma').toLowerCase();
+  return short ? formatted.replace('am', 'a').replace('pm', 'p') : formatted;
 };
 
 const formatHours = (h: number) => {
@@ -131,8 +136,11 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                               color.text
                             )}
                           >
-                            {a.actual_start && a.actual_end ? (
-                              <span className="text-[10px] font-bold">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
+                    {a.actual_start && a.actual_end ? (
+                              <>
+                                <span className="text-[10px] font-bold sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
+                                <span className="text-[10px] font-bold hidden sm:inline">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
+                              </>
                             ) : (
                               <span className="font-medium truncate text-[10px]">{a.shifts?.name ?? 'Shift'}</span>
                             )}
