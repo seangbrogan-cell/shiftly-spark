@@ -160,13 +160,6 @@ export default function EmployeeDashboard() {
                   </div>
                 )}
 
-                {/* Date range label */}
-                <span className="text-sm font-medium text-muted-foreground">
-                  {(activeTab === 'full-schedule' || calendarView === 'weekly')
-                    ? `${format(weekDays[0], 'MMM d')} – ${format(weekDays[6], 'MMM d, yyyy')}`
-                    : format(currentMonth, 'MMMM yyyy')
-                  }
-                </span>
 
                 {/* Navigation */}
                 {(activeTab === 'full-schedule' || calendarView === 'weekly') ? (
