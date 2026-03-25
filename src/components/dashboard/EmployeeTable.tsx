@@ -86,62 +86,64 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
     <>
       {employees.map((emp) => (
         <TableRow key={emp.id}>
-          <TableCell className="font-medium whitespace-nowrap">{emp.name}</TableCell>
+          <TableCell className="font-medium whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4">{emp.name}</TableCell>
           <TableCell className="text-muted-foreground hidden sm:table-cell">{emp.email}</TableCell>
           <TableCell className="hidden md:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
-          <TableCell>
-            <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'}>
+          <TableCell className="px-1 sm:px-4">
+            <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'} className="text-[10px] sm:text-xs px-1.5 sm:px-2.5">
               {emp.role}
             </Badge>
           </TableCell>
-          <TableCell className="text-center">{shiftCounts[emp.id] || 0}</TableCell>
-          <TableCell className="text-right">
-            <div className="flex justify-end gap-1">
+          <TableCell className="text-center text-xs sm:text-sm px-1 sm:px-4">{shiftCounts[emp.id] || 0}</TableCell>
+          <TableCell className="text-right px-1 sm:px-4">
+            <div className="flex justify-end gap-0 sm:gap-1">
               {(emp as any).user_id ? (
                 cooldowns[emp.id] ? (
-                  <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
-                    <Clock className="h-3.5 w-3.5 shrink-0" />
+                  <span className="inline-flex items-center gap-1 px-1 sm:px-2 text-[10px] sm:text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
+                    <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                     <span>{cooldowns[emp.id]}s</span>
                   </span>
                 ) : (
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-7 w-7 sm:h-8 sm:w-8"
                     onClick={() => handleResendReset(emp)}
                     disabled={resending === emp.id}
                     aria-label={`Resend reset link to ${emp.name}`}
                     title="Resend password reset link"
                   >
-                    <RefreshCw className={`h-4 w-4 ${resending === emp.id ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${resending === emp.id ? 'animate-spin' : ''}`} />
                   </Button>
                 )
               ) : cooldowns[emp.id] ? (
-                <span className="inline-flex items-center gap-1 px-2 text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
-                  <Clock className="h-3.5 w-3.5 shrink-0" />
+                <span className="inline-flex items-center gap-1 px-1 sm:px-2 text-[10px] sm:text-xs text-muted-foreground tabular-nums" title={`Resend available in ${cooldowns[emp.id]}s`}>
+                  <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                   <span>{cooldowns[emp.id]}s</span>
                 </span>
               ) : (
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-7 w-7 sm:h-8 sm:w-8"
                   onClick={() => handleInvite(emp)}
                   disabled={inviting === emp.id}
                   aria-label={`Invite ${emp.name}`}
                   title="Create account & send invite"
                 >
-                  <Send className={`h-4 w-4 ${inviting === emp.id ? 'animate-pulse' : ''}`} />
+                  <Send className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${inviting === emp.id ? 'animate-pulse' : ''}`} />
                 </Button>
               )}
               {onEmail && (
-                <Button variant="ghost" size="icon" onClick={() => onEmail(emp)} aria-label={`Email ${emp.name}`} title="Send email">
-                  <Mail className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => onEmail(emp)} aria-label={`Email ${emp.name}`} title="Send email">
+                  <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               )}
-              <Button variant="ghost" size="icon" onClick={() => onEdit(emp)} aria-label={`Edit ${emp.name}`}>
-                <Pencil className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => onEdit(emp)} aria-label={`Edit ${emp.name}`}>
+                <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => onDelete(emp)} aria-label={`Delete ${emp.name}`}>
-                <Trash2 className="h-4 w-4 text-destructive" />
+              <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-8 sm:w-8" onClick={() => onDelete(emp)} aria-label={`Delete ${emp.name}`}>
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-destructive" />
               </Button>
             </div>
           </TableCell>
@@ -182,12 +184,12 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
   const headers = (
     <TableHeader>
       <TableRow className="bg-muted/50">
-        <TableHead>Name</TableHead>
+        <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Name</TableHead>
         <TableHead className="hidden sm:table-cell">Email</TableHead>
         <TableHead className="hidden md:table-cell">Phone</TableHead>
-        <TableHead>Role</TableHead>
-        <TableHead className="text-center">Shifts</TableHead>
-        <TableHead className="text-right">Actions</TableHead>
+        <TableHead className="text-xs sm:text-sm px-1 sm:px-4">Role</TableHead>
+        <TableHead className="text-center text-xs sm:text-sm px-1 sm:px-4">Shifts</TableHead>
+        <TableHead className="text-right text-xs sm:text-sm px-1 sm:px-4">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );
