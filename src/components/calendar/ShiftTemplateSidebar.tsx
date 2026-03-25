@@ -46,7 +46,7 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
     <aside
       ref={setNodeRef}
       className={cn(
-        'hidden lg:flex flex-col shrink-0 border-l border-border bg-card overflow-y-auto transition-all duration-200 print:hidden',
+        'hidden lg:flex flex-col shrink-0 border-l border-border bg-card overflow-y-auto transition-all duration-200 print:hidden sticky top-0 -my-3 sm:-my-6 lg:-my-8 -mr-3 sm:-mr-6 lg:-mr-8',
         collapsed ? 'w-12' : 'w-52',
         isOver && 'border-destructive/50 bg-destructive/5'
       )}
