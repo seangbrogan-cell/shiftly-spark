@@ -9,7 +9,6 @@ import { DraggableShiftTemplate } from './DraggableShiftTemplate';
 
 interface ShiftTemplateSidebarProps {
   shifts: Shift[];
-  onAssignShift?: () => void;
 }
 
 type Period = 'allday' | 'morning' | 'afternoon' | 'evening';
