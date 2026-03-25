@@ -323,7 +323,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 </div>
               ))}
               <div className="px-0.5 sm:px-1 py-1 sm:py-1.5 text-center flex items-center justify-center">
-                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Hrs</span>
+                <span className="text-[10px] text-muted-foreground/50">Hrs</span>
               </div>
             </div>
 
