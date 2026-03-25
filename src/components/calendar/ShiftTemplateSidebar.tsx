@@ -103,6 +103,8 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
           })}
         </div>
       )}
+      </>
+      )}
     </div>
   );
 }
