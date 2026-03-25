@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth, isSameWeek, isSameMonth as isSameMonthFn } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +16,7 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users, Printer } from 'lucide-react';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users, Printer, LayoutDashboard } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
 import { FullScheduleView } from '@/components/employee/FullScheduleView';
@@ -111,7 +112,7 @@ export default function EmployeeDashboard() {
   if (!employee) {
     return (
       <div className="min-h-screen bg-background">
-        <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} />
+        <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} isAdmin={profile?.role === 'employer'} />
         <main className="mx-auto max-w-xl px-6 py-24 text-center">
           <h1 className="text-2xl font-bold text-foreground">Welcome to WorkSchedule</h1>
           <p className="mt-3 text-muted-foreground">
@@ -124,7 +125,7 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} />
+      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
@@ -304,7 +305,7 @@ export default function EmployeeDashboard() {
   );
 }
 
-function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string }) {
+function EmployeeHeader({ email, displayName, onSignOut, employeeId, isAdmin }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string; isAdmin?: boolean }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -316,6 +317,14 @@ function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?:
           <span className="hidden sm:block text-sm text-muted-foreground">
             {displayName || email}
           </span>
+          {isAdmin && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard">
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
+            </Button>
+          )}
           <NotificationBell employeeId={employeeId} />
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4" />
