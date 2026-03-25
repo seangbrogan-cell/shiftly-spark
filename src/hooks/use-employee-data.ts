@@ -122,6 +122,24 @@ export function useScheduleLastUpdated(employerId: string | undefined) {
   });
 }
 
+// Fetch approved time-off requests for an employee within a date range
+export function useEmployeeApprovedTimeOff(employeeId: string | undefined) {
+  return useQuery({
+    queryKey: ['employee-approved-time-off', employeeId],
+    queryFn: async () => {
+      if (!employeeId) return [];
+      const { data, error } = await supabase
+        .from('time_off_requests')
+        .select('employee_id, start_date, end_date')
+        .eq('employee_id', employeeId)
+        .eq('status', 'approved');
+      if (error) throw error;
+      return data as { employee_id: string; start_date: string; end_date: string }[];
+    },
+    enabled: !!employeeId,
+  });
+}
+
 // Find the employee record linked to the current auth user
 export function useCurrentEmployee() {
   return useQuery({

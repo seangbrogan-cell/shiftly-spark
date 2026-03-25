@@ -380,6 +380,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                     let totalMinutes = 0;
                     weekDays.forEach((day) => {
                       const dateStr = format(day, 'yyyy-MM-dd');
+                      // Skip days with approved time off
+                      if (timeOffSet.has(`${emp.id}:${dateStr}`)) return;
                       const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                       cellAssignments.forEach((a) => {
                         if (a.actual_start && a.actual_end) {
@@ -408,6 +410,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 const dateStr = format(day, 'yyyy-MM-dd');
                 const counts = { morning: 0, afternoon: 0, evening: 0 };
                 employees.forEach((emp) => {
+                  if (timeOffSet.has(`${emp.id}:${dateStr}`)) return;
                   const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                   cellAssignments.forEach((a) => {
                     if (!a.shifts?.is_all_day && a.shifts?.start_time) {
@@ -442,6 +445,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   employees.forEach((emp) => {
                     weekDays.forEach((day) => {
                       const dateStr = format(day, 'yyyy-MM-dd');
+                      if (timeOffSet.has(`${emp.id}:${dateStr}`)) return;
                       const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                       cellAssignments.forEach((a) => {
                         if (a.actual_start && a.actual_end) {
