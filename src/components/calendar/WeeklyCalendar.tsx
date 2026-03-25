@@ -410,6 +410,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 const dateStr = format(day, 'yyyy-MM-dd');
                 const counts = { morning: 0, afternoon: 0, evening: 0 };
                 employees.forEach((emp) => {
+                  if (timeOffSet.has(`${emp.id}:${dateStr}`)) return;
                   const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                   cellAssignments.forEach((a) => {
                     if (!a.shifts?.is_all_day && a.shifts?.start_time) {
