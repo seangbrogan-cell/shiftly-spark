@@ -147,7 +147,7 @@ export default function Dashboard() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex flex-col gap-3 mb-6 print:hidden">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
-                <TabsList className="shrink-0">
+                <TabsList className="shrink-0 gap-1">
                   <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
                     <Calendar className="h-4 w-4" /> <span className="hidden xs:inline">Schedule</span>
                   </TabsTrigger>
