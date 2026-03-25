@@ -94,6 +94,7 @@ export async function checkConflict(
   actualEnd: string,
   excludeId?: string
 ): Promise<boolean> {
+  // First check via RPC
   const { data, error } = await supabase.rpc('check_shift_conflict', {
     _employee_id: employeeId,
     _assigned_date: assignedDate,
@@ -102,7 +103,27 @@ export async function checkConflict(
     _exclude_assignment_id: excludeId ?? null,
   });
   if (error) throw error;
-  return data as boolean;
+
+  // If RPC reports a conflict, verify with a direct query to avoid stale results
+  if (data) {
+    let query = supabase
+      .from('shift_assignments')
+      .select('id')
+      .eq('employee_id', employeeId)
+      .eq('assigned_date', assignedDate)
+      .not('actual_start', 'is', null)
+      .not('actual_end', 'is', null)
+      .lt('actual_start', actualEnd)
+      .gt('actual_end', actualStart);
+    if (excludeId) {
+      query = query.neq('id', excludeId);
+    }
+    const { data: rows, error: verifyErr } = await query.limit(1);
+    if (verifyErr) throw verifyErr;
+    return (rows?.length ?? 0) > 0;
+  }
+
+  return false;
 }
 
 export function getWeekDays(weekStart: Date): Date[] {
