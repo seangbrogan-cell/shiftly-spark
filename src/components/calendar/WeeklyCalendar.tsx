@@ -308,7 +308,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             {/* Day Headers */}
             <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
               <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
-                <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
+                <span className="text-[8px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
               </div>
               {weekDays.map((day) => (
                 <div
