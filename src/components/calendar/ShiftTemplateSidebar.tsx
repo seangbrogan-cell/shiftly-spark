@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, Plus } from 'lucide-react';
+import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, Plus, PanelRightClose, PanelRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Shift } from '@/hooks/use-dashboard-data';
@@ -27,6 +27,7 @@ function getStartHour(shift: Shift): number {
 }
 
 export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
 
   const grouped = useMemo(() => {
@@ -49,10 +50,23 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
         isOver && 'border-destructive/50 bg-destructive/5 rounded-lg'
       )}
     >
-      <div className="flex items-center gap-2 mb-3">
-        <LayoutGrid className="h-4 w-4 text-primary" />
-        <h3 className="text-sm font-semibold text-foreground">Shift Templates</h3>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <LayoutGrid className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold text-foreground">Shift Templates</h3>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelRight className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+        </Button>
       </div>
+      {collapsed ? null : (
+      <>
       <p className="text-xs text-muted-foreground mb-3">
         {isOver ? 'Drop to unassign shift' : 'Drag a shift onto the calendar to assign it.'}
       </p>
@@ -88,6 +102,8 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
             );
           })}
         </div>
+      )}
+      </>
       )}
     </div>
   );
