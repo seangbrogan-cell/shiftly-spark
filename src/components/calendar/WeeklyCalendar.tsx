@@ -535,12 +535,15 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         </AlertDialogContent>
       </AlertDialog>
       </div>
-      {renderSidebar?.(() => {
-        setEditingAssignment(null);
-        setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-        setDefaultEmployeeId('');
-        setModalOpen(true);
-      })}
+      {renderSidebar && sidebarPortalRef?.current && createPortal(
+        renderSidebar(() => {
+          setEditingAssignment(null);
+          setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+          setDefaultEmployeeId('');
+          setModalOpen(true);
+        }),
+        sidebarPortalRef.current
+      )}
     </div>
     </DndContext>
   );
