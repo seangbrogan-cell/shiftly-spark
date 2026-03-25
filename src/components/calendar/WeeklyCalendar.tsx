@@ -433,7 +433,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                     ) : (
                       <div className="flex flex-col items-center gap-0">
                         {lines.map((line) => (
-                          <p key={line.full} className="text-[10px] font-medium text-muted-foreground leading-tight">
+                          <p key={line.full} className="text-[10px] text-muted-foreground/50 leading-tight">
                             <span className="sm:hidden">{line.short}</span>
                             <span className="hidden sm:inline">{line.full}</span>
                           </p>
