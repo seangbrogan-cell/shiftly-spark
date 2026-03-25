@@ -68,7 +68,6 @@ export function useWeekPublishStatus(weekStart: Date) {
         .gte('assigned_date', start)
         .lte('assigned_date', end)
         .gt('updated_at', lastPublish.published_at)
-        .is('published_at', null)
         .limit(1);
 
       if (changed && changed.length > 0) {
