@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { format, addWeeks, subWeeks, isToday, startOfWeek, isSameWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
@@ -43,9 +44,10 @@ interface WeeklyCalendarProps {
   companyName?: string;
   workplaceId?: string;
   renderSidebar?: (onAssignShift: () => void) => React.ReactNode;
+  sidebarPortalRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
@@ -259,7 +261,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div className="flex items-start gap-4">
+    <div>
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
@@ -533,12 +535,15 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         </AlertDialogContent>
       </AlertDialog>
       </div>
-      {renderSidebar?.(() => {
-        setEditingAssignment(null);
-        setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-        setDefaultEmployeeId('');
-        setModalOpen(true);
-      })}
+      {renderSidebar && sidebarPortalRef?.current && createPortal(
+        renderSidebar(() => {
+          setEditingAssignment(null);
+          setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+          setDefaultEmployeeId('');
+          setModalOpen(true);
+        }),
+        sidebarPortalRef.current
+      )}
     </div>
     </DndContext>
   );

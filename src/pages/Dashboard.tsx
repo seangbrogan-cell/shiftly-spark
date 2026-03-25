@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
@@ -93,6 +93,7 @@ export default function Dashboard() {
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
+  const sidebarPortalRef = useRef<HTMLDivElement>(null);
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
@@ -191,6 +192,7 @@ export default function Dashboard() {
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}
                   workplaceId={selectedWorkplaceId}
+                  sidebarPortalRef={sidebarPortalRef}
                   renderSidebar={(onAssignShift) => (
                     <ShiftTemplateSidebar shifts={shifts} onAssignShift={onAssignShift} />
                   )}
@@ -273,6 +275,8 @@ export default function Dashboard() {
           </Tabs>
         </main>
 
+        {/* Portal target for shift template sidebar */}
+        <div ref={sidebarPortalRef} />
       </div>
 
       {/* Modals */}
