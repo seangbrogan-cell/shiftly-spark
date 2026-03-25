@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { format, isToday, startOfWeek, addDays } from 'date-fns';
+import { format, isToday, startOfWeek, addDays, differenceInMinutes } from 'date-fns';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
 import type { EmployeeAssignment } from '@/hooks/use-employee-data';
@@ -12,6 +12,21 @@ interface EmployeeWeeklyViewProps {
 const formatTime = (ts: string | null) => {
   if (!ts) return '';
   return format(new Date(ts), 'h:mma').toLowerCase();
+};
+
+const calcTotalHours = (assignments: EmployeeAssignment[]) => {
+  let totalMin = 0;
+  assignments.forEach((a) => {
+    if (a.actual_start && a.actual_end) {
+      totalMin += differenceInMinutes(new Date(a.actual_end), new Date(a.actual_start));
+    }
+  });
+  return totalMin / 60;
+};
+
+const formatHours = (h: number) => {
+  if (h === 0) return '—';
+  return h % 1 === 0 ? `${h}h` : `${h.toFixed(1)}h`;
 };
 
 export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyViewProps) {
@@ -27,15 +42,17 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
     return map;
   }, [assignments]);
 
+  const totalHours = useMemo(() => calcTotalHours(assignments), [assignments]);
+
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       {/* Day Headers */}
-      <div className="grid grid-cols-7 border-b border-border sticky top-0 bg-card z-10">
+      <div className="grid grid-cols-[repeat(7,1fr)_36px] sm:grid-cols-[repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
         {days.map((day) => (
           <div
             key={day.toISOString()}
             className={cn(
-              'px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border last:border-r-0',
+              'px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border',
               isToday(day) && 'bg-primary-light/30'
             )}
           >
@@ -45,10 +62,13 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             </p>
           </div>
         ))}
+        <div className="px-0.5 py-1 sm:py-1.5 text-center flex items-center justify-center">
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase">Hrs</span>
+        </div>
       </div>
 
       {/* Day Cells */}
-      <div className="grid grid-cols-7">
+      <div className="grid grid-cols-[repeat(7,1fr)_36px] sm:grid-cols-[repeat(7,1fr)_46px]">
         {days.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const dayAssignments = byDate[dateStr] ?? [];
@@ -57,7 +77,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             <div
               key={dateStr}
               className={cn(
-                'px-0.5 py-0.5 border-r border-border last:border-r-0 min-h-[4rem] align-top',
+                'px-0.5 py-0.5 border-r border-border min-h-[4rem] align-top',
                 isToday(day) && 'bg-primary-light/10'
               )}
             >
@@ -88,6 +108,9 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             </div>
           );
         })}
+        <div className="px-0.5 py-0.5 min-h-[4rem] flex items-start justify-center pt-2">
+          <span className="text-xs font-bold text-foreground">{formatHours(totalHours)}</span>
+        </div>
       </div>
     </div>
   );

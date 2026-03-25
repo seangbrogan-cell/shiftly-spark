@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay, differenceInMinutes } from 'date-fns';
 import { Clock, X } from 'lucide-react';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,11 @@ interface EmployeeMonthlyViewProps {
 const formatTime = (ts: string | null) => {
   if (!ts) return '';
   return format(new Date(ts), 'h:mma').toLowerCase();
+};
+
+const formatHours = (h: number) => {
+  if (h === 0) return '—';
+  return h % 1 === 0 ? `${h}h` : `${h.toFixed(1)}h`;
 };
 
 export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyViewProps) {
@@ -46,6 +51,21 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
     return map;
   }, [assignments]);
 
+  const weekHours = useMemo(() => {
+    return weeks.map((week) => {
+      let totalMin = 0;
+      week.forEach((day) => {
+        const dateStr = format(day, 'yyyy-MM-dd');
+        (byDate[dateStr] ?? []).forEach((a) => {
+          if (a.actual_start && a.actual_end) {
+            totalMin += differenceInMinutes(new Date(a.actual_end), new Date(a.actual_start));
+          }
+        });
+      });
+      return totalMin / 60;
+    });
+  }, [weeks, byDate]);
+
   const selectedAssignments = selectedDay
     ? byDate[format(selectedDay, 'yyyy-MM-dd')] ?? []
     : [];
@@ -54,17 +74,20 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
     <div>
       <div className="rounded-lg border border-border bg-card overflow-x-auto">
         {/* Day-of-week headers */}
-        <div className="grid grid-cols-7 border-b border-border sticky top-0 bg-card z-10">
+        <div className="grid grid-cols-[repeat(7,1fr)_36px] sm:grid-cols-[repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
           {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-            <div key={d} className="px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border last:border-r-0">
+            <div key={d} className="px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase">{d}</p>
             </div>
           ))}
+          <div className="px-0.5 py-1 sm:py-1.5 text-center flex items-center justify-center">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase">Hrs</span>
+          </div>
         </div>
 
         {/* Calendar cells */}
         {weeks.map((week, wi) => (
-          <div key={wi} className="grid grid-cols-7">
+          <div key={wi} className="grid grid-cols-[repeat(7,1fr)_36px] sm:grid-cols-[repeat(7,1fr)_46px]">
             {week.map((day) => {
               const dateStr = format(day, 'yyyy-MM-dd');
               const dayAssignments = byDate[dateStr] ?? [];
@@ -78,7 +101,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                   type="button"
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={cn(
-                    'px-0.5 py-0.5 border-r border-b border-border last:border-r-0 min-h-[4rem] text-left transition-colors',
+                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors',
                     !inMonth && 'opacity-40',
                     today && 'bg-primary-light/10',
                     isSelected && 'ring-2 ring-primary/40',
@@ -124,6 +147,9 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                 </button>
               );
             })}
+            <div className="px-0.5 py-0.5 border-b border-border min-h-[4rem] flex items-start justify-center pt-2">
+              <span className="text-xs font-bold text-foreground">{formatHours(weekHours[wi])}</span>
+            </div>
           </div>
         ))}
       </div>
