@@ -34,6 +34,8 @@ function statusBadge(status: string) {
   switch (status) {
     case 'approved':
       return <Badge className="bg-green-600 hover:bg-green-700 text-white">Approved</Badge>;
+    case 'denied':
+      return <Badge variant="destructive">Denied</Badge>;
     case 'rejected':
       return <Badge variant="destructive">Rejected</Badge>;
     default:
