@@ -153,25 +153,21 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                     <div
                       key={s.id}
                       className={cn(
-                        'rounded px-1 py-0.5 text-xs border flex-1',
+                        'rounded border px-0.5 sm:px-1.5 py-1 flex-1',
                         colorDef.bg,
-                        colorDef.border,
-                        colorDef.text
+                        colorDef.border
                       )}
                     >
-                      {s.actual_start && s.actual_end ? (
-                        <>
-                          <span className="text-[10px] font-bold sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                          <span className="text-[10px] font-bold hidden sm:inline lg:hidden">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                        </>
-                      ) : (
-                        <span className="font-medium truncate text-[10px]">{s.shifts?.name}</span>
-                      )}
-                      {s.actual_start && s.actual_end && (
-                        <span className="text-[10px] font-bold hidden lg:inline">
-                          {formatTime(s.actual_start)} – {formatTime(s.actual_end)}
-                        </span>
-                      )}
+                      <div className={cn('text-[9px] sm:text-xs leading-tight', colorDef.text)}>
+                        {s.actual_start && s.actual_end ? (
+                          <div className="font-bold lg:whitespace-nowrap">
+                            <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                            <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                          </div>
+                        ) : (
+                          <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
