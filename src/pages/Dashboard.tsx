@@ -126,20 +126,20 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Tabs defaultValue="schedule" className="w-full">
-            <div className="flex items-center justify-between gap-4 mb-6 flex-wrap print:hidden">
-              <div className="flex items-center gap-4">
-                <TabsList>
-                  <TabsTrigger value="schedule" className="gap-2">
-                    <Calendar className="h-4 w-4" /> Schedule
+            <div className="flex flex-col gap-3 mb-6 print:hidden">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
+                <TabsList className="shrink-0">
+                  <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                    <Calendar className="h-4 w-4" /> <span className="hidden xs:inline">Schedule</span>
                   </TabsTrigger>
-                  <TabsTrigger value="employees" className="gap-2">
-                    <Users className="h-4 w-4" /> Employees
+                  <TabsTrigger value="employees" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                    <Users className="h-4 w-4" /> <span className="hidden xs:inline">Employees</span>
                   </TabsTrigger>
-                   <TabsTrigger value="shifts" className="gap-2">
-                     <LayoutGrid className="h-4 w-4" /> Shifts
+                   <TabsTrigger value="shifts" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                     <LayoutGrid className="h-4 w-4" /> <span className="hidden xs:inline">Shifts</span>
                    </TabsTrigger>
-                   <TabsTrigger value="time-off" className="gap-2 relative">
-                     <CalendarOff className="h-4 w-4" /> Time Off
+                   <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm sm:gap-2 relative">
+                     <CalendarOff className="h-4 w-4" /> <span className="hidden xs:inline">Time Off</span>
                      {pendingTimeOffCount > 0 && (
                        <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground px-1 animate-pulse">
                          {pendingTimeOffCount}
@@ -157,12 +157,14 @@ export default function Dashboard() {
                 )}
               </div>
               {employerId && (
-                <PublishPanel
-                  employerId={employerId}
-                  currentWeek={startOfWeek(new Date(), { weekStartsOn: 1 })}
-                  employees={employees}
-                  shifts={shifts}
-                />
+                <div className="flex justify-end">
+                  <PublishPanel
+                    employerId={employerId}
+                    currentWeek={startOfWeek(new Date(), { weekStartsOn: 1 })}
+                    employees={employees}
+                    shifts={shifts}
+                  />
+                </div>
               )}
             </div>
 
