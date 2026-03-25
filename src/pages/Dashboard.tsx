@@ -93,6 +93,7 @@ export default function Dashboard() {
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
+  const sidebarPortalRef = useRef<HTMLDivElement>(null);
 
   const handleEdit = (emp: Employee) => {
     setEditingEmployee(emp);
