@@ -139,7 +139,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
               <div
                 key={dateStr}
                 className={cn(
-                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5',
+                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10'
                 )}
               >
