@@ -270,7 +270,7 @@ export default function EmployeeDashboard() {
           {/* Full Schedule Tab */}
           {fullScheduleAllowed && activeWorkplaceId && (
             <TabsContent value="full-schedule">
-              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} />
+              <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} employerId={employerId} />
             </TabsContent>
           )}
 

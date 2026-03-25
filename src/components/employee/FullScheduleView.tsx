@@ -5,10 +5,13 @@ import { format, startOfWeek, endOfWeek, isToday } from 'date-fns';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
+import { useRoleTypes } from '@/hooks/use-role-types';
+import { buildRoleSortPriority } from '@/lib/roles';
 
 interface FullScheduleViewProps {
   workplaceId: string;
   weekStart: Date;
+  employerId?: string;
 }
 
 interface FullAssignment {
@@ -22,10 +25,12 @@ interface FullAssignment {
   employees: { name: string; role: string } | null;
 }
 
-export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewProps) {
+export function FullScheduleView({ workplaceId, weekStart, employerId }: FullScheduleViewProps) {
   const start = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const end = format(endOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const weekDays = getWeekDays(weekStart);
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
   const { data: assignments = [], isLoading } = useQuery({
     queryKey: ['full-schedule', workplaceId, start],
@@ -54,7 +59,11 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
-    return Array.from(employeeMap.entries()).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    return Array.from(employeeMap.entries()).sort((a, b) => {
+      const priorityDiff = roleSortPriority(a[1].role) - roleSortPriority(b[1].role);
+      if (priorityDiff !== 0) return priorityDiff;
+      return a[1].name.localeCompare(b[1].name);
+    });
   }, [assignments]);
 
   // Build assignment map: empId:date -> assignments[]
