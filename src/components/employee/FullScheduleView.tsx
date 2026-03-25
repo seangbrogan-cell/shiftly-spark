@@ -121,12 +121,12 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
 
       {/* Employee Rows */}
       {employees.map(([empId, { name, role }]) => (
-        <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
+        <div key={empId} className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
           {/* Employee Name Cell */}
-          <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
-            <div>
-              <p className="text-xs font-medium text-foreground truncate">{name}</p>
-              {role && <p className="text-[10px] text-muted-foreground">{role}</p>}
+          <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start min-w-0">
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-foreground truncate">{name}</p>
+              {role && <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{role}</p>}
             </div>
           </div>
 
