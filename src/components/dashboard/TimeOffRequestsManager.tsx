@@ -102,6 +102,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     },
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ['employer-time-off-requests'] });
+      qc.invalidateQueries({ queryKey: ['pending-time-off-count'] });
       const label = status === 'approved' ? 'approved' : 'denied';
       toast({ title: `Request ${label}`, description: `The time-off request has been ${label}.` });
       setRejectTarget(null);
