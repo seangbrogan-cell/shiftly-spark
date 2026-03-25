@@ -46,8 +46,8 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
       const { data, error } = await supabase.functions.invoke('create-employee-account', {
         body: { employeeId: emp.id },
       });
-      if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      if (error) throw error;
       toast({ title: 'Invite sent', description: `Password reset email sent to ${emp.email}` });
       startCooldown(emp.id);
     } catch (err: any) {
