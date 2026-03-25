@@ -46,6 +46,8 @@ function statusBadge(status: string) {
 export function TimeOffRequestsManager({ employerId }: Props) {
   const { toast } = useToast();
   const qc = useQueryClient();
+  const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['employer-time-off-requests', employerId],
@@ -62,10 +64,14 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   });
 
   const updateStatus = useMutation({
-    mutationFn: async ({ id, status, request }: { id: string; status: string; request: TimeOffRequest }) => {
+    mutationFn: async ({ id, status, request, explanation }: { id: string; status: string; request: TimeOffRequest; explanation?: string }) => {
+      const updateData: Record<string, string> = { status };
+      if (explanation) {
+        updateData.notes = explanation;
+      }
       const { error } = await supabase
         .from('time_off_requests')
-        .update({ status })
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
 
@@ -85,6 +91,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
                 endDate: format(parseISO(request.end_date), 'MMM d, yyyy'),
                 reason: request.reason,
                 decision: status === 'approved' ? 'approved' : 'rejected',
+                explanation: explanation || undefined,
               },
             },
           });
@@ -95,12 +102,20 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     },
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ['employer-time-off-requests'] });
-      toast({ title: `Request ${status}`, description: `The time-off request has been ${status}.` });
+      const label = status === 'approved' ? 'approved' : 'denied';
+      toast({ title: `Request ${label}`, description: `The time-off request has been ${label}.` });
+      setRejectTarget(null);
+      setRejectReason('');
     },
     onError: () => {
       toast({ title: 'Error', description: 'Failed to update request.', variant: 'destructive' });
     },
   });
+
+  const handleReject = () => {
+    if (!rejectTarget) return;
+    updateStatus.mutate({ id: rejectTarget.id, status: 'denied', request: rejectTarget, explanation: rejectReason || undefined });
+  };
 
   const pending = requests.filter(r => r.status === 'pending');
   const resolved = requests.filter(r => r.status !== 'pending');
@@ -126,7 +141,12 @@ export function TimeOffRequestsManager({ employerId }: Props) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {pending.map(r => (
-              <RequestCard key={r.id} request={r} onAction={(status) => updateStatus.mutate({ id: r.id, status, request: r })} />
+              <RequestCard
+                key={r.id}
+                request={r}
+                onApprove={() => updateStatus.mutate({ id: r.id, status: 'approved', request: r })}
+                onReject={() => { setRejectTarget(r); setRejectReason(''); }}
+              />
             ))}
           </div>
         )}
@@ -143,6 +163,35 @@ export function TimeOffRequestsManager({ employerId }: Props) {
           </div>
         </section>
       )}
+
+      {/* Reject Modal */}
+      <Dialog open={!!rejectTarget} onOpenChange={(open) => { if (!open) { setRejectTarget(null); setRejectReason(''); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Deny Time-Off Request</DialogTitle>
+            <DialogDescription>
+              Denying request from <span className="font-semibold">{rejectTarget?.employees?.name}</span> for{' '}
+              {rejectTarget && format(new Date(rejectTarget.start_date), 'MMM d')} – {rejectTarget && format(new Date(rejectTarget.end_date), 'MMM d, yyyy')}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="reject-reason">Explanation (optional)</Label>
+            <Textarea
+              id="reject-reason"
+              placeholder="Provide a reason for denying this request..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRejectTarget(null); setRejectReason(''); }}>Cancel</Button>
+            <Button variant="destructive" onClick={handleReject} disabled={updateStatus.isPending}>
+              {updateStatus.isPending ? 'Denying...' : 'Deny Request'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
