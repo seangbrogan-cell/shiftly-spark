@@ -197,7 +197,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
       {management.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Management</h3>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="rounded-lg border border-border bg-card overflow-x-auto">
             <Table>
               {headers}
               <TableBody>
