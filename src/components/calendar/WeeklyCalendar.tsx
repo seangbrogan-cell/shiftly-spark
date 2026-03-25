@@ -308,21 +308,21 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             {/* Day Headers */}
             <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
               <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
-                <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
+                <span className="text-[8px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
               </div>
               {weekDays.map((day) => (
                 <div
                   key={day.toISOString()}
                   className={`px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border ${isToday(day) ? 'bg-primary-light/30' : ''}`}
                 >
-                  <p className="text-[8px] sm:text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
-                  <p className={`text-[10px] sm:text-sm font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
+                  <p className="text-[7px] sm:text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+                  <p className={`text-[9px] sm:text-sm font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
                     {format(day, 'd')}
                   </p>
                 </div>
               ))}
               <div className="px-0.5 sm:px-1 py-1 sm:py-1.5 text-center flex items-center justify-center">
-                <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hrs</span>
+                <span className="text-[8px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Hrs</span>
               </div>
             </div>
 
@@ -336,8 +336,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 {/* Employee Name Cell */}
                 <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
                   <div>
-                    <p className="text-[11px] sm:text-sm font-medium text-foreground truncate">{emp.name}</p>
-                    <p className="text-[9px] sm:text-xs text-muted-foreground">{emp.role}</p>
+                    <p className="text-[10px] sm:text-sm font-medium text-foreground truncate">{emp.name}</p>
+                    <p className="text-[8px] sm:text-xs text-muted-foreground">{emp.role}</p>
                   </div>
                 </div>
 
@@ -392,7 +392,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                     const hours = Math.floor(totalMinutes / 60);
                     const mins = Math.round(totalMinutes % 60);
                     return (
-                      <span className={`text-[10px] sm:text-sm font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      <span className={`text-[9px] sm:text-sm font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {totalMinutes > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : '0h'}
                       </span>
                     );
