@@ -34,7 +34,6 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
         : format(d, 'h:mma').toLowerCase();
     } catch { return ''; }
   };
-  };
 
   const hasTime = assignment.actual_start && assignment.actual_end;
   const shiftName = assignment.shifts?.name ?? 'Shift';
