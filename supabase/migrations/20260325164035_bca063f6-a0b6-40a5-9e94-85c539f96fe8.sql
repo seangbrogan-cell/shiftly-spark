@@ -1,0 +1,1 @@
+UPDATE public.employees SET user_id = '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' WHERE id = 'b45450f2-29fb-4555-b3bf-9c88e1fbaf6b'
