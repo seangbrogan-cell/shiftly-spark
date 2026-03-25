@@ -5,10 +5,13 @@ import { format, startOfWeek, endOfWeek, isToday } from 'date-fns';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
+import { useRoleTypes } from '@/hooks/use-role-types';
+import { buildRoleSortPriority } from '@/lib/roles';
 
 interface FullScheduleViewProps {
   workplaceId: string;
   weekStart: Date;
+  employerId?: string;
 }
 
 interface FullAssignment {
