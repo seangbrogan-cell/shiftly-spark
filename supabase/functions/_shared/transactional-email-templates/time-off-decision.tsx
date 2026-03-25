@@ -47,6 +47,9 @@ const TimeOffDecisionEmail = ({ employeeName, startDate, endDate, reason, decisi
             <Text style={{ ...detailRow, color: isApproved ? '#16a34a' : '#dc2626', fontWeight: '600' as const }}>
               <strong>Status:</strong> {isApproved ? 'Approved' : 'Denied'}
             </Text>
+            {!isApproved && explanation && (
+              <Text style={detailRow}><strong>Reason for denial:</strong> {explanation}</Text>
+            )}
           </Section>
           <Text style={text}>
             {isApproved
