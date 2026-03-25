@@ -68,9 +68,17 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
     return map;
   }, [assignments]);
 
-  const formatTime = (ts: string | null) => {
+  const formatTime = (ts: string | null, short = false) => {
     if (!ts) return '';
-    return format(new Date(ts), 'h:mma').toLowerCase();
+    const d = new Date(ts);
+    if (short) {
+      const minutes = d.getMinutes();
+      const formatted = minutes === 0
+        ? format(d, 'ha').toLowerCase()
+        : format(d, 'h:mma').toLowerCase();
+      return formatted.replace('am', 'a').replace('pm', 'p');
+    }
+    return format(d, 'h:mma').toLowerCase();
   };
 
   if (isLoading) {
