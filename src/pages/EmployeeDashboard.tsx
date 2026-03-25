@@ -160,13 +160,6 @@ export default function EmployeeDashboard() {
                   </div>
                 )}
 
-                {/* Date range label */}
-                <span className="text-sm font-medium text-muted-foreground">
-                  {(activeTab === 'full-schedule' || calendarView === 'weekly')
-                    ? `${format(weekDays[0], 'MMM d')} – ${format(weekDays[6], 'MMM d, yyyy')}`
-                    : format(currentMonth, 'MMMM yyyy')
-                  }
-                </span>
 
                 {/* Navigation */}
                 {(activeTab === 'full-schedule' || calendarView === 'weekly') ? (
@@ -202,14 +195,22 @@ export default function EmployeeDashboard() {
             )}
           </div>
 
-          {/* Workplace title – visible for schedule tabs */}
+          {/* Workplace title + date range – visible for schedule tabs */}
           {(activeTab === 'schedule' || activeTab === 'full-schedule') && (
-            <h1 className="text-xl font-bold text-foreground mb-4">
-              {(() => {
-                const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
-                return activeTab === 'full-schedule' ? `${wpName} Full Schedule` : `${wpName} Schedule`;
-              })()}
-            </h1>
+            <div className="flex items-baseline gap-3 mb-4">
+              <h1 className="text-xl font-bold text-foreground">
+                {(() => {
+                  const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
+                  return activeTab === 'full-schedule' ? `${wpName} Full Schedule` : `${wpName} Schedule`;
+                })()}
+              </h1>
+              <span className="text-sm font-medium text-muted-foreground">
+                {(activeTab === 'full-schedule' || calendarView === 'weekly')
+                  ? `${format(weekDays[0], 'MMM d')} – ${format(weekDays[6], 'MMM d, yyyy')}`
+                  : format(currentMonth, 'MMMM yyyy')
+                }
+              </span>
+            </div>
           )}
 
           {/* Schedule Tab */}
