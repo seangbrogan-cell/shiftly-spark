@@ -85,7 +85,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             <div
               key={dateStr}
               className={cn(
-                'px-0.5 py-0.5 border-r border-border min-h-[4rem] flex flex-col gap-0.5',
+                'px-0.5 py-0.5 border-r border-border min-h-[4rem] flex flex-col gap-0.5 items-center justify-center',
                 isToday(day) && 'bg-primary-light/10'
               )}
             >
