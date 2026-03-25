@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDroppable } from '@dnd-kit/core';
-import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, Plus, PanelRightClose, PanelRight } from 'lucide-react';
+import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, PanelRightClose, PanelRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Shift } from '@/hooks/use-dashboard-data';
