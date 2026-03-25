@@ -230,7 +230,7 @@ export default function EmployeeDashboard() {
 
           {/* Workplace title + date range – visible for schedule tabs */}
           {(activeTab === 'schedule' || activeTab === 'full-schedule') && (
-            <div className="flex items-baseline gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-0 sm:gap-3 mb-4">
               <h1 className="text-xl font-bold text-foreground">
                 {(() => {
                   const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
