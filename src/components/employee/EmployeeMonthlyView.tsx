@@ -139,7 +139,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                               color.text
                             )}
                           >
-                    <div className={cn('text-[9px] sm:text-xs leading-tight', color.text)}>
+                    <div className={cn('text-[9px] sm:text-xs leading-tight text-center', color.text)}>
                       {a.actual_start && a.actual_end ? (
                         <div className="font-bold">
                           <span className="sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
