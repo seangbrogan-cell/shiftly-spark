@@ -316,7 +316,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   className={`px-0.5 sm:px-1 py-1 sm:py-1.5 text-center border-r border-border ${isToday(day) ? 'bg-primary-light/30' : ''}`}
                 >
                   <p className="text-[8px] sm:text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
-                  <p className={`text-xs sm:text-sm font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
+                  <p className={`text-[10px] sm:text-sm font-bold ${isToday(day) ? 'text-primary' : 'text-foreground'}`}>
                     {format(day, 'd')}
                   </p>
                 </div>
