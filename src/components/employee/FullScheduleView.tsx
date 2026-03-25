@@ -25,10 +25,12 @@ interface FullAssignment {
   employees: { name: string; role: string } | null;
 }
 
-export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewProps) {
+export function FullScheduleView({ workplaceId, weekStart, employerId }: FullScheduleViewProps) {
   const start = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const end = format(endOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
   const weekDays = getWeekDays(weekStart);
+  const { data: dbRoles = [] } = useRoleTypes(employerId);
+  const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
   const { data: assignments = [], isLoading } = useQuery({
     queryKey: ['full-schedule', workplaceId, start],
