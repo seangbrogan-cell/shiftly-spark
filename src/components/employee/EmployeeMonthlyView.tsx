@@ -61,23 +61,15 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
 
   return (
     <div>
-      {/* Day headers */}
-      <div className="grid grid-cols-7 mb-1">
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-          <div key={d} className="text-center py-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase">{d}</span>
-          </div>
-        ))}
-      </div>
-
       {/* Calendar grid */}
       <div className="grid grid-cols-7 gap-3">
-        {weeks.flat().map((day) => {
+        {weeks.flat().map((day, idx) => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const dayAssignments = byDate[dateStr] ?? [];
           const inMonth = isSameMonth(day, monthDate);
           const today = isToday(day);
           const isSelected = selectedDay && isSameDay(day, selectedDay);
+          const isFirstRow = idx < 7;
 
           return (
             <button
@@ -93,6 +85,9 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
               `}
             >
               <div className="text-center mb-1.5">
+                {isFirstRow && (
+                  <p className="text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+                )}
                 <p className={`text-sm font-bold ${today ? 'text-primary' : 'text-foreground'}`}>
                   {format(day, 'd')}
                 </p>
