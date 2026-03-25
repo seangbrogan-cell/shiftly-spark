@@ -428,11 +428,11 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 return (
                   <div key={dateStr} className={`p-0.5 sm:p-2 border-r border-border text-center ${isToday(day) ? 'bg-primary-light/20' : ''}`}>
                     {lines.length === 0 ? (
-                      <span className="text-[8px] sm:text-[10px] text-muted-foreground">—</span>
+                      <span className="text-[10px] text-muted-foreground">—</span>
                     ) : (
                       <div className="flex flex-col items-center gap-0">
                         {lines.map((line) => (
-                          <p key={line.full} className="text-[8px] sm:text-[10px] font-medium text-muted-foreground leading-tight">
+                          <p key={line.full} className="text-[10px] font-medium text-muted-foreground leading-tight">
                             <span className="sm:hidden">{line.short}</span>
                             <span className="hidden sm:inline">{line.full}</span>
                           </p>
