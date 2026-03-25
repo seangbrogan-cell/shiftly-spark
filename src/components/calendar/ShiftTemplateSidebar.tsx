@@ -43,68 +43,72 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
   }, [shifts]);
 
   return (
-    <div
+    <aside
       ref={setNodeRef}
       className={cn(
-        'transition-colors',
-        isOver && 'border-destructive/50 bg-destructive/5 rounded-lg'
+        'hidden lg:flex flex-col shrink-0 border-l border-border bg-card overflow-y-auto transition-all duration-200 print:hidden',
+        collapsed ? 'w-12' : 'w-52',
+        isOver && 'border-destructive/50 bg-destructive/5'
       )}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <LayoutGrid className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold text-foreground">Shift Templates</h3>
-        </div>
+      <div className="p-3 border-b border-border flex items-center justify-between gap-2">
+        {!collapsed && (
+          <div className="flex items-center gap-2 min-w-0">
+            <LayoutGrid className="h-5 w-5 text-primary shrink-0" />
+            <h3 className="font-semibold text-foreground truncate text-sm">Shift Templates</h3>
+          </div>
+        )}
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6"
+          className={cn('h-8 w-8 shrink-0', collapsed && 'mx-auto')}
           onClick={() => setCollapsed(!collapsed)}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? <PanelRight className="h-3.5 w-3.5" /> : <PanelRightClose className="h-3.5 w-3.5" />}
+          {collapsed ? <PanelRight className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
         </Button>
       </div>
-      {collapsed ? null : (
-      <>
-      <p className="text-xs text-muted-foreground mb-3">
-        {isOver ? 'Drop to unassign shift' : 'Drag a shift onto the calendar to assign it.'}
-      </p>
-      {onAssignShift && (
-        <Button size="sm" className="w-full mb-3" onClick={onAssignShift}>
-          <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
-        </Button>
-      )}
-      {shifts.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic">
-          No shifts created yet. Add shifts in the Shifts tab.
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {PERIODS.map(({ key, label, icon: Icon, iconClass, borderClass, bgClass }) => {
-            const periodShifts = grouped[key];
-            return (
-              <div key={key} className={`rounded-md border ${borderClass} ${bgClass} p-2.5`}>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Icon className={`h-3.5 w-3.5 ${iconClass}`} />
-                  <span className="text-xs font-semibold text-foreground">{label}</span>
-                </div>
-                {periodShifts.length === 0 ? (
-                  <p className="text-[10px] text-muted-foreground text-center py-1 italic">No shifts</p>
-                ) : (
-                  <div className="space-y-1.5">
-                    {periodShifts.map((shift) => (
-                      <DraggableShiftTemplate key={shift.id} shift={shift} />
-                    ))}
+
+      {!collapsed && (
+        <div className="p-3 flex-1">
+          <p className="text-xs text-muted-foreground mb-3">
+            {isOver ? 'Drop to unassign shift' : 'Drag a shift onto the calendar to assign it.'}
+          </p>
+          {onAssignShift && (
+            <Button size="sm" className="w-full mb-3" onClick={onAssignShift}>
+              <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
+            </Button>
+          )}
+          {shifts.length === 0 ? (
+            <p className="text-xs text-muted-foreground italic">
+              No shifts created yet. Add shifts in the Shifts tab.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {PERIODS.map(({ key, label, icon: Icon, iconClass, borderClass, bgClass }) => {
+                const periodShifts = grouped[key];
+                return (
+                  <div key={key} className={`rounded-md border ${borderClass} ${bgClass} p-2.5`}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Icon className={`h-3.5 w-3.5 ${iconClass}`} />
+                      <span className="text-xs font-semibold text-foreground">{label}</span>
+                    </div>
+                    {periodShifts.length === 0 ? (
+                      <p className="text-[10px] text-muted-foreground text-center py-1 italic">No shifts</p>
+                    ) : (
+                      <div className="space-y-1.5">
+                        {periodShifts.map((shift) => (
+                          <DraggableShiftTemplate key={shift.id} shift={shift} />
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
-      </>
-      )}
-    </div>
+    </aside>
   );
 }
