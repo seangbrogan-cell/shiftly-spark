@@ -34,7 +34,7 @@ export function CalendarCell({ id, children, isToday, unavailable, unavailableLa
       ) : (
         <div className="flex flex-col gap-0.5 h-full">
           {timeRestriction && (
-            <div className="text-[9px] text-muted-foreground/70 text-center leading-tight font-medium">
+            <div className="text-[8px] sm:text-[9px] text-muted-foreground/70 text-center leading-tight font-medium truncate">
               {timeRestriction}
             </div>
           )}
