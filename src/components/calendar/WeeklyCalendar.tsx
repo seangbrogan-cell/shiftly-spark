@@ -336,8 +336,8 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                 {/* Employee Name Cell */}
                 <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
                   <div>
-                    <p className="text-[10px] sm:text-sm font-medium text-foreground truncate">{emp.name}</p>
-                    <p className="text-[8px] sm:text-xs text-muted-foreground">{emp.role}</p>
+                    <p className="text-xs font-medium text-foreground truncate">{emp.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{emp.role}</p>
                   </div>
                 </div>
 
