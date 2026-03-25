@@ -126,7 +126,7 @@ export default function EmployeeDashboard() {
     <div className="min-h-screen bg-background">
       <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} />
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           {/* Combined toolbar: tabs + controls on one line */}
           <div className="flex flex-col gap-2 mb-4 print:hidden">

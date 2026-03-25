@@ -183,7 +183,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
     <TableHeader>
       <TableRow className="bg-muted/50">
         <TableHead>Name</TableHead>
-        <TableHead>Email</TableHead>
+        <TableHead className="hidden sm:table-cell">Email</TableHead>
         <TableHead className="hidden md:table-cell">Phone</TableHead>
         <TableHead>Role</TableHead>
         <TableHead className="text-center">Shifts</TableHead>
