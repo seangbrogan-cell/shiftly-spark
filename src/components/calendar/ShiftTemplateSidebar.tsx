@@ -27,6 +27,7 @@ function getStartHour(shift: Shift): number {
 }
 
 export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
 
   const grouped = useMemo(() => {
