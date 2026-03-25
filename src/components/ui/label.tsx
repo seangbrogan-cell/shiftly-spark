@@ -8,7 +8,7 @@ const labelVariants = cva("text-sm font-medium leading-none peer-disabled:cursor
 
 const Label = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants> & { children?: React.ReactNode; htmlFor?: string }
+  React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
 >(({ className, ...props }, ref) => (
   <LabelPrimitive.Root ref={ref} className={cn(labelVariants(), className)} {...props} />
 ));
