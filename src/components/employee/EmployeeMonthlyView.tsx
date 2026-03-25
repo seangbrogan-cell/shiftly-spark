@@ -139,14 +139,16 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                               color.text
                             )}
                           >
-                    {a.actual_start && a.actual_end ? (
-                              <>
-                                <span className="text-[10px] font-bold sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
-                                <span className="text-[10px] font-bold hidden sm:inline">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
-                              </>
-                            ) : (
-                              <span className="font-medium truncate text-[10px]">{a.shifts?.name ?? 'Shift'}</span>
-                            )}
+                    <div className={cn('text-[9px] sm:text-xs leading-tight', color.text)}>
+                      {a.actual_start && a.actual_end ? (
+                        <div className="font-bold">
+                          <span className="sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
+                          <span className="hidden sm:inline">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
+                        </div>
+                      ) : (
+                        <span className="font-medium truncate">{a.shifts?.name ?? 'Shift'}</span>
+                      )}
+                    </div>
                           </div>
                         );
                       })}
