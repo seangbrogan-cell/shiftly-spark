@@ -104,9 +104,10 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                           key={s.id}
                           className={cn('rounded px-1.5 py-0.5 text-xs mb-0.5 border', colorDef.bg, colorDef.border, colorDef.text)}
                         >
-                          <div className="font-medium truncate">{s.shifts?.name}</div>
-                          {s.actual_start && s.actual_end && (
-                            <div className="text-[10px] opacity-75">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</div>
+                          {s.actual_start && s.actual_end ? (
+                            <div className="text-[10px] font-bold">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</div>
+                          ) : (
+                            <div className="font-medium truncate">{s.shifts?.name}</div>
                           )}
                         </div>
                       );
