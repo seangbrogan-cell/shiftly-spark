@@ -13,11 +13,14 @@ interface EmployeeMonthlyViewProps {
 const formatTime = (ts: string | null, short = false) => {
   if (!ts) return '';
   const d = new Date(ts);
-  const minutes = d.getMinutes();
-  const formatted = minutes === 0
-    ? format(d, 'ha').toLowerCase()
-    : format(d, 'h:mma').toLowerCase();
-  return short ? formatted.replace('am', 'a').replace('pm', 'p') : formatted;
+  if (short) {
+    const minutes = d.getMinutes();
+    const formatted = minutes === 0
+      ? format(d, 'ha').toLowerCase()
+      : format(d, 'h:mma').toLowerCase();
+    return formatted.replace('am', 'a').replace('pm', 'p');
+  }
+  return format(d, 'h:mma').toLowerCase();
 };
 
 const formatHours = (h: number) => {
