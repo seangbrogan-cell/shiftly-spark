@@ -194,7 +194,7 @@ export default function Dashboard() {
             </TabsContent>
 
             {/* Employees Tab */}
-            <TabsContent value="employees">
+            <TabsContent value="employees" className="py-2 sm:py-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-foreground">Employees</h2>
