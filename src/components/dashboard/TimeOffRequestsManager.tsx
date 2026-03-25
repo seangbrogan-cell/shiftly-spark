@@ -119,7 +119,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
         {pending.length === 0 ? (
           <p className="text-sm text-muted-foreground">No pending requests.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {pending.map(r => (
               <RequestCard key={r.id} request={r} onAction={(status) => updateStatus.mutate({ id: r.id, status, request: r })} />
             ))}
