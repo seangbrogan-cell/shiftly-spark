@@ -28,6 +28,7 @@ function getStartHour(shift: Shift): number {
 }
 
 export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSidebarProps) {
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
 
