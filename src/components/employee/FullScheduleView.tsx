@@ -96,7 +96,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       {/* Day Headers - matching dashboard grid */}
-      <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
+      <div className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
         <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
         </div>
@@ -121,12 +121,12 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
 
       {/* Employee Rows */}
       {employees.map(([empId, { name, role }]) => (
-        <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
+        <div key={empId} className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
           {/* Employee Name Cell */}
-          <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
-            <div>
-              <p className="text-xs font-medium text-foreground truncate">{name}</p>
-              {role && <p className="text-[10px] text-muted-foreground">{role}</p>}
+          <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start min-w-0">
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs font-medium text-foreground truncate">{name}</p>
+              {role && <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{role}</p>}
             </div>
           </div>
 
@@ -139,7 +139,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
               <div
                 key={dateStr}
                 className={cn(
-                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5',
+                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10'
                 )}
               >
