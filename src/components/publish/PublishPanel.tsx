@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useWeekPublishStatus, usePublishSchedule, useNotificationConfig } from '@/hooks/use-publish-data';
-import { StatusBadge } from './StatusBadge';
+import { StatusBadge, PublishedTimestamp } from './StatusBadge';
 import { PublishPreviewModal } from './PublishPreviewModal';
 import { NotificationConfigPanel } from './NotificationConfigPanel';
 import { Send, Eye, Users, Settings } from 'lucide-react';
@@ -53,44 +53,50 @@ export function PublishPanel({ employerId, currentWeek, employees, shifts }: Pub
   };
 
   const status = publishStatus?.status ?? 'no_schedule';
+  const publishedAt = publishStatus?.publishedAt ?? null;
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Users className="h-3 w-3" />
-          <span>{affectedEmployeeIds.length}</span>
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Users className="h-3 w-3" />
+            <span>{affectedEmployeeIds.length}</span>
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 gap-1 text-xs"
+            onClick={() => setConfigOpen(true)}
+          >
+            <Settings className="h-3 w-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 px-2.5 gap-1 text-xs"
+            onClick={() => setPreviewOpen(true)}
+            disabled={status === 'no_schedule'}
+          >
+            <Eye className="h-3 w-3" /> Preview
+          </Button>
+          <StatusBadge
+            status={status}
+            publishedAt={publishedAt}
+          />
+          <Button
+            size="sm"
+            className="h-7 px-2.5 gap-1 text-xs"
+            onClick={handlePublish}
+            disabled={status === 'no_schedule' || status === 'published' || publishSchedule.isPending}
+          >
+            <Send className="h-3 w-3" />
+            {publishSchedule.isPending ? '...' : 'Publish'}
+          </Button>
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="h-7 px-2 gap-1 text-xs"
-          onClick={() => setConfigOpen(true)}
-        >
-          <Settings className="h-3 w-3" />
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="h-7 px-2.5 gap-1 text-xs"
-          onClick={() => setPreviewOpen(true)}
-          disabled={status === 'no_schedule'}
-        >
-          <Eye className="h-3 w-3" /> Preview
-        </Button>
-        <StatusBadge
-          status={status}
-          publishedAt={publishStatus?.publishedAt ?? null}
-        />
-        <Button
-          size="sm"
-          className="h-7 px-2.5 gap-1 text-xs"
-          onClick={handlePublish}
-          disabled={status === 'no_schedule' || status === 'published' || publishSchedule.isPending}
-        >
-          <Send className="h-3 w-3" />
-          {publishSchedule.isPending ? '...' : 'Publish'}
-        </Button>
+        {publishedAt && (
+          <PublishedTimestamp publishedAt={publishedAt} />
+        )}
       </div>
 
       <PublishPreviewModal
