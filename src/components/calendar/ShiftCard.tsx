@@ -56,8 +56,8 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
         <div className={`text-[9px] sm:text-xs leading-tight flex-1 min-w-0 ${color.text}`}>
           {hasTime ? (
             <div className="font-bold">
-              <span className="sm:hidden">{formatTime(assignment.actual_start!, true)} – {formatTime(assignment.actual_end!, true)}</span>
-              <span className="hidden sm:inline @[100px]:whitespace-nowrap">{formatTime(assignment.actual_start!)} – {formatTime(assignment.actual_end!)}</span>
+              <span className="inline @[110px]:hidden">{formatTime(assignment.actual_start!, true)} – {formatTime(assignment.actual_end!, true)}</span>
+              <span className="hidden @[110px]:inline">{formatTime(assignment.actual_start!)} – {formatTime(assignment.actual_end!)}</span>
             </div>
           ) : (
             <span className="font-medium truncate block">{shiftName}</span>
