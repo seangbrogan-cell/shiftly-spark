@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
@@ -183,7 +183,7 @@ export default function Dashboard() {
             </div>
 
             {/* Schedule Tab - Weekly Calendar */}
-            <TabsContent value="schedule">
+            <TabsContent value="schedule" className="mt-0">
               {employerId && selectedWorkplaceId && (
                 <WeeklyCalendar
                   employees={workplaceEmployees}
@@ -191,6 +191,9 @@ export default function Dashboard() {
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}
                   workplaceId={selectedWorkplaceId}
+                  renderSidebar={(onAssignShift) => (
+                    <ShiftTemplateSidebar shifts={shifts} onAssignShift={onAssignShift} />
+                  )}
                 />
               )}
             </TabsContent>
@@ -270,8 +273,6 @@ export default function Dashboard() {
           </Tabs>
         </main>
 
-        {/* Right sidebar - Shift Templates */}
-        <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {}} />
       </div>
 
       {/* Modals */}

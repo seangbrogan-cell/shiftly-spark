@@ -42,9 +42,10 @@ interface WeeklyCalendarProps {
   employerId: string;
   companyName?: string;
   workplaceId?: string;
+  renderSidebar?: (onAssignShift: () => void) => React.ReactNode;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
@@ -258,7 +259,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div>
+    <div className="flex gap-0">
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
@@ -532,6 +533,12 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         </AlertDialogContent>
       </AlertDialog>
       </div>
+      {renderSidebar?.(() => {
+        setEditingAssignment(null);
+        setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+        setDefaultEmployeeId('');
+        setModalOpen(true);
+      })}
     </div>
     </DndContext>
   );
