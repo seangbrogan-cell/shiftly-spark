@@ -271,7 +271,7 @@ export default function Dashboard() {
         </main>
 
         {/* Right sidebar - Shift Templates */}
-        <aside className="hidden lg:block w-52 flex-shrink-0 border-l border-border bg-card overflow-y-auto p-4 print:hidden">
+        <aside className="hidden lg:block w-52 flex-shrink-0 border-l border-border overflow-y-auto p-3 print:hidden">
           <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {}} />
         </aside>
       </div>
