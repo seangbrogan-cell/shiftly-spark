@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDroppable } from '@dnd-kit/core';
 import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, Plus, PanelRightClose, PanelRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ function getStartHour(shift: Shift): number {
 }
 
 export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSidebarProps) {
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
 
@@ -55,7 +57,12 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
         {!collapsed && (
           <div className="flex items-center gap-2 min-w-0">
             <LayoutGrid className="h-5 w-5 text-primary shrink-0" />
-            <h3 className="font-semibold text-foreground truncate text-sm">Shift Templates</h3>
+            <button
+              onClick={() => navigate('/dashboard?tab=shifts')}
+              className="font-semibold text-foreground truncate text-sm hover:text-primary hover:underline transition-colors cursor-pointer"
+            >
+              Shift Templates
+            </button>
           </div>
         )}
         <Button

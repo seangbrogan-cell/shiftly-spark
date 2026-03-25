@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
 import { useWorkplaces } from '@/hooks/use-workplaces';
@@ -31,6 +31,13 @@ export default function Dashboard() {
 
   const { data: workplaces = [] } = useWorkplaces(employerId ?? undefined);
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'schedule');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && tab !== activeTab) setActiveTab(tab);
+  }, [searchParams]);
 
   // Auto-select first workplace
   useEffect(() => {
@@ -128,7 +135,7 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8">
 
-          <Tabs defaultValue="schedule" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex flex-col gap-3 mb-6 print:hidden">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
                 <TabsList className="shrink-0">
