@@ -14,10 +14,10 @@ interface ShiftTemplateSidebarProps {
 type Period = 'allday' | 'morning' | 'afternoon' | 'evening';
 
 const PERIODS: { key: Period; label: string; icon: typeof Sunrise; iconClass: string; borderClass: string; bgClass: string }[] = [
-  { key: 'morning', label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-200 dark:border-amber-800', bgClass: 'bg-amber-50/50 dark:bg-amber-950/20' },
-  { key: 'afternoon', label: 'Afternoon', icon: Sun, iconClass: 'text-orange-500', borderClass: 'border-orange-200 dark:border-orange-800', bgClass: 'bg-orange-50/50 dark:bg-orange-950/20' },
-  { key: 'evening', label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50/50 dark:bg-indigo-950/20' },
-  { key: 'allday', label: 'Off Work', icon: CalendarOff, iconClass: 'text-slate-500', borderClass: 'border-slate-200 dark:border-slate-700', bgClass: 'bg-slate-50/50 dark:bg-slate-950/20' },
+  { key: 'morning', label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  { key: 'afternoon', label: 'Afternoon', icon: Sun, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  { key: 'evening', label: 'Evening', icon: Moon, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  { key: 'allday', label: 'Off Work', icon: CalendarOff, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
 ];
 
 function getStartHour(shift: Shift): number {
