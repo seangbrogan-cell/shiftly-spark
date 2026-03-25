@@ -160,13 +160,16 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                       )}
                     >
                       {s.actual_start && s.actual_end ? (
-                        <span className="text-[10px] font-bold lg:hidden">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                        <>
+                          <span className="text-[10px] font-bold sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                          <span className="text-[10px] font-bold hidden sm:inline lg:hidden">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                        </>
                       ) : (
                         <span className="font-medium truncate text-[10px]">{s.shifts?.name}</span>
                       )}
                       {s.actual_start && s.actual_end && (
                         <span className="text-[10px] font-bold hidden lg:inline">
-                          {format(new Date(s.actual_start), 'h:mma').toLowerCase()} – {format(new Date(s.actual_end), 'h:mma').toLowerCase()}
+                          {formatTime(s.actual_start)} – {formatTime(s.actual_end)}
                         </span>
                       )}
                     </div>
