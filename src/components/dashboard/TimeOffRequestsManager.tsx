@@ -196,7 +196,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   );
 }
 
-function RequestCard({ request: r, onAction, compact }: { request: TimeOffRequest; onAction?: (status: string) => void; compact?: boolean }) {
+function RequestCard({ request: r, onApprove, onReject, compact }: { request: TimeOffRequest; onApprove?: () => void; onReject?: () => void; compact?: boolean }) {
   if (compact) {
     return (
       <Card>
@@ -209,6 +209,7 @@ function RequestCard({ request: r, onAction, compact }: { request: TimeOffReques
             {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
           </p>
           <p className="text-xs mt-1 truncate"><span className="font-medium">Reason:</span> {r.reason}</p>
+          {r.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{r.notes}</p>}
         </CardContent>
       </Card>
     );
@@ -230,13 +231,13 @@ function RequestCard({ request: r, onAction, compact }: { request: TimeOffReques
           <p className="text-xs text-muted-foreground mt-1 truncate">Replacement: {r.replacement.name}</p>
         )}
         <p className="text-xs text-muted-foreground mt-1">Submitted {format(new Date(r.created_at), 'MMM d, h:mm a')}</p>
-        {onAction && r.status === 'pending' && (
+        {onApprove && onReject && r.status === 'pending' && (
           <div className="flex gap-2 mt-2">
-            <Button size="sm" className="gap-1 flex-1 h-7 text-xs" onClick={() => onAction('approved')}>
+            <Button size="sm" className="gap-1 flex-1 h-7 text-xs" onClick={onApprove}>
               <Check className="h-3 w-3" /> Approve
             </Button>
-            <Button size="sm" variant="destructive" className="gap-1 flex-1 h-7 text-xs" onClick={() => onAction('rejected')}>
-              <X className="h-3 w-3" /> Reject
+            <Button size="sm" variant="destructive" className="gap-1 flex-1 h-7 text-xs" onClick={onReject}>
+              <X className="h-3 w-3" /> Deny
             </Button>
           </div>
         )}
