@@ -131,9 +131,9 @@ export function TimeOffRequestsManager({ employerId }: Props) {
       {resolved.length > 0 && (
         <section>
           <h3 className="text-lg font-semibold text-foreground mb-3">Past Requests ({resolved.length})</h3>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {resolved.map(r => (
-              <RequestCard key={r.id} request={r} />
+              <RequestCard key={r.id} request={r} compact />
             ))}
           </div>
         </section>
