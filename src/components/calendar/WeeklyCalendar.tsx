@@ -445,6 +445,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   employees.forEach((emp) => {
                     weekDays.forEach((day) => {
                       const dateStr = format(day, 'yyyy-MM-dd');
+                      if (timeOffSet.has(`${emp.id}:${dateStr}`)) return;
                       const cellAssignments = assignmentMap[`${emp.id}:${dateStr}`] ?? [];
                       cellAssignments.forEach((a) => {
                         if (a.actual_start && a.actual_end) {
