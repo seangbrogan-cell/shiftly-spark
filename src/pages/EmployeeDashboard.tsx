@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth } from 'date-fns';
+import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth, isSameWeek, isSameMonth as isSameMonthFn } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -190,7 +190,12 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
+                    <Button
+                      variant={isSameWeek(currentWeek, new Date(), { weekStartsOn: 1 }) ? 'default' : 'outline'}
+                      size="sm"
+                      className={`h-8 text-xs sm:text-sm ${!isSameWeek(currentWeek, new Date(), { weekStartsOn: 1 }) ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50' : ''}`}
+                      onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+                    >
                       Today
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
@@ -202,7 +207,12 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
+                    <Button
+                      variant={isSameMonthFn(currentMonth, new Date()) ? 'default' : 'outline'}
+                      size="sm"
+                      className={`h-8 text-xs sm:text-sm ${!isSameMonthFn(currentMonth, new Date()) ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50' : ''}`}
+                      onClick={() => setCurrentMonth(startOfMonth(new Date()))}
+                    >
                       Today
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
