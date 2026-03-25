@@ -192,6 +192,7 @@ export default function Dashboard() {
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}
                   workplaceId={selectedWorkplaceId}
+                  sidebarPortalRef={sidebarPortalRef}
                   renderSidebar={(onAssignShift) => (
                     <ShiftTemplateSidebar shifts={shifts} onAssignShift={onAssignShift} />
                   )}
