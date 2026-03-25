@@ -404,7 +404,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             {/* Daily Shift Category Summary Row */}
             <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-t border-border bg-muted/30">
               <div className="p-1 sm:p-2 border-r border-border">
-                <span className="text-[8px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Summary</span>
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Summary</span>
               </div>
               {weekDays.map((day) => {
                 const dateStr = format(day, 'yyyy-MM-dd');
