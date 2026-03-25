@@ -161,7 +161,7 @@ export function ShiftModal({ open, onOpenChange, employerId, editingShift, workp
 
   return (
     <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) resetForm(); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto my-4 sm:my-6 pb-8 sm:pb-6">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Shift' : 'Add Shift'}</DialogTitle>
           <DialogDescription>
