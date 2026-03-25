@@ -402,7 +402,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             ))}
 
             {/* Daily Shift Category Summary Row */}
-            <div className="grid grid-cols-[110px_repeat(7,1fr)_46px] border-t border-border bg-muted/30">
+            <div className="hidden sm:grid grid-cols-[110px_repeat(7,1fr)_46px] border-t border-border bg-muted/30">
               <div className="p-2 border-r border-border">
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Summary</span>
               </div>
