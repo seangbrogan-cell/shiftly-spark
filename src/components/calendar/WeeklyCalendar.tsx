@@ -540,44 +540,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         </AlertDialogContent>
       </AlertDialog>
       </div>
-
-      {/* Right sidebar - Shift Templates + Publish Panel */}
-      <div className={cn(
-        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200 print-hide',
-        rightSidebarCollapsed ? 'w-10' : 'w-52'
-      )}>
-        {rightSidebarCollapsed ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 mx-auto"
-            onClick={() => setRightSidebarCollapsed(false)}
-            aria-label="Expand sidebar"
-          >
-            <PanelRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <>
-            <div className="flex justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => setRightSidebarCollapsed(true)}
-                aria-label="Collapse sidebar"
-              >
-                <PanelRightClose className="h-4 w-4" />
-              </Button>
-            </div>
-            <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
-              setEditingAssignment(null);
-              setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-              setDefaultEmployeeId('');
-              setModalOpen(true);
-            }} />
-          </>
-        )}
-      </div>
     </div>
     </DndContext>
   );
