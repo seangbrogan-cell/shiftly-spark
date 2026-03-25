@@ -49,13 +49,10 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
       <div className="flex items-center gap-1">
         <GripVertical className="h-3 w-3 text-muted-foreground/40 shrink-0 hidden @[80px]:block" />
 
-        <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0 hidden sm:block`} />
-
         <div className={`text-[10px] leading-tight flex-1 ${color.text}`}>
           {hasTime ? (
-            <div className="flex flex-col">
-              <span>{formatTime(assignment.actual_start!)}</span>
-              <span>{formatTime(assignment.actual_end!)}</span>
+            <div className="font-bold whitespace-nowrap">
+              {formatTime(assignment.actual_start!)} – {formatTime(assignment.actual_end!)}
             </div>
           ) : (
             <span className="font-medium">{shiftName}</span>
