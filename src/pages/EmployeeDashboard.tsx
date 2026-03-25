@@ -112,7 +112,7 @@ export default function EmployeeDashboard() {
   if (!employee) {
     return (
       <div className="min-h-screen bg-background">
-        <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} />
+        <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} isAdmin={profile?.role === 'employer'} />
         <main className="mx-auto max-w-xl px-6 py-24 text-center">
           <h1 className="text-2xl font-bold text-foreground">Welcome to WorkSchedule</h1>
           <p className="mt-3 text-muted-foreground">
