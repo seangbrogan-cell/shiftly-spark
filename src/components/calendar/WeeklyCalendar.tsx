@@ -339,9 +339,9 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
               <div key={emp.id} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
                 {/* Employee Name Cell */}
                 <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
-                  <div>
-                    <p className="text-xs font-medium text-foreground truncate">{emp.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{emp.role}</p>
+                  <div className="min-w-0">
+                    <p className="text-[10px] sm:text-xs font-medium text-foreground truncate">{emp.name}</p>
+                    <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{emp.role}</p>
                   </div>
                 </div>
 
