@@ -69,7 +69,7 @@ export const template = {
   subject: (data: Record<string, any>) =>
     `Your time-off request has been ${data.decision === 'rejected' ? 'denied' : 'approved'}`,
   displayName: 'Time-off request decision',
-  previewData: { employeeName: 'Jane', startDate: 'Jan 20, 2025', endDate: 'Jan 22, 2025', reason: 'Vacation', decision: 'approved' },
+  previewData: { employeeName: 'Jane', startDate: 'Jan 20, 2025', endDate: 'Jan 22, 2025', reason: 'Vacation', decision: 'rejected', explanation: 'We need all hands on deck that week' },
 } satisfies TemplateEntry
 
 const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', Arial, sans-serif" }
