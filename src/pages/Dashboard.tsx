@@ -32,11 +32,20 @@ export default function Dashboard() {
   const { data: workplaces = [] } = useWorkplaces(employerId ?? undefined);
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'schedule');
+  const [activeTab, setActiveTabState] = useState(() => searchParams.get('tab') || 'schedule');
+
+  const setActiveTab = (tab: string) => {
+    setActiveTabState(tab);
+    if (tab === 'schedule') {
+      setSearchParams({}, { replace: true });
+    } else {
+      setSearchParams({ tab }, { replace: true });
+    }
+  };
 
   useEffect(() => {
     const tab = searchParams.get('tab');
-    if (tab && tab !== activeTab) setActiveTab(tab);
+    if (tab && tab !== activeTab) setActiveTabState(tab);
   }, [searchParams]);
 
   // Auto-select first workplace
