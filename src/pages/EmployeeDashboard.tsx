@@ -80,10 +80,33 @@ export default function EmployeeDashboard() {
   });
   const fullScheduleAllowed = workplaceSettings?.full_schedule_visible ?? false;
 
-  const { data: weeklyAssignments = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(scheduleEmployeeId, currentWeek, activeWorkplaceId);
-  const { data: monthlyAssignments = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(scheduleEmployeeId, currentMonth, activeWorkplaceId);
+  const { data: weeklyAssignmentsRaw = [], isLoading: loadingWeek } = useEmployeeWeeklySchedule(scheduleEmployeeId, currentWeek, activeWorkplaceId);
+  const { data: monthlyAssignmentsRaw = [], isLoading: loadingMonth } = useEmployeeMonthlySchedule(scheduleEmployeeId, currentMonth, activeWorkplaceId);
   const { data: timeOffRequests = [], isLoading: loadingRequests } = useTimeOffRequests(employeeId, statusFilter);
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
+  const { data: approvedTimeOff = [] } = useEmployeeApprovedTimeOff(employeeId);
+
+  // Build set of dates with approved time off to filter out assignments
+  const timeOffDates = useMemo(() => {
+    const set = new Set<string>();
+    approvedTimeOff.forEach((req) => {
+      const start = new Date(req.start_date + 'T00:00:00');
+      const end = new Date(req.end_date + 'T00:00:00');
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        set.add(format(d, 'yyyy-MM-dd'));
+      }
+    });
+    return set;
+  }, [approvedTimeOff]);
+
+  const weeklyAssignments = useMemo(
+    () => weeklyAssignmentsRaw.filter((a) => !timeOffDates.has(a.assigned_date)),
+    [weeklyAssignmentsRaw, timeOffDates]
+  );
+  const monthlyAssignments = useMemo(
+    () => monthlyAssignmentsRaw.filter((a) => !timeOffDates.has(a.assigned_date)),
+    [monthlyAssignmentsRaw, timeOffDates]
+  );
 
   if (!employee) {
     return (
