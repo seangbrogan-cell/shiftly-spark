@@ -392,7 +392,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                     const hours = Math.floor(totalMinutes / 60);
                     const mins = Math.round(totalMinutes % 60);
                     return (
-                      <span className={`text-[10px] sm:text-sm font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      <span className={`text-[9px] sm:text-sm font-semibold ${totalMinutes > 0 ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {totalMinutes > 0 ? `${hours}h${mins > 0 ? ` ${mins}m` : ''}` : '0h'}
                       </span>
                     );
