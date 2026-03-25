@@ -169,7 +169,7 @@ export default function Dashboard() {
                 </div>
               )}
               {employerId && (
-                <div className="flex justify-end">
+                <div className="flex justify-start">
                   <PublishPanel
                     employerId={employerId}
                     currentWeek={startOfWeek(new Date(), { weekStartsOn: 1 })}

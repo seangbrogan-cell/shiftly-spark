@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { format, addWeeks, subWeeks, isToday, startOfWeek, isSameWeek } from 'date-fns';
 import { DndContext, DragEndEvent, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, CalendarDays, Plus, PanelRightClose, PanelRight, Printer } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, Printer } from 'lucide-react';
 import type { Employee, Shift } from '@/hooks/use-dashboard-data';
 import { buildRoleSortPriority } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
@@ -52,7 +52,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
   const [defaultDate, setDefaultDate] = useState<string>('');
   const [defaultEmployeeId, setDefaultEmployeeId] = useState<string>('');
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [rightSidebarCollapsed, setRightSidebarCollapsed] = useState(false);
+  
 
   const { data: assignments = [], isLoading } = useWeeklyAssignments(currentWeek, workplaceId);
   const { data: dbRoles = [] } = useRoleTypes(employerId);
@@ -258,7 +258,15 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div className="flex gap-6">
+    <div className="flex flex-col gap-4">
+      {/* Shift Templates - horizontal at top */}
+      <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
+        setEditingAssignment(null);
+        setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
+        setDefaultEmployeeId('');
+        setModalOpen(true);
+      }} />
+
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
@@ -531,44 +539,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </div>
-
-      {/* Right sidebar - Shift Templates + Publish Panel */}
-      <div className={cn(
-        'hidden lg:flex lg:flex-col gap-4 flex-shrink-0 transition-all duration-200 print-hide',
-        rightSidebarCollapsed ? 'w-10' : 'w-52'
-      )}>
-        {rightSidebarCollapsed ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 mx-auto"
-            onClick={() => setRightSidebarCollapsed(false)}
-            aria-label="Expand sidebar"
-          >
-            <PanelRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <>
-            <div className="flex justify-end">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => setRightSidebarCollapsed(true)}
-                aria-label="Collapse sidebar"
-              >
-                <PanelRightClose className="h-4 w-4" />
-              </Button>
-            </div>
-            <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
-              setEditingAssignment(null);
-              setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-              setDefaultEmployeeId('');
-              setModalOpen(true);
-            }} />
-          </>
-        )}
       </div>
     </div>
     </DndContext>
