@@ -532,16 +532,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
         </AlertDialogContent>
       </AlertDialog>
       </div>
-
-      {/* Right sidebar - Shift Templates */}
-      <div className="hidden lg:block w-52 flex-shrink-0 print-hide">
-        <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
-          setEditingAssignment(null);
-          setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-          setDefaultEmployeeId('');
-          setModalOpen(true);
-        }} />
-      </div>
     </div>
     </DndContext>
   );
