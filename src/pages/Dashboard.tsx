@@ -273,8 +273,6 @@ export default function Dashboard() {
           </Tabs>
         </main>
 
-        {/* Right sidebar - Shift Templates */}
-        <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {}} />
       </div>
 
       {/* Modals */}
