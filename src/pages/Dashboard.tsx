@@ -340,6 +340,12 @@ function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () =
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
+          <Button variant="outline" size="sm" asChild>
+            <Link to="/employee">
+              <UserCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Employee View</span>
+            </Link>
+          </Button>
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4" />
           </Button>
