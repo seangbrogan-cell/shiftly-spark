@@ -258,15 +258,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div className="flex flex-col gap-4">
-      {/* Shift Templates - horizontal at top */}
-      <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
-        setEditingAssignment(null);
-        setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-        setDefaultEmployeeId('');
-        setModalOpen(true);
-      }} />
-
+    <div className="flex gap-6">
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
