@@ -148,7 +148,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
               <div
                 key={dateStr}
                 className={cn(
-                  'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 items-center justify-center min-w-0 overflow-hidden',
+                  'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10'
                 )}
               >
@@ -168,7 +168,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                       )}
                     >
                       <div className="flex items-center gap-1">
-                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1 text-center', colorDef.text)}>
+                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
                           {s.actual_start && s.actual_end ? (
                             <div className="font-bold lg:whitespace-nowrap">
                               <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>

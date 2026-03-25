@@ -85,7 +85,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             <div
               key={dateStr}
               className={cn(
-                'px-0.5 py-0.5 border-r border-border min-h-[4rem] flex flex-col gap-0.5 items-center justify-center',
+                'px-0.5 py-0.5 border-r border-border min-h-[4rem] flex flex-col gap-0.5',
                 isToday(day) && 'bg-primary-light/10'
               )}
             >
@@ -105,7 +105,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
                       color.text
                     )}
                   >
-                    <div className={cn('text-[9px] sm:text-xs leading-tight text-center', color.text)}>
+                    <div className={cn('text-[9px] sm:text-xs leading-tight', color.text)}>
                       {a.actual_start && a.actual_end ? (
                         <div className="font-bold">
                           <span className="sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>

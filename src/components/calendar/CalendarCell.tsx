@@ -32,7 +32,7 @@ export function CalendarCell({ id, children, isToday, unavailable, unavailableLa
           <span className="text-[10px] text-muted-foreground/50 select-none">{unavailableLabel ?? 'N/A'}</span>
         </div>
       ) : (
-        <div className="flex flex-col gap-0.5 h-full items-center justify-center">
+        <div className="flex flex-col gap-0.5 h-full">
           {timeRestriction && (
             <div className="text-[8px] sm:text-[9px] text-muted-foreground/70 text-center leading-tight font-medium truncate">
               {timeRestriction}
