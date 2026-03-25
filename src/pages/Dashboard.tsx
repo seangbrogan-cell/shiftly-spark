@@ -148,14 +148,26 @@ export default function Dashboard() {
                    </TabsTrigger>
                 </TabsList>
                 {employerId && (
+                  <div className="hidden lg:block">
+                    <WorkplaceSelector
+                      workplaces={workplaces}
+                      selectedId={selectedWorkplaceId}
+                      onSelect={setSelectedWorkplaceId}
+                      employerId={employerId}
+                    />
+                  </div>
+                )}
+              </div>
+              {employerId && (
+                <div className="lg:hidden">
                   <WorkplaceSelector
                     workplaces={workplaces}
                     selectedId={selectedWorkplaceId}
                     onSelect={setSelectedWorkplaceId}
                     employerId={employerId}
                   />
-                )}
-              </div>
+                </div>
+              )}
               {employerId && (
                 <div className="flex justify-end">
                   <PublishPanel
