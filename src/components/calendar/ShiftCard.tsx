@@ -25,13 +25,14 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
     zIndex: isDragging ? 50 : 1,
   };
 
-  const formatTime = (ts: string) => {
+  const formatTime = (ts: string, short = false) => {
     try {
       const d = new Date(ts);
       const minutes = d.getMinutes();
-      return minutes === 0
+      const formatted = minutes === 0
         ? format(d, 'ha').toLowerCase()
         : format(d, 'h:mma').toLowerCase();
+      return short ? formatted.replace('am', 'a').replace('pm', 'p') : formatted;
     } catch { return ''; }
   };
 
@@ -52,7 +53,8 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
         <div className={`text-xs leading-tight flex-1 ${color.text}`}>
           {hasTime ? (
             <div className="font-bold lg:whitespace-nowrap">
-              {formatTime(assignment.actual_start!)} – {formatTime(assignment.actual_end!)}
+              <span className="sm:hidden">{formatTime(assignment.actual_start!, true)} – {formatTime(assignment.actual_end!, true)}</span>
+              <span className="hidden sm:inline">{formatTime(assignment.actual_start!)} – {formatTime(assignment.actual_end!)}</span>
             </div>
           ) : (
             <span className="font-medium">{shiftName}</span>
