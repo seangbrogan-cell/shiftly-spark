@@ -16,6 +16,7 @@ import { DeleteEmployeeDialog } from '@/components/dashboard/DeleteEmployeeDialo
 import { ShiftModal } from '@/components/dashboard/ShiftModal';
 import { ShiftList } from '@/components/dashboard/ShiftList';
 import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
+import { ShiftTemplateSidebar } from '@/components/calendar/ShiftTemplateSidebar';
 import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
