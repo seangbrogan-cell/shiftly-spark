@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDroppable } from '@dnd-kit/core';
-import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, Plus, PanelRightClose, PanelRight } from 'lucide-react';
+import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, PanelRightClose, PanelRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Shift } from '@/hooks/use-dashboard-data';
@@ -9,7 +9,6 @@ import { DraggableShiftTemplate } from './DraggableShiftTemplate';
 
 interface ShiftTemplateSidebarProps {
   shifts: Shift[];
-  onAssignShift?: () => void;
 }
 
 type Period = 'allday' | 'morning' | 'afternoon' | 'evening';
@@ -27,7 +26,7 @@ function getStartHour(shift: Shift): number {
   return d.getHours() + d.getMinutes() / 60;
 }
 
-export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSidebarProps) {
+export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
@@ -75,11 +74,6 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
           <p className="text-xs text-muted-foreground mb-3">
             {isOver ? 'Drop to unassign shift' : 'Drag a shift onto the calendar to assign it.'}
           </p>
-          {onAssignShift && (
-            <Button size="sm" className="w-full mb-3" onClick={onAssignShift}>
-              <Plus className="h-4 w-4 mr-1.5" /> Assign Shift
-            </Button>
-          )}
           {shifts.length === 0 ? (
             <p className="text-xs text-muted-foreground italic">
               No shifts created yet. Add shifts in the Shifts tab.
