@@ -137,7 +137,7 @@ export default function EmployeeDashboard() {
                 </TabsTrigger>
                 {fullScheduleAllowed && (
                   <TabsTrigger value="full-schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                    <Users className="h-4 w-4" /> <span className="hidden xs:inline">Full</span> Schedule
+                    <Users className="h-4 w-4" /> <span className="hidden xs:inline">Full Schedule</span><span className="xs:hidden">Full</span>
                   </TabsTrigger>
                 )}
                 <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
