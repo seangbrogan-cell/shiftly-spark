@@ -258,7 +258,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-    <div className="flex gap-6">
+    <div>
       <div className="flex-1 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
         <div>
@@ -531,16 +531,6 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      </div>
-
-      {/* Right sidebar - Shift Templates */}
-      <div className="hidden lg:block w-52 flex-shrink-0 print-hide">
-        <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {
-          setEditingAssignment(null);
-          setDefaultDate(format(new Date(), 'yyyy-MM-dd'));
-          setDefaultEmployeeId('');
-          setModalOpen(true);
-        }} />
       </div>
     </div>
     </DndContext>

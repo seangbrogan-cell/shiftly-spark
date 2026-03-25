@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmployees, useShifts, useShiftAssignmentCounts, useProfile, type Employee, type Shift } from '@/hooks/use-dashboard-data';
@@ -16,6 +16,7 @@ import { DeleteEmployeeDialog } from '@/components/dashboard/DeleteEmployeeDialo
 import { ShiftModal } from '@/components/dashboard/ShiftModal';
 import { ShiftList } from '@/components/dashboard/ShiftList';
 import { WeeklyCalendar } from '@/components/calendar/WeeklyCalendar';
+import { ShiftTemplateSidebar } from '@/components/calendar/ShiftTemplateSidebar';
 import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
@@ -125,6 +126,7 @@ export default function Dashboard() {
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
 
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8">
+
           <Tabs defaultValue="schedule" className="w-full">
             <div className="flex flex-col gap-3 mb-6 print:hidden">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
@@ -267,6 +269,11 @@ export default function Dashboard() {
             </TabsContent>
           </Tabs>
         </main>
+
+        {/* Right sidebar - Shift Templates */}
+        <aside className="hidden lg:block w-52 flex-shrink-0 border-l border-border bg-card overflow-y-auto p-4 print:hidden">
+          <ShiftTemplateSidebar shifts={shifts} onAssignShift={() => {}} />
+        </aside>
       </div>
 
       {/* Modals */}
