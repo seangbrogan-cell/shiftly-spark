@@ -274,6 +274,8 @@ export default function Dashboard() {
           </Tabs>
         </main>
 
+        {/* Portal target for shift template sidebar */}
+        <div ref={sidebarPortalRef} />
       </div>
 
       {/* Modals */}
