@@ -126,6 +126,7 @@ export default function Dashboard() {
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
 
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8">
+
           <Tabs defaultValue="schedule" className="w-full">
             <div className="flex flex-col gap-3 mb-6 print:hidden">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
