@@ -184,12 +184,12 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
   const headers = (
     <TableHeader>
       <TableRow className="bg-muted/50">
-        <TableHead>Name</TableHead>
+        <TableHead className="text-xs sm:text-sm px-2 sm:px-4">Name</TableHead>
         <TableHead className="hidden sm:table-cell">Email</TableHead>
         <TableHead className="hidden md:table-cell">Phone</TableHead>
-        <TableHead>Role</TableHead>
-        <TableHead className="text-center">Shifts</TableHead>
-        <TableHead className="text-right">Actions</TableHead>
+        <TableHead className="text-xs sm:text-sm px-1 sm:px-4">Role</TableHead>
+        <TableHead className="text-center text-xs sm:text-sm px-1 sm:px-4">Shifts</TableHead>
+        <TableHead className="text-right text-xs sm:text-sm px-1 sm:px-4">Actions</TableHead>
       </TableRow>
     </TableHeader>
   );
