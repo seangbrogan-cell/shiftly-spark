@@ -96,7 +96,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       {/* Day Headers - matching dashboard grid */}
-      <div className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
+      <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
         <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
         </div>
@@ -121,7 +121,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
 
       {/* Employee Rows */}
       {employees.map(([empId, { name, role }]) => (
-        <div key={empId} className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
+        <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
           {/* Employee Name Cell */}
           <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start min-w-0">
             <div className="min-w-0">
@@ -139,7 +139,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
               <div
                 key={dateStr}
                 className={cn(
-                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5 min-w-0 overflow-hidden',
+                  'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10'
                 )}
               >
@@ -153,20 +153,22 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                     <div
                       key={s.id}
                       className={cn(
-                        'rounded border px-0.5 sm:px-1.5 py-1 flex-1',
+                        'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
                         colorDef.bg,
                         colorDef.border
                       )}
                     >
-                      <div className={cn('text-[9px] sm:text-xs leading-tight', colorDef.text)}>
-                        {s.actual_start && s.actual_end ? (
-                          <div className="font-bold lg:whitespace-nowrap">
-                            <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                            <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                          </div>
-                        ) : (
-                          <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
-                        )}
+                      <div className="flex items-center gap-1">
+                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                          {s.actual_start && s.actual_end ? (
+                            <div className="font-bold lg:whitespace-nowrap">
+                              <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                              <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                            </div>
+                          ) : (
+                            <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
