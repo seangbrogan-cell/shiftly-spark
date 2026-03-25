@@ -153,20 +153,22 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                     <div
                       key={s.id}
                       className={cn(
-                        'rounded border px-0.5 sm:px-1.5 py-1 flex-1',
+                        'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
                         colorDef.bg,
                         colorDef.border
                       )}
                     >
-                      <div className={cn('text-[9px] sm:text-xs leading-tight', colorDef.text)}>
-                        {s.actual_start && s.actual_end ? (
-                          <div className="font-bold lg:whitespace-nowrap">
-                            <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                            <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                          </div>
-                        ) : (
-                          <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
-                        )}
+                      <div className="flex items-center gap-1">
+                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                          {s.actual_start && s.actual_end ? (
+                            <div className="font-bold lg:whitespace-nowrap">
+                              <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                              <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                            </div>
+                          ) : (
+                            <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
