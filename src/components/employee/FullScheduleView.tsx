@@ -59,7 +59,11 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
-    return Array.from(employeeMap.entries()).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    return Array.from(employeeMap.entries()).sort((a, b) => {
+      const priorityDiff = roleSortPriority(a[1].role) - roleSortPriority(b[1].role);
+      if (priorityDiff !== 0) return priorityDiff;
+      return a[1].name.localeCompare(b[1].name);
+    });
   }, [assignments]);
 
   // Build assignment map: empId:date -> assignments[]
