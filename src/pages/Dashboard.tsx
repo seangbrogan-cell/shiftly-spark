@@ -183,17 +183,17 @@ export default function Dashboard() {
 
             {/* Employees Tab */}
             <TabsContent value="employees">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-foreground">Employees</h2>
-                  <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
+                  <h2 className="text-xl sm:text-2xl font-bold text-foreground">Employees</h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
-                    <Mail className="mr-2 h-4 w-4" /> Email All
+                  <Button variant="outline" size="sm" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
+                    <Mail className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">Email All</span><span className="sm:hidden">Email</span>
                   </Button>
-                  <Button onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
-                    <Plus className="mr-2 h-4 w-4" /> Add Employee
+                  <Button size="sm" onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
+                    <Plus className="mr-1.5 h-4 w-4" /> Add
                   </Button>
                 </div>
               </div>
