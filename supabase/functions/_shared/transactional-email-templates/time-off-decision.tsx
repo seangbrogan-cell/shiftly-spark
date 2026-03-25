@@ -15,7 +15,7 @@ interface TimeOffDecisionProps {
   explanation?: string
 }
 
-const TimeOffDecisionEmail = ({ employeeName, startDate, endDate, reason, decision = 'approved' }: TimeOffDecisionProps) => {
+const TimeOffDecisionEmail = ({ employeeName, startDate, endDate, reason, decision = 'approved', explanation }: TimeOffDecisionProps) => {
   const isApproved = decision === 'approved'
   return (
     <Html lang="en" dir="ltr">
