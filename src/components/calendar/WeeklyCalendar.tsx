@@ -332,12 +332,12 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
               if (priorityDiff !== 0) return priorityDiff;
               return a.name.localeCompare(b.name);
             }).map((emp) => (
-              <div key={emp.id} className="grid grid-cols-[110px_repeat(7,1fr)_46px]">
+              <div key={emp.id} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
                 {/* Employee Name Cell */}
-                <div className="px-2 py-1 border-r border-b border-border flex items-start">
+                <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
                   <div>
-                    <p className="text-sm font-medium text-foreground truncate">{emp.name}</p>
-                    <p className="text-xs text-muted-foreground">{emp.role}</p>
+                    <p className="text-[11px] sm:text-sm font-medium text-foreground truncate">{emp.name}</p>
+                    <p className="text-[9px] sm:text-xs text-muted-foreground">{emp.role}</p>
                   </div>
                 </div>
 
