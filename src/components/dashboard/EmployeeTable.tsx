@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FunctionsHttpError } from '@supabase/supabase-js';
 import type { Employee } from '@/hooks/use-dashboard-data';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { buildRoleSortPriority } from '@/lib/roles';
@@ -40,6 +41,25 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
     }, 1000);
   };
 
+  const getFunctionErrorMessage = async (err: unknown) => {
+    if (err instanceof FunctionsHttpError) {
+      try {
+        const payload = await err.context.json();
+        if (payload && typeof payload === 'object') {
+          const maybeError = (payload as { error?: unknown; message?: unknown }).error;
+          const maybeMessage = (payload as { error?: unknown; message?: unknown }).message;
+          if (typeof maybeError === 'string' && maybeError.trim()) return maybeError;
+          if (typeof maybeMessage === 'string' && maybeMessage.trim()) return maybeMessage;
+        }
+      } catch {
+        // Ignore parse issues and fall back below.
+      }
+    }
+
+    if (err instanceof Error && err.message) return err.message;
+    return 'Request failed. Please try again.';
+  };
+
   const handleInvite = async (emp: Employee) => {
     setInviting(emp.id);
     try {
@@ -50,8 +70,8 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
       if (error) throw error;
       toast({ title: 'Invite sent', description: `Password reset email sent to ${emp.email}` });
       startCooldown(emp.id);
-    } catch (err: any) {
-      const msg = err.message || '';
+    } catch (err: unknown) {
+      const msg = await getFunctionErrorMessage(err);
       if (msg.includes('wait') || msg.includes('too recently') || msg.includes('429')) {
         startCooldown(emp.id);
       }
@@ -67,12 +87,12 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
       const { data, error } = await supabase.functions.invoke('resend-reset-link', {
         body: { employeeId: emp.id },
       });
-      if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      if (error) throw error;
       toast({ title: 'Reset link sent', description: `Password reset email sent to ${emp.email}` });
       startCooldown(emp.id);
-    } catch (err: any) {
-      const msg = err.message || '';
+    } catch (err: unknown) {
+      const msg = await getFunctionErrorMessage(err);
       if (msg.includes('wait') || msg.includes('too recently') || msg.includes('429')) {
         startCooldown(emp.id);
       }
