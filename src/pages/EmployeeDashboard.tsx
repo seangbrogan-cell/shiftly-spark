@@ -202,6 +202,16 @@ export default function EmployeeDashboard() {
             )}
           </div>
 
+          {/* Workplace title – visible for schedule tabs */}
+          {(activeTab === 'schedule' || activeTab === 'full-schedule') && (
+            <h1 className="text-xl font-bold text-foreground mb-4">
+              {(() => {
+                const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
+                return activeTab === 'full-schedule' ? `${wpName} Full Schedule` : `${wpName} Schedule`;
+              })()}
+            </h1>
+          )}
+
           {/* Schedule Tab */}
           <TabsContent value="schedule">
             {calendarView === 'weekly' ? (
