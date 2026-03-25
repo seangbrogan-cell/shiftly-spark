@@ -44,9 +44,10 @@ interface WeeklyCalendarProps {
   companyName?: string;
   workplaceId?: string;
   renderSidebar?: (onAssignShift: () => void) => React.ReactNode;
+  sidebarPortalRef?: React.RefObject<HTMLDivElement>;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
