@@ -305,7 +305,7 @@ export default function EmployeeDashboard() {
   );
 }
 
-function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string }) {
+function EmployeeHeader({ email, displayName, onSignOut, employeeId, isAdmin }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string; isAdmin?: boolean }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -317,6 +317,14 @@ function EmployeeHeader({ email, displayName, onSignOut, employeeId }: { email?:
           <span className="hidden sm:block text-sm text-muted-foreground">
             {displayName || email}
           </span>
+          {isAdmin && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/dashboard">
+                <LayoutDashboard className="h-4 w-4" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
+            </Button>
+          )}
           <NotificationBell employeeId={employeeId} />
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4" />
