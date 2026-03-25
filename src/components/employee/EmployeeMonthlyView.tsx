@@ -101,7 +101,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                   type="button"
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={cn(
-                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors',
+                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors flex flex-col',
                     !inMonth && 'opacity-40',
                     today && 'bg-primary-light/10',
                     isSelected && 'ring-2 ring-primary/40',
