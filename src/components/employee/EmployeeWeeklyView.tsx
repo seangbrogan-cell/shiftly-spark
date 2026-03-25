@@ -8,7 +8,6 @@ interface EmployeeWeeklyViewProps {
   weekStart: Date;
 }
 
-// Same color logic as employer calendar
 const SHIFT_COLORS = [
   { bg: 'bg-blue-50 dark:bg-blue-950/40', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300', dot: 'bg-blue-500' },
   { bg: 'bg-emerald-50 dark:bg-emerald-950/40', border: 'border-emerald-200 dark:border-emerald-800', text: 'text-emerald-700 dark:text-emerald-300', dot: 'bg-emerald-500' },
@@ -47,34 +46,34 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
         return (
           <div
             key={dateStr}
-            className={`rounded-lg border border-border p-3 min-h-[140px] transition-colors ${today ? 'bg-primary-light/30 border-primary/30' : 'bg-card'}`}
+            className={`rounded-lg border border-border p-2 min-h-[100px] transition-colors ${today ? 'bg-primary-light/30 border-primary/30' : 'bg-card'}`}
           >
-            <div className="text-center mb-3">
-              <p className="text-xs font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
-              <p className={`text-lg font-bold ${today ? 'text-primary' : 'text-foreground'}`}>
+            <div className="text-center mb-1.5">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase">{format(day, 'EEE')}</p>
+              <p className={`text-sm font-bold ${today ? 'text-primary' : 'text-foreground'}`}>
                 {format(day, 'd')}
               </p>
             </div>
 
             {dayAssignments.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center mt-4">No shifts</p>
+              <p className="text-[9px] text-muted-foreground text-center mt-4">No shifts</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {dayAssignments.map((a) => {
                   const color = getColor(a.shift_id);
                   return (
-                    <div key={a.id} className={`rounded-md border ${color.bg} ${color.border} p-2`}>
-                      <div className="flex items-center gap-1.5">
+                    <div key={a.id} className={`rounded-md border ${color.bg} ${color.border} p-1`}>
+                      <div className="flex items-center gap-1">
                         <div className={`h-1.5 w-1.5 rounded-full ${color.dot} shrink-0`} />
-                        <p className={`text-xs font-semibold truncate ${color.text}`}>
+                        <span className={`text-[9px] font-semibold leading-tight truncate ${color.text}`}>
                           {a.shifts?.name ?? 'Shift'}
-                        </p>
+                        </span>
                       </div>
                       {a.actual_start && a.actual_end && (
-                        <div className="flex items-center gap-1 mt-1">
-                          <Clock className="h-3 w-3 text-muted-foreground" />
-                          <p className="text-[10px] text-muted-foreground">
-                            {format(new Date(a.actual_start), 'h:mm a')} – {format(new Date(a.actual_end), 'h:mm a')}
+                        <div className="flex items-center gap-0.5 mt-0.5 pl-2.5">
+                          <Clock className="h-2.5 w-2.5 text-muted-foreground" />
+                          <p className="text-[8px] leading-tight text-muted-foreground truncate">
+                            {format(new Date(a.actual_start), 'h:mma')}–{format(new Date(a.actual_end), 'h:mma')}
                           </p>
                         </div>
                       )}
