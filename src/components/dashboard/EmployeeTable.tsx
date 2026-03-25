@@ -86,8 +86,8 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
     <>
       {employees.map((emp) => (
         <TableRow key={emp.id}>
-          <TableCell className="font-medium">{emp.name}</TableCell>
-          <TableCell className="text-muted-foreground">{emp.email}</TableCell>
+          <TableCell className="font-medium whitespace-nowrap">{emp.name}</TableCell>
+          <TableCell className="text-muted-foreground hidden sm:table-cell">{emp.email}</TableCell>
           <TableCell className="hidden md:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
           <TableCell>
             <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'}>
