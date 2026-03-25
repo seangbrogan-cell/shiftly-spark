@@ -12,6 +12,7 @@ interface TimeOffDecisionProps {
   endDate?: string
   reason?: string
   decision?: 'approved' | 'rejected'
+  explanation?: string
 }
 
 const TimeOffDecisionEmail = ({ employeeName, startDate, endDate, reason, decision = 'approved' }: TimeOffDecisionProps) => {
