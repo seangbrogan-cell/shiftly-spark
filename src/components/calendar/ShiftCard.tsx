@@ -44,7 +44,7 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`group relative rounded border ${color.bg} ${color.border} px-1.5 py-1 @container cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
+      className={`group relative rounded border ${color.bg} ${color.border} px-0.5 sm:px-1.5 py-1 @container cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
     >
       <div className="flex items-center gap-1">
         <GripVertical className="h-3 w-3 text-muted-foreground/40 shrink-0 hidden @[80px]:block" />
