@@ -26,7 +26,14 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
   };
 
   const formatTime = (ts: string) => {
-    try { return format(new Date(ts), 'h:mma'); } catch { return ''; }
+    try {
+      const d = new Date(ts);
+      const minutes = d.getMinutes();
+      return minutes === 0
+        ? format(d, 'ha').toLowerCase()
+        : format(d, 'h:mma').toLowerCase();
+    } catch { return ''; }
+  };
   };
 
   const hasTime = assignment.actual_start && assignment.actual_end;
