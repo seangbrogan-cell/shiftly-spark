@@ -6,6 +6,7 @@ type Status = 'draft' | 'published' | 'changes_pending' | 'no_schedule';
 interface StatusBadgeProps {
   status: Status;
   publishedAt: string | null;
+  hideTimestamp?: boolean;
 }
 
 const statusConfig: Record<Status, { label: string; className: string }> = {
@@ -27,18 +28,20 @@ const statusConfig: Record<Status, { label: string; className: string }> = {
   },
 };
 
-export function StatusBadge({ status, publishedAt }: StatusBadgeProps) {
+export function StatusBadge({ status, publishedAt, hideTimestamp }: StatusBadgeProps) {
   const config = statusConfig[status];
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
-      <span className={`inline-flex items-center justify-center h-7 px-2.5 text-xs font-medium rounded-md border ${config.className}`}>
-        {config.label}
-      </span>
-      {publishedAt && (
-        <span className="text-[10px] sm:text-xs text-muted-foreground leading-tight">
-          Last published {format(new Date(publishedAt), 'MMM d, h:mm a')}
-        </span>
-      )}
-    </div>
+    <span className={`inline-flex items-center justify-center h-7 px-2.5 text-xs font-medium rounded-md border ${config.className}`}>
+      {config.label}
+    </span>
+  );
+}
+
+export function PublishedTimestamp({ publishedAt }: { publishedAt: string | null }) {
+  if (!publishedAt) return null;
+  return (
+    <span className="text-[10px] sm:text-xs text-muted-foreground">
+      Last published {format(new Date(publishedAt), 'MMM d, h:mm a')}
+    </span>
   );
 }
