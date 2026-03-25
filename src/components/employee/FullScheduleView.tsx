@@ -168,7 +168,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                       )}
                     >
                       <div className="flex items-center gap-1">
-                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1 text-center', colorDef.text)}>
                           {s.actual_start && s.actual_end ? (
                             <div className="font-bold lg:whitespace-nowrap">
                               <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
