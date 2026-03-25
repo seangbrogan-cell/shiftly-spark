@@ -57,21 +57,54 @@ export function PublishPreviewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
-          <DialogTitle>Schedule Preview</DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <DialogTitle className="text-base sm:text-lg">Schedule Preview</DialogTitle>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {format(weekStart, 'MMM d')} – {format(weekEnd, 'MMM d, yyyy')}
           </p>
         </DialogHeader>
 
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
           <Switch checked={employeeView} onCheckedChange={setEmployeeView} id="view-toggle" />
-          <Label htmlFor="view-toggle" className="text-sm">Show as employee sees it</Label>
+          <Label htmlFor="view-toggle" className="text-xs sm:text-sm">Show as employee sees it</Label>
         </div>
 
-        {/* Preview grid */}
-        <div className="rounded-lg border border-border overflow-x-auto">
+        {/* Mobile: stacked card layout */}
+        <div className="sm:hidden space-y-3">
+          {(employeeView ? affectedEmployees.slice(0, 1) : affectedEmployees).map((emp) => (
+            <div key={emp.id} className="rounded-lg border border-border overflow-hidden">
+              <div className="px-3 py-2 bg-muted/50 border-b border-border">
+                <p className="text-xs font-semibold text-foreground">{emp.name}</p>
+              </div>
+              <div className="grid grid-cols-7 divide-x divide-border">
+                {weekDays.map((day) => {
+                  const dateStr = format(day, 'yyyy-MM-dd');
+                  const dayAssignments = assignmentsByEmployee[emp.id]?.filter((a) => a.assigned_date === dateStr) ?? [];
+                  return (
+                    <div key={dateStr} className="p-0.5 min-h-[48px]">
+                      <p className="text-[8px] font-semibold text-muted-foreground text-center">{format(day, 'EEE')}</p>
+                      <p className="text-[10px] font-bold text-foreground text-center mb-0.5">{format(day, 'd')}</p>
+                      {dayAssignments.map((a) => (
+                        <div key={a.id} className="rounded bg-primary/10 px-0.5 py-0.5 mb-0.5">
+                          <p className="text-[8px] font-semibold text-primary text-center truncate">{a.shifts?.name}</p>
+                          {employeeView && a.actual_start && a.actual_end && (
+                            <p className="text-[7px] text-muted-foreground text-center">
+                              {format(new Date(a.actual_start), 'ha').toLowerCase()}–{format(new Date(a.actual_end), 'ha').toLowerCase()}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: grid layout */}
+        <div className="hidden sm:block rounded-lg border border-border overflow-x-auto">
           <div className="grid grid-cols-[140px_repeat(7,1fr)] border-b border-border bg-muted/50">
             <div className="p-2 border-r border-border text-xs font-semibold text-muted-foreground">
               {employeeView ? 'Day' : 'Employee'}
@@ -85,7 +118,6 @@ export function PublishPreviewModal({
           </div>
 
           {employeeView ? (
-            // Single-employee view: show first affected employee only
             affectedEmployees.slice(0, 1).map((emp) => (
               <div key={emp.id} className="grid grid-cols-[140px_repeat(7,1fr)]">
                 <div className="p-2 border-r border-b border-border text-sm font-medium text-foreground truncate">
@@ -136,8 +168,8 @@ export function PublishPreviewModal({
         </div>
 
         {/* Notification info */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-2">
-          <span>Employees will receive notifications via:</span>
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted-foreground mt-2">
+          <span>Notifications via:</span>
           {channels.includes('in_app') && (
             <Badge variant="outline" className="text-[10px] gap-1">
               <Bell className="h-3 w-3" /> In-App
@@ -150,9 +182,9 @@ export function PublishPreviewModal({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handlePublish} disabled={isPublishing} className="gap-2">
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button size="sm" onClick={handlePublish} disabled={isPublishing} className="gap-2">
             <Send className="h-4 w-4" />
             {isPublishing ? 'Publishing...' : 'Publish'}
           </Button>
