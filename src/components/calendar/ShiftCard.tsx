@@ -25,13 +25,14 @@ export function ShiftCard({ assignment, onDelete }: ShiftCardProps) {
     zIndex: isDragging ? 50 : 1,
   };
 
-  const formatTime = (ts: string) => {
+  const formatTime = (ts: string, short = false) => {
     try {
       const d = new Date(ts);
       const minutes = d.getMinutes();
-      return minutes === 0
+      const formatted = minutes === 0
         ? format(d, 'ha').toLowerCase()
         : format(d, 'h:mma').toLowerCase();
+      return short ? formatted.replace('am', 'a').replace('pm', 'p') : formatted;
     } catch { return ''; }
   };
 
