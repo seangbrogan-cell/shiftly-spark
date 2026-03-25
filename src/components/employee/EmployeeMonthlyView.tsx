@@ -101,7 +101,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                   type="button"
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={cn(
-                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors',
+                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors flex flex-col',
                     !inMonth && 'opacity-40',
                     today && 'bg-primary-light/10',
                     isSelected && 'ring-2 ring-primary/40',
@@ -114,7 +114,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                     </p>
                   </div>
                   {dayAssignments.length > 0 && (
-                    <div className="space-y-0.5">
+                    <div className="flex flex-col gap-0.5 flex-1">
                       {dayAssignments.slice(0, 2).map((a) => {
                         const color = getShiftColor({
                           color: a.shifts?.color ?? null,
@@ -125,7 +125,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                           <div
                             key={a.id}
                             className={cn(
-                              'rounded px-1 py-0.5 text-xs border',
+                              'rounded px-1 py-0.5 text-xs border flex-1',
                               color.bg,
                               color.border,
                               color.text
