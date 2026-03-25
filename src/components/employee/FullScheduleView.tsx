@@ -96,7 +96,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
   return (
     <div className="rounded-lg border border-border bg-card overflow-x-auto">
       {/* Day Headers - matching dashboard grid */}
-      <div className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
+      <div className="grid grid-cols-[60px_repeat(7,1fr)_28px] sm:grid-cols-[110px_repeat(7,1fr)_46px] border-b border-border sticky top-0 bg-card z-10">
         <div className="px-1 sm:px-2 py-1 sm:py-1.5 border-r border-border flex items-center">
           <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Employee</span>
         </div>
