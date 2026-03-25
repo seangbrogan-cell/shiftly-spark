@@ -86,8 +86,8 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
     <>
       {employees.map((emp) => (
         <TableRow key={emp.id}>
-          <TableCell className="font-medium">{emp.name}</TableCell>
-          <TableCell className="text-muted-foreground">{emp.email}</TableCell>
+          <TableCell className="font-medium whitespace-nowrap">{emp.name}</TableCell>
+          <TableCell className="text-muted-foreground hidden sm:table-cell">{emp.email}</TableCell>
           <TableCell className="hidden md:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
           <TableCell>
             <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'}>
@@ -183,7 +183,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
     <TableHeader>
       <TableRow className="bg-muted/50">
         <TableHead>Name</TableHead>
-        <TableHead>Email</TableHead>
+        <TableHead className="hidden sm:table-cell">Email</TableHead>
         <TableHead className="hidden md:table-cell">Phone</TableHead>
         <TableHead>Role</TableHead>
         <TableHead className="text-center">Shifts</TableHead>
@@ -197,7 +197,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
       {management.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Management</h3>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="rounded-lg border border-border bg-card overflow-x-auto">
             <Table>
               {headers}
               <TableBody>
@@ -210,7 +210,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
       {staff.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Staff</h3>
-          <div className="rounded-lg border border-border bg-card overflow-hidden">
+          <div className="rounded-lg border border-border bg-card overflow-x-auto">
             <Table>
               {headers}
               <TableBody>

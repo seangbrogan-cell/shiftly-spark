@@ -126,36 +126,36 @@ export default function EmployeeDashboard() {
     <div className="min-h-screen bg-background">
       <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} />
 
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           {/* Combined toolbar: tabs + controls on one line */}
-          <div className="flex flex-wrap items-center gap-2 mb-4 print:hidden">
-            <TabsList>
-              <TabsTrigger value="schedule" className="gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <CalendarDays className="h-4 w-4" /> My Schedule
-              </TabsTrigger>
-              {fullScheduleAllowed && (
-                <TabsTrigger value="full-schedule" className="gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <Users className="h-4 w-4" /> Full Schedule
+          <div className="flex flex-col gap-2 mb-4 print:hidden">
+            <div className="overflow-x-auto pb-1 -mb-1">
+              <TabsList className="shrink-0">
+                <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <CalendarDays className="h-4 w-4" /> <span className="hidden xs:inline">My</span> Schedule
                 </TabsTrigger>
-              )}
-              <TabsTrigger value="time-off" className="gap-1.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                <History className="h-4 w-4" /> Time Off
-              </TabsTrigger>
-            </TabsList>
+                {fullScheduleAllowed && (
+                  <TabsTrigger value="full-schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Users className="h-4 w-4" /> <span className="hidden xs:inline">Full</span> Schedule
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <History className="h-4 w-4" /> Time Off
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Schedule controls – visible for schedule tabs */}
             {(activeTab === 'schedule' || activeTab === 'full-schedule') && (
-              <>
-                <div className="h-6 w-px bg-border hidden sm:block" />
-
+              <div className="flex flex-wrap items-center gap-2">
                 {/* Workplace dropdown */}
                 <select
                   id="employee-workplace"
                   value={activeWorkplaceId ?? ''}
                   onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
                   disabled={employeeWorkplaces.length === 0}
-                  className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none"
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none max-w-[140px] sm:max-w-none"
                 >
                   {employeeWorkplaces.length === 0 ? (
                     <option value="">No workplaces</option>
@@ -184,14 +184,13 @@ export default function EmployeeDashboard() {
                   </div>
                 )}
 
-
                 {/* Navigation */}
                 {(activeTab === 'full-schedule' || calendarView === 'weekly') ? (
                   <>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
+                    <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
                       Today
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
@@ -203,7 +202,7 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
+                    <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
                       Today
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
@@ -212,10 +211,10 @@ export default function EmployeeDashboard() {
                   </>
                 )}
 
-                <Button size="sm" variant="outline" className="h-8" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 mr-1" /> Print
+                <Button size="sm" variant="outline" className="h-8 text-xs sm:text-sm" onClick={() => window.print()}>
+                  <Printer className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Print</span>
                 </Button>
-              </>
+              </div>
             )}
           </div>
 
