@@ -157,7 +157,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-3 sm:p-6">
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Edit Employee' : 'Add Employee'}</DialogTitle>
           <DialogDescription>
@@ -234,8 +234,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
                 const hasCustomTime = dayRange && (dayRange.start_time !== '00:00' || dayRange.end_time !== '23:59');
 
                 return (
-                  <div key={day} className="flex items-center gap-3">
-                    <label className="flex items-center gap-1.5 cursor-pointer w-16 shrink-0">
+                  <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <label className="flex items-center gap-1.5 cursor-pointer w-14 shrink-0">
                       <Checkbox
                         checked={isEnabled}
                         onCheckedChange={(checked) => {
@@ -244,29 +244,29 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
                           );
                         }}
                       />
-                      <span className="text-sm font-medium">{day}</span>
+                      <span className="text-xs sm:text-sm font-medium">{day}</span>
                     </label>
                     {isEnabled && (
-                      <div className="flex items-center gap-1.5 flex-1">
+                      <div className="flex items-center gap-1 sm:gap-1.5 pl-6 sm:pl-0 flex-1">
                         <Input
                           type="time"
                           value={dayRange?.start_time ?? '00:00'}
                           onChange={(e) => updateDayTime(day, 'start_time', e.target.value)}
-                          className="h-8 text-xs w-[110px]"
+                          className="h-7 sm:h-8 text-[10px] sm:text-xs w-[90px] sm:w-[110px] px-1.5 sm:px-3"
                         />
-                        <span className="text-xs text-muted-foreground">to</span>
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">to</span>
                         <Input
                           type="time"
                           value={dayRange?.end_time ?? '23:59'}
                           onChange={(e) => updateDayTime(day, 'end_time', e.target.value)}
-                          className="h-8 text-xs w-[110px]"
+                          className="h-7 sm:h-8 text-[10px] sm:text-xs w-[90px] sm:w-[110px] px-1.5 sm:px-3"
                         />
                         {hasCustomTime && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-xs text-muted-foreground"
+                            className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs text-muted-foreground"
                             onClick={() => {
                               updateDayTime(day, 'start_time', '00:00');
                               updateDayTime(day, 'end_time', '23:59');
@@ -278,7 +278,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
                       </div>
                     )}
                     {!isEnabled && (
-                      <span className="text-xs text-muted-foreground">Not available</span>
+                      <span className="text-[10px] sm:text-xs text-muted-foreground pl-6 sm:pl-0">Not available</span>
                     )}
                   </div>
                 );
