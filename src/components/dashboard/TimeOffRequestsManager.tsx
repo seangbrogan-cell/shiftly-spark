@@ -142,7 +142,24 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   );
 }
 
-function RequestCard({ request: r, onAction }: { request: TimeOffRequest; onAction?: (status: string) => void }) {
+function RequestCard({ request: r, onAction, compact }: { request: TimeOffRequest; onAction?: (status: string) => void; compact?: boolean }) {
+  if (compact) {
+    return (
+      <Card>
+        <CardContent className="p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="font-medium text-sm text-foreground truncate">{r.employees?.name ?? 'Unknown'}</p>
+            {statusBadge(r.status)}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+          </p>
+          <p className="text-xs mt-1 truncate"><span className="font-medium">Reason:</span> {r.reason}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardContent className="p-4">
