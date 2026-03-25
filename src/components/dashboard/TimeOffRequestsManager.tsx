@@ -119,7 +119,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
         {pending.length === 0 ? (
           <p className="text-sm text-muted-foreground">No pending requests.</p>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {pending.map(r => (
               <RequestCard key={r.id} request={r} onAction={(status) => updateStatus.mutate({ id: r.id, status, request: r })} />
             ))}
@@ -162,34 +162,30 @@ function RequestCard({ request: r, onAction, compact }: { request: TimeOffReques
 
   return (
     <Card>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <p className="font-medium text-foreground">{r.employees?.name ?? 'Unknown'}</p>
-              {statusBadge(r.status)}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {format(new Date(r.start_date), 'MMM d, yyyy')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
-            </p>
-            <p className="text-sm mt-1"><span className="font-medium">Reason:</span> {r.reason}</p>
-            {r.notes && <p className="text-sm text-muted-foreground mt-0.5">{r.notes}</p>}
-            {r.replacement?.name && (
-              <p className="text-xs text-muted-foreground mt-1">Suggested replacement: {r.replacement.name}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Submitted {format(new Date(r.created_at), 'MMM d, h:mm a')}</p>
-          </div>
-          {onAction && r.status === 'pending' && (
-            <div className="flex gap-2 shrink-0">
-              <Button size="sm" onClick={() => onAction('approved')} className="gap-1">
-                <Check className="h-3.5 w-3.5" /> Approve
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => onAction('rejected')} className="gap-1">
-                <X className="h-3.5 w-3.5" /> Reject
-              </Button>
-            </div>
-          )}
+      <CardContent className="p-3">
+        <div className="flex items-center gap-2 mb-1">
+          <p className="font-medium text-sm text-foreground truncate">{r.employees?.name ?? 'Unknown'}</p>
+          {statusBadge(r.status)}
         </div>
+        <p className="text-xs text-muted-foreground">
+          {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+        </p>
+        <p className="text-xs mt-1 truncate"><span className="font-medium">Reason:</span> {r.reason}</p>
+        {r.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{r.notes}</p>}
+        {r.replacement?.name && (
+          <p className="text-xs text-muted-foreground mt-1 truncate">Replacement: {r.replacement.name}</p>
+        )}
+        <p className="text-xs text-muted-foreground mt-1">Submitted {format(new Date(r.created_at), 'MMM d, h:mm a')}</p>
+        {onAction && r.status === 'pending' && (
+          <div className="flex gap-2 mt-2">
+            <Button size="sm" className="gap-1 flex-1 h-7 text-xs" onClick={() => onAction('approved')}>
+              <Check className="h-3 w-3" /> Approve
+            </Button>
+            <Button size="sm" variant="destructive" className="gap-1 flex-1 h-7 text-xs" onClick={() => onAction('rejected')}>
+              <X className="h-3 w-3" /> Reject
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
