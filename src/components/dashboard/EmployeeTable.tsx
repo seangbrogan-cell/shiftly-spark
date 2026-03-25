@@ -86,16 +86,16 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
     <>
       {employees.map((emp) => (
         <TableRow key={emp.id}>
-          <TableCell className="font-medium whitespace-nowrap text-xs sm:text-sm px-2 sm:px-4">{emp.name}</TableCell>
-          <TableCell className="text-muted-foreground hidden sm:table-cell">{emp.email}</TableCell>
-          <TableCell className="hidden md:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
-          <TableCell className="px-1 sm:px-4">
-            <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'} className="text-[10px] sm:text-xs px-1.5 sm:px-2.5">
+          <TableCell className="font-medium whitespace-nowrap text-xs md:text-sm px-2 md:px-4">{emp.name}</TableCell>
+          <TableCell className="text-muted-foreground text-xs hidden md:table-cell">{emp.email}</TableCell>
+          <TableCell className="hidden lg:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
+          <TableCell className="px-1 md:px-4">
+            <Badge variant={emp.role !== 'Staff' ? 'default' : 'secondary'} className="text-[10px] md:text-xs px-1.5 md:px-2.5">
               {emp.role}
             </Badge>
           </TableCell>
-          <TableCell className="text-center text-xs sm:text-sm px-1 sm:px-4">{shiftCounts[emp.id] || 0}</TableCell>
-          <TableCell className="text-right px-1 sm:px-4">
+          <TableCell className="text-center text-xs md:text-sm px-1 md:px-4">{shiftCounts[emp.id] || 0}</TableCell>
+          <TableCell className="text-right px-1 md:px-4">
             <div className="flex justify-end gap-0 sm:gap-1">
               {(emp as any).user_id ? (
                 cooldowns[emp.id] ? (
