@@ -45,8 +45,8 @@ export function ShiftTemplateSidebar({ shifts, onAssignShift }: ShiftTemplateSid
     <div
       ref={setNodeRef}
       className={cn(
-        'rounded-lg border border-border bg-card p-4 transition-colors',
-        isOver && 'border-destructive/50 bg-destructive/5'
+        'transition-colors',
+        isOver && 'border-destructive/50 bg-destructive/5 rounded-lg'
       )}
     >
       <div className="flex items-center gap-2 mb-3">
