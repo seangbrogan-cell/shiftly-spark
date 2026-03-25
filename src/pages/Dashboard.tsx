@@ -183,7 +183,7 @@ export default function Dashboard() {
             </div>
 
             {/* Schedule Tab - Weekly Calendar */}
-            <TabsContent value="schedule">
+            <TabsContent value="schedule" className="mt-0">
               {employerId && selectedWorkplaceId && (
                 <WeeklyCalendar
                   employees={workplaceEmployees}
@@ -191,6 +191,9 @@ export default function Dashboard() {
                   employerId={employerId}
                   companyName={selectedWorkplace?.name ?? ''}
                   workplaceId={selectedWorkplaceId}
+                  renderSidebar={(onAssignShift) => (
+                    <ShiftTemplateSidebar shifts={shifts} onAssignShift={onAssignShift} />
+                  )}
                 />
               )}
             </TabsContent>
