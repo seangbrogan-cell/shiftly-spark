@@ -131,7 +131,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
               <div
                 key={dateStr}
                 className={cn(
-                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] align-top',
+                  'px-0.5 py-0.5 border-r border-b border-border min-h-[2.5rem] flex flex-col gap-0.5',
                   isToday(day) && 'bg-primary-light/10'
                 )}
               >
@@ -145,7 +145,7 @@ export function FullScheduleView({ workplaceId, weekStart }: FullScheduleViewPro
                     <div
                       key={s.id}
                       className={cn(
-                        'rounded px-1 py-0.5 text-xs mb-0.5 border',
+                        'rounded px-1 py-0.5 text-xs border flex-1',
                         colorDef.bg,
                         colorDef.border,
                         colorDef.text

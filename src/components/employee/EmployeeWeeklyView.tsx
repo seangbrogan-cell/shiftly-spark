@@ -77,7 +77,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
             <div
               key={dateStr}
               className={cn(
-                'px-0.5 py-0.5 border-r border-border min-h-[4rem] align-top',
+                'px-0.5 py-0.5 border-r border-border min-h-[4rem] flex flex-col gap-0.5',
                 isToday(day) && 'bg-primary-light/10'
               )}
             >
@@ -91,7 +91,7 @@ export function EmployeeWeeklyView({ assignments, weekStart }: EmployeeWeeklyVie
                   <div
                     key={a.id}
                     className={cn(
-                      'rounded px-1 py-0.5 text-xs mb-0.5 border',
+                      'rounded px-1 py-0.5 text-xs border flex-1',
                       color.bg,
                       color.border,
                       color.text
