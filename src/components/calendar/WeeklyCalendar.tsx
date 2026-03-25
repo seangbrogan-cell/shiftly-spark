@@ -274,9 +274,10 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
-            variant="outline"
+            variant={isSameWeek(currentWeek, new Date(), { weekStartsOn: 1 }) ? 'default' : 'outline'}
             size="sm"
             onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+            className={isSameWeek(currentWeek, new Date(), { weekStartsOn: 1 }) ? '' : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50'}
           >
             <CalendarDays className="h-4 w-4 mr-1.5" /> Today
           </Button>

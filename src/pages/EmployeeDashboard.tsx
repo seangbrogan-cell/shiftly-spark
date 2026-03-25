@@ -207,7 +207,12 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button variant="outline" size="sm" className="h-8 text-xs sm:text-sm" onClick={() => setCurrentMonth(startOfMonth(new Date()))}>
+                    <Button
+                      variant={isSameMonthFn(currentMonth, new Date()) ? 'default' : 'outline'}
+                      size="sm"
+                      className={`h-8 text-xs sm:text-sm ${!isSameMonthFn(currentMonth, new Date()) ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50' : ''}`}
+                      onClick={() => setCurrentMonth(startOfMonth(new Date()))}
+                    >
                       Today
                     </Button>
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
