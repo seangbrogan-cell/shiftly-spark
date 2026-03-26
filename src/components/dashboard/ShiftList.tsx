@@ -48,28 +48,26 @@ function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => vo
   const color = getShiftColor({ color: (shift as any).color, is_all_day: allDay, start_time: shift.start_time });
 
   return (
-    <div className={`group rounded-lg border ${color.border} ${color.bg} p-4 transition-shadow hover:shadow-md`}>
-      <div className="flex items-start gap-3">
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${color.bg}`}>
-          <div className={`h-3 w-3 rounded-full ${color.dot}`} />
+    <div className={`group flex items-center gap-2 rounded-md border ${color.border} ${color.bg} p-2.5 transition-shadow hover:shadow-md`}>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <div className={`h-2 w-2 rounded-full ${color.dot} shrink-0`} />
+          <p className={`text-xs font-semibold truncate ${color.text}`}>{shift.name}</p>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className={`font-medium ${color.text} truncate`}>{shift.name}</p>
-          <p className="text-sm text-muted-foreground">
-            {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
-          </p>
-          {shift.notes && (
-            <p className="mt-1 text-sm text-muted-foreground truncate">{shift.notes}</p>
-          )}
-        </div>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
-            <Pencil className="h-3.5 w-3.5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={onDelete}>
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
+        <p className="text-[10px] text-muted-foreground mt-0.5">
+          {allDay ? 'All Day' : `${formatTime(shift.start_time)} – ${formatTime(shift.end_time)}`}
+        </p>
+        {shift.notes && (
+          <p className="mt-0.5 text-[10px] text-muted-foreground truncate">{shift.notes}</p>
+        )}
+      </div>
+      <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={onEdit}>
+          <Pencil className="h-3 w-3" />
+        </Button>
+        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive hover:text-destructive" onClick={onDelete}>
+          <Trash2 className="h-3 w-3" />
+        </Button>
       </div>
     </div>
   );
