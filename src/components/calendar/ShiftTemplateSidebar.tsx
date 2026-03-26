@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDroppable } from '@dnd-kit/core';
-import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, PanelRightClose, PanelRight } from 'lucide-react';
+import { LayoutGrid, Sunrise, Sun, Moon, CalendarOff, PanelRightClose, PanelRight, ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import type { Shift } from '@/hooks/use-dashboard-data';
@@ -13,12 +13,26 @@ interface ShiftTemplateSidebarProps {
 
 type Period = 'allday' | 'morning' | 'afternoon' | 'evening';
 
-const PERIODS: { key: Period; label: string; icon: typeof Sunrise; iconClass: string; borderClass: string; bgClass: string }[] = [
-  { key: 'morning', label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
-  { key: 'afternoon', label: 'Afternoon', icon: Sun, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
-  { key: 'evening', label: 'Evening', icon: Moon, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
-  { key: 'allday', label: 'Off Work', icon: CalendarOff, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
-];
+const PERIODS_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconClass: string; borderClass: string; bgClass: string }> = {
+  morning: { label: 'Morning', icon: Sunrise, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  afternoon: { label: 'Afternoon', icon: Sun, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  evening: { label: 'Evening', icon: Moon, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+  allday: { label: 'Off Work', icon: CalendarOff, iconClass: 'text-amber-500', borderClass: 'border-amber-300 dark:border-amber-700', bgClass: 'bg-amber-50 dark:bg-amber-950/30' },
+};
+
+const DEFAULT_ORDER: Period[] = ['morning', 'afternoon', 'evening', 'allday'];
+const STORAGE_KEY = 'shift-sidebar-period-order';
+
+function loadOrder(): Period[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as Period[];
+      if (parsed.length === 4 && DEFAULT_ORDER.every(p => parsed.includes(p))) return parsed;
+    }
+  } catch {}
+  return DEFAULT_ORDER;
+}
 
 function getStartHour(shift: Shift): number {
   if ((shift as any).is_all_day || !shift.start_time) return -1;
@@ -29,7 +43,19 @@ function getStartHour(shift: Shift): number {
 export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [periodOrder, setPeriodOrder] = useState<Period[]>(loadOrder);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
+
+  const movePeriod = useCallback((index: number, direction: -1 | 1) => {
+    setPeriodOrder(prev => {
+      const next = [...prev];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= next.length) return prev;
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   const grouped = useMemo(() => {
     const groups: Record<Period, Shift[]> = { allday: [], morning: [], afternoon: [], evening: [] };
@@ -80,13 +106,33 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
             </p>
           ) : (
             <div className="space-y-3">
-              {PERIODS.map(({ key, label, icon: Icon, iconClass, borderClass, bgClass }) => {
+              {periodOrder.map((key, index) => {
+                const config = PERIODS_CONFIG[key];
+                const Icon = config.icon;
                 const periodShifts = grouped[key];
                 return (
-                  <div key={key} className={`rounded-md border ${borderClass} ${bgClass} p-2.5`}>
+                  <div key={key} className={`rounded-md border ${config.borderClass} ${config.bgClass} p-2.5`}>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Icon className={`h-3.5 w-3.5 ${iconClass}`} />
-                      <span className="text-xs font-semibold text-foreground">{label}</span>
+                      <Icon className={`h-3.5 w-3.5 ${config.iconClass}`} />
+                      <span className="text-xs font-semibold text-foreground flex-1">{config.label}</span>
+                      <div className="flex">
+                        <button
+                          onClick={() => movePeriod(index, -1)}
+                          disabled={index === 0}
+                          className="p-0.5 rounded hover:bg-foreground/10 disabled:opacity-25 disabled:cursor-not-allowed transition-opacity"
+                          aria-label={`Move ${config.label} up`}
+                        >
+                          <ChevronUp className="h-3 w-3 text-muted-foreground" />
+                        </button>
+                        <button
+                          onClick={() => movePeriod(index, 1)}
+                          disabled={index === periodOrder.length - 1}
+                          className="p-0.5 rounded hover:bg-foreground/10 disabled:opacity-25 disabled:cursor-not-allowed transition-opacity"
+                          aria-label={`Move ${config.label} down`}
+                        >
+                          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                        </button>
+                      </div>
                     </div>
                     {periodShifts.length === 0 ? (
                       <p className="text-[10px] text-muted-foreground text-center py-1 italic">No shifts</p>
