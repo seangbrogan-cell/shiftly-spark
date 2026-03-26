@@ -118,7 +118,7 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
           const periodShifts = grouped[period];
 
           return (
-            <div key={period} className={`rounded-lg border ${config.borderClass} ${config.bgClass} p-4`}>
+            <div key={period} className={`w-52 rounded-lg border ${config.borderClass} ${config.bgClass} p-4`}>
               <div className="flex items-center gap-2 mb-3">
                 <Icon className={`h-5 w-5 ${config.iconClass}`} />
                 <h3 className="text-sm font-semibold text-foreground">{config.label}</h3>
