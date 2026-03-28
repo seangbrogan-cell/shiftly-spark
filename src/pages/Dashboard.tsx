@@ -340,6 +340,14 @@ function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () =
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
+          {user?.id === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin/analytics">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Link>
+            </Button>
+          )}
           <Button variant="outline" size="sm" asChild>
             <Link to="/employee">
               <UserCircle className="h-4 w-4" />
