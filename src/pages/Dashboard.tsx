@@ -330,7 +330,7 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () => void }) {
+function DashboardHeader({ email, onSignOut, userId }: { email?: string; onSignOut: () => void; userId?: string }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">
@@ -340,7 +340,7 @@ function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () =
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
-          {user?.id === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
+          {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
             <Button variant="outline" size="sm" asChild>
               <Link to="/admin/analytics">
                 <BarChart3 className="h-4 w-4" />
