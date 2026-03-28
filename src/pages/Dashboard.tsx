@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle, BarChart3 } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -138,7 +138,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader email={user?.email} onSignOut={signOut} />
+      <DashboardHeader email={user?.email} onSignOut={signOut} userId={user?.id} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
@@ -330,7 +330,7 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () => void }) {
+function DashboardHeader({ email, onSignOut, userId }: { email?: string; onSignOut: () => void; userId?: string }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">
@@ -340,6 +340,14 @@ function DashboardHeader({ email, onSignOut }: { email?: string; onSignOut: () =
         </div>
         <div className="flex items-center gap-4">
           <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
+          {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/admin/analytics">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Link>
+            </Button>
+          )}
           <Button variant="outline" size="sm" asChild>
             <Link to="/employee">
               <UserCircle className="h-4 w-4" />
