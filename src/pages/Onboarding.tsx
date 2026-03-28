@@ -74,6 +74,21 @@ export default function Onboarding() {
       queryClient.setQueryData(['profile'], nextProfile);
 
       toast({ title: 'Organization created!', description: `Welcome to ${companyName.trim()}` });
+
+      // Send admin alert about new employer signup (fire-and-forget)
+      supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'new-employer-signup',
+          recipientEmail: 'seanandchez@gmail.com',
+          idempotencyKey: `new-employer-${employerId}`,
+          templateData: {
+            companyName: companyName.trim(),
+            ownerName: displayName.trim(),
+            ownerEmail: user.email,
+          },
+        },
+      }).catch(() => {});
+
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       navigate('/dashboard', { replace: true });
     } catch (err: any) {
