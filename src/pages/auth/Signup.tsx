@@ -30,12 +30,17 @@ export default function Signup() {
     }
     setLoading(true);
 
+    const metadata: Record<string, string> = { account_type: accountType! };
+    if (accountType === 'employee') {
+      metadata.company_name = companyName.trim();
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { account_type: accountType },
+        data: metadata,
       },
     });
 
