@@ -221,10 +221,3 @@ export default function Signup() {
     </div>
   );
 }
-      {/* Right - Form */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8">
-        {step === 'role' ? <RoleSelection /> : <SignupForm />}
-      </div>
-    </div>
-  );
-}
