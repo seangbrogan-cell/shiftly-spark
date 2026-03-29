@@ -35,10 +35,10 @@ export default function Login() {
           .eq('user_id', user.id)
           .single();
 
-        if (!profile?.employer_id) {
-          navigate('/onboarding');
-        } else if (profile.role === 'employee') {
+        if (profile?.role === 'employee') {
           navigate('/employee');
+        } else if (!profile?.employer_id) {
+          navigate('/onboarding');
         } else {
           navigate('/dashboard');
         }
