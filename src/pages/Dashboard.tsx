@@ -133,6 +133,9 @@ export default function Dashboard() {
   };
 
   if (profile && !employerId && !profileIsFetching) {
+    if (profile.role === 'employee') {
+      return <Navigate to="/employee" replace />;
+    }
     return <Navigate to="/onboarding" replace />;
   }
 
