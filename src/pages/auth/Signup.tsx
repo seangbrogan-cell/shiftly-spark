@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Clock, ArrowRight } from 'lucide-react';
 
 export default function Signup() {
+  const [step, setStep] = useState<'role' | 'form'>('role');
+  const [accountType, setAccountType] = useState<'employer' | 'employee' | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
