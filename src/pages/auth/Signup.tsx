@@ -14,6 +14,7 @@ export default function Signup() {
   const [step, setStep] = useState<'role' | 'form'>('role');
   const [accountType, setAccountType] = useState<'employer' | 'employee' | null>(null);
   const [email, setEmail] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
