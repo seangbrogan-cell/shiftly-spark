@@ -122,6 +122,27 @@ export default function Signup() {
       </CardHeader>
       <form onSubmit={handleSignup}>
         <CardContent className="space-y-4">
+          {accountType === 'employee' && (
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Company Name</Label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="companyName"
+                  type="text"
+                  placeholder="Enter your employer's company name"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="pl-10"
+                  required
+                  maxLength={100}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Enter the exact company name your employer registered with
+              </p>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
