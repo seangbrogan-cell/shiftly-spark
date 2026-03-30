@@ -28,8 +28,8 @@ import { getWeekDays } from '@/hooks/use-calendar-data';
 
 export default function EmployeeDashboard() {
   const { user, signOut } = useAuth();
-  const { data: profile } = useProfile();
-  const { data: employee } = useCurrentEmployee();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: employee, isLoading: employeeLoading } = useCurrentEmployee();
 
   const isEmployerPreview = profile?.role === 'employer' && !employee;
   const employerId = employee?.employer_id ?? profile?.employer_id;
@@ -114,6 +114,14 @@ export default function EmployeeDashboard() {
     () => monthlyAssignmentsRaw.filter((a) => !timeOffDates.has(a.assigned_date)),
     [monthlyAssignmentsRaw, timeOffDates]
   );
+
+  if (profileLoading || employeeLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!employee && !isEmployerPreview) {
     return (
