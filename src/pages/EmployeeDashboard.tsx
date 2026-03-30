@@ -31,6 +31,9 @@ export default function EmployeeDashboard() {
   const { data: profile } = useProfile();
   const { data: employee } = useCurrentEmployee();
 
+  const isEmployerPreview = profile?.role === 'employer' && !employee;
+  const employerId = employee?.employer_id ?? profile?.employer_id;
+
   const [calendarView, setCalendarView] = useState<'weekly' | 'monthly'>('weekly');
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
@@ -41,10 +44,12 @@ export default function EmployeeDashboard() {
   
 
   const employeeId = employee?.id;
-  const employerId = employee?.employer_id ?? profile?.employer_id;
 
   const weekDays = getWeekDays(currentWeek);
   const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
+  const { data: employerWorkplaces = [] } = useEmployerWorkplacesList(isEmployerPreview ? employerId ?? undefined : undefined);
+
+  const workplaces = isEmployerPreview ? employerWorkplaces : employeeWorkplaces;
 
   useEffect(() => {
     if (!selectedWorkplaceId && employeeWorkplaces.length > 0) {
