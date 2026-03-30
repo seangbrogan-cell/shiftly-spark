@@ -220,3 +220,21 @@ export function useEmployeeWorkplacesList(employeeId: string | undefined, employ
     enabled: !!employeeId,
   });
 }
+
+// Fetch all workplaces for an employer (used when employer has no employee record)
+export function useEmployerWorkplacesList(employerId: string | undefined) {
+  return useQuery({
+    queryKey: ['employer-workplaces-list', employerId],
+    queryFn: async () => {
+      if (!employerId) return [];
+      const { data, error } = await supabase
+        .from('workplaces')
+        .select('id, name')
+        .eq('employer_id', employerId)
+        .order('created_at');
+      if (error) throw error;
+      return (data ?? []).map((w) => ({ id: w.id, name: w.name }));
+    },
+    enabled: !!employerId,
+  });
+}
