@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import type { Employee } from '@/hooks/use-dashboard-data';
+import { useUpdateEmployee } from '@/hooks/use-dashboard-data';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { buildRoleSortPriority } from '@/lib/roles';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Pencil, Trash2, Send, Check, Clock, RefreshCw, Mail } from 'lucide-react';
+import { Pencil, Trash2, Send, Check, Clock, RefreshCw, Mail, UserCheck, X } from 'lucide-react';
 
 interface EmployeeTableProps {
   employees: Employee[];
@@ -176,22 +177,39 @@ function EmployeeRows({ employees, shiftCounts, onEdit, onDelete, onEmail }: Emp
 export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDelete, onEmail }: EmployeeTableProps) {
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
+  const updateEmployee = useUpdateEmployee();
+  const { toast } = useToast();
 
-  const { management, staff } = useMemo(() => {
+  const { management, staff, pending } = useMemo(() => {
     const mgmt: Employee[] = [];
     const stf: Employee[] = [];
+    const pnd: Employee[] = [];
     employees.forEach((e) => {
-      if (e.role === 'Staff') stf.push(e);
-      else mgmt.push(e);
+      if ((e as any).status === 'pending') {
+        pnd.push(e);
+      } else if (e.role === 'Staff') {
+        stf.push(e);
+      } else {
+        mgmt.push(e);
+      }
     });
-    // Sort management by role priority then name
     mgmt.sort((a, b) => {
       const p = roleSortPriority(a.role) - roleSortPriority(b.role);
       return p !== 0 ? p : a.name.localeCompare(b.name);
     });
     stf.sort((a, b) => a.name.localeCompare(b.name));
-    return { management: mgmt, staff: stf };
+    pnd.sort((a, b) => a.name.localeCompare(b.name));
+    return { management: mgmt, staff: stf, pending: pnd };
   }, [employees, roleSortPriority]);
+
+  const handleApprove = async (emp: Employee) => {
+    try {
+      await updateEmployee.mutateAsync({ id: emp.id, status: 'active' } as any);
+      toast({ title: 'Employee approved', description: `${emp.name} has been added to your team.` });
+    } catch {
+      toast({ title: 'Error', description: 'Failed to approve employee.', variant: 'destructive' });
+    }
+  };
 
   if (employees.length === 0) {
     return (
@@ -216,6 +234,63 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
 
   return (
     <div className="space-y-6">
+      {pending.length > 0 && (
+        <div>
+          <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Pending Approval ({pending.length})
+          </h3>
+          <div className="rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-amber-50/50 dark:bg-amber-950/20 overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-amber-100/50 dark:bg-amber-900/20">
+                  <TableHead className="text-xs md:text-sm px-2 md:px-4">Name</TableHead>
+                  <TableHead className="hidden md:table-cell text-xs">Email</TableHead>
+                  <TableHead className="hidden lg:table-cell">Phone</TableHead>
+                  <TableHead className="text-right text-xs md:text-sm px-1 md:px-4">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pending.map((emp) => (
+                  <TableRow key={emp.id}>
+                    <TableCell className="font-medium whitespace-nowrap text-xs md:text-sm px-2 md:px-4">
+                      {emp.name}
+                      <Badge variant="outline" className="ml-2 text-[10px] border-amber-400 text-amber-600 dark:text-amber-400">
+                        Pending
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-xs hidden md:table-cell">{emp.email}</TableCell>
+                    <TableCell className="hidden lg:table-cell text-muted-foreground">{emp.phone || '—'}</TableCell>
+                    <TableCell className="text-right px-1 md:px-4">
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="h-7 text-xs gap-1"
+                          onClick={() => handleApprove(emp)}
+                          disabled={updateEmployee.isPending}
+                        >
+                          <UserCheck className="h-3.5 w-3.5" />
+                          Approve
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs text-destructive hover:text-destructive"
+                          onClick={() => onDelete(emp)}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                          Reject
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
       {management.length > 0 && (
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Management</h3>
