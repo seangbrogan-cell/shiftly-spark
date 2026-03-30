@@ -1,0 +1,11 @@
+name: Lighthouse CI
+on: [push, pull_request]
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: treosh/lighthouse-ci-action@v9
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
