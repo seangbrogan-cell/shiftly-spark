@@ -115,7 +115,7 @@ export default function EmployeeDashboard() {
     [monthlyAssignmentsRaw, timeOffDates]
   );
 
-  if (!employee) {
+  if (!employee && !isEmployerPreview) {
     return (
       <div className="min-h-screen bg-background">
         <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} isAdmin={profile?.role === 'employer'} />
@@ -128,6 +128,11 @@ export default function EmployeeDashboard() {
       </div>
     );
   }
+
+  // For employer preview, force full-schedule tab and default active tab
+  const effectiveActiveTab = isEmployerPreview ? (activeTab === 'time-off' ? 'full-schedule' : activeTab) : activeTab;
+  // Employer preview always shows full schedule
+  const showFullSchedule = isEmployerPreview || (workplaceSettings?.full_schedule_visible ?? false);
 
   return (
     <div className="min-h-screen bg-background">
