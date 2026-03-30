@@ -306,19 +306,20 @@ export default function EmployeeDashboard() {
 
           {/* Time Off Tab – hidden for employer preview */}
           {!isEmployerPreview && (
-          <TabsContent value="time-off">
-            <div className="flex justify-end mb-4">
-              <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
-              </Button>
-            </div>
-            <TimeOffHistory
-              requests={timeOffRequests}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              isLoading={loadingRequests}
-            />
-          </TabsContent>
+            <TabsContent value="time-off">
+              <div className="flex justify-end mb-4">
+                <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
+                </Button>
+              </div>
+              <TimeOffHistory
+                requests={timeOffRequests}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                isLoading={loadingRequests}
+              />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
