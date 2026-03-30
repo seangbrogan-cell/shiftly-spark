@@ -42,7 +42,7 @@ export function WorkplaceSelector({ workplaces, selectedId, onSelect, employerId
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={selectedId} onValueChange={onSelect}>
+      <Select value={selectedId ?? ''} onValueChange={onSelect}>
         <SelectTrigger className="h-8 w-[200px] text-sm">
           <SelectValue placeholder="Select workplace" />
         </SelectTrigger>
