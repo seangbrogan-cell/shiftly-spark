@@ -146,7 +146,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} userId={user?.id} />
+      <DashboardHeader email={user?.email} displayName={profile?.display_name} avatarUrl={(profile as any)?.avatar_url} onSignOut={signOut} userId={user?.id} profile={profile} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
