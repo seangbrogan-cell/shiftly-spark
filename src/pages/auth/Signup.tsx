@@ -31,7 +31,7 @@ export default function Signup() {
     }
     setLoading(true);
 
-    const metadata: Record<string, string> = { account_type: accountType! };
+    const metadata: Record<string, string> = { account_type: accountType!, display_name: fullName.trim() };
     if (accountType === 'employee') {
       metadata.company_name = companyName.trim();
     }
