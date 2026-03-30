@@ -52,22 +52,22 @@ export default function EmployeeDashboard() {
   const workplaces = isEmployerPreview ? employerWorkplaces : employeeWorkplaces;
 
   useEffect(() => {
-    if (!selectedWorkplaceId && employeeWorkplaces.length > 0) {
-      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+    if (!selectedWorkplaceId && workplaces.length > 0) {
+      setSelectedWorkplaceId(workplaces[0].id);
       return;
     }
 
     if (
       selectedWorkplaceId &&
-      employeeWorkplaces.length > 0 &&
-      !employeeWorkplaces.some((wp) => wp.id === selectedWorkplaceId)
+      workplaces.length > 0 &&
+      !workplaces.some((wp) => wp.id === selectedWorkplaceId)
     ) {
-      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+      setSelectedWorkplaceId(workplaces[0].id);
     }
-  }, [employeeWorkplaces, selectedWorkplaceId]);
+  }, [workplaces, selectedWorkplaceId]);
 
   // Always lock schedule view to a single selected workplace (no combined/all view)
-  const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
+  const activeWorkplaceId = selectedWorkplaceId ?? workplaces[0]?.id;
   const scheduleEmployeeId = activeWorkplaceId ? employeeId : undefined;
 
   // Check if the active workplace has full_schedule_visible enabled
