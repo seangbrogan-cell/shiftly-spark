@@ -23,7 +23,7 @@ interface EmployerProfileModalProps {
   } | null;
 }
 
-export function EmployerProfileModal({ open, onOpenChange, profile }: EmployerProfileModalProps) {
+export function EmployerProfileModal({ open, onOpenChange, email, profile }: EmployerProfileModalProps) {
   const qc = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
