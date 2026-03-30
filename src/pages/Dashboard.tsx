@@ -334,6 +334,14 @@ export default function Dashboard() {
         preselected={emailPreselected}
         senderName={profile?.display_name || undefined}
       />
+      {employerId && (
+        <CsvUploadModal
+          open={csvModalOpen}
+          onOpenChange={setCsvModalOpen}
+          employerId={employerId}
+          existingEmails={employees.map(e => e.email)}
+        />
+      )}
     </div>
   );
 }
