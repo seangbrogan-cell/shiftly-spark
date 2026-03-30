@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle, BarChart3 } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle, BarChart3, Upload } from 'lucide-react';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -22,6 +22,7 @@ import { PublishPanel } from '@/components/publish/PublishPanel';
 import { WorkplaceSelector } from '@/components/dashboard/WorkplaceSelector';
 import { WorkplaceManager } from '@/components/dashboard/WorkplaceManager';
 import { EmailEmployeesModal } from '@/components/dashboard/EmailEmployeesModal';
+import { CsvUploadModal } from '@/components/dashboard/CsvUploadModal';
 import { TimeOffRequestsManager } from '@/components/dashboard/TimeOffRequestsManager';
 import { startOfWeek } from 'date-fns';
 
@@ -110,6 +111,7 @@ export default function Dashboard() {
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [emailPreselected, setEmailPreselected] = useState<Employee[]>([]);
+  const [csvModalOpen, setCsvModalOpen] = useState(false);
   const sidebarPortalRef = useRef<HTMLDivElement>(null);
 
   const handleEdit = (emp: Employee) => {
@@ -228,6 +230,9 @@ export default function Dashboard() {
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
                 <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setCsvModalOpen(true)} disabled={!employerId}>
+                    <Upload className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">CSV Import</span><span className="sm:hidden">CSV</span>
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
                     <Mail className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">Email All</span><span className="sm:hidden">Email</span>
                   </Button>
@@ -329,6 +334,14 @@ export default function Dashboard() {
         preselected={emailPreselected}
         senderName={profile?.display_name || undefined}
       />
+      {employerId && (
+        <CsvUploadModal
+          open={csvModalOpen}
+          onOpenChange={setCsvModalOpen}
+          employerId={employerId}
+          existingEmails={employees.map(e => e.email)}
+        />
+      )}
     </div>
   );
 }
