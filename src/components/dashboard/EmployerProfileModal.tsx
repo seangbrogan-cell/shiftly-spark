@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 interface EmployerProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  email?: string;
   profile: {
     user_id: string;
     display_name: string | null;
