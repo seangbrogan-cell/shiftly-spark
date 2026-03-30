@@ -28,8 +28,8 @@ import { getWeekDays } from '@/hooks/use-calendar-data';
 
 export default function EmployeeDashboard() {
   const { user, signOut } = useAuth();
-  const { data: profile } = useProfile();
-  const { data: employee } = useCurrentEmployee();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: employee, isLoading: employeeLoading } = useCurrentEmployee();
 
   const isEmployerPreview = profile?.role === 'employer' && !employee;
   const employerId = employee?.employer_id ?? profile?.employer_id;
