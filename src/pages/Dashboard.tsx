@@ -143,7 +143,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader email={user?.email} onSignOut={signOut} userId={user?.id} />
+      <DashboardHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} userId={user?.id} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
@@ -346,7 +346,7 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, onSignOut, userId }: { email?: string; onSignOut: () => void; userId?: string }) {
+function DashboardHeader({ email, displayName, onSignOut, userId }: { email?: string; displayName?: string | null; onSignOut: () => void; userId?: string }) {
   return (
     <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
       <div className="flex h-16 items-center justify-between px-6">
@@ -355,7 +355,7 @@ function DashboardHeader({ email, onSignOut, userId }: { email?: string; onSignO
           <span className="text-xl font-bold text-foreground">WorkSchedule</span>
         </div>
         <div className="flex items-center gap-4">
-          <span className="hidden sm:block text-sm text-muted-foreground">{email}</span>
+          <span className="hidden sm:block text-sm text-muted-foreground">{displayName || email}</span>
           {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
             <Button variant="outline" size="sm" asChild>
               <Link to="/admin/analytics">
