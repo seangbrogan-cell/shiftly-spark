@@ -66,7 +66,7 @@ export function useProfile() {
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
-      const { data, error } = await supabase.from('profiles').select('*, employers(*)').eq('user_id', user.id).maybeSingle();
+      const { data, error } = await supabase.from('profiles').select('*, employers(name)').eq('user_id', user.id).maybeSingle();
       if (error) throw error;
       return data;
     },
