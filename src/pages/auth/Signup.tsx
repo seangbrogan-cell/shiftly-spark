@@ -14,6 +14,7 @@ export default function Signup() {
   const [step, setStep] = useState<'role' | 'form'>('role');
   const [accountType, setAccountType] = useState<'employer' | 'employee' | null>(null);
   const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,7 +31,7 @@ export default function Signup() {
     }
     setLoading(true);
 
-    const metadata: Record<string, string> = { account_type: accountType! };
+    const metadata: Record<string, string> = { account_type: accountType!, display_name: fullName.trim() };
     if (accountType === 'employee') {
       metadata.company_name = companyName.trim();
     }
@@ -162,6 +163,18 @@ export default function Signup() {
                     </p>
                   </div>
                 )}
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    maxLength={100}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
