@@ -230,6 +230,9 @@ export default function Dashboard() {
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
                 <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setCsvModalOpen(true)} disabled={!employerId}>
+                    <Upload className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">CSV Import</span><span className="sm:hidden">CSV</span>
+                  </Button>
                   <Button variant="outline" size="sm" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
                     <Mail className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">Email All</span><span className="sm:hidden">Email</span>
                   </Button>
