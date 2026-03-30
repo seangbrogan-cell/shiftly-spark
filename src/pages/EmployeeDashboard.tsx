@@ -195,7 +195,7 @@ export default function EmployeeDashboard() {
                 </select>
 
                 {/* View toggle – only for My Schedule */}
-                {activeTab === 'schedule' && (
+                {activeTab === 'schedule' && !isEmployerPreview && (
                   <div className="flex rounded-md border border-border overflow-hidden">
                     <button
                       onClick={() => setCalendarView('weekly')}
