@@ -8,7 +8,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle, BarChart3, Upload } from 'lucide-react';
+import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, CalendarOff, Bell, UserCircle, BarChart3, Upload, ChevronDown, User, Settings } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { EmployerProfileModal } from '@/components/dashboard/EmployerProfileModal';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -143,7 +146,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DashboardHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} userId={user?.id} />
+      <DashboardHeader email={user?.email} displayName={profile?.display_name} avatarUrl={(profile as any)?.avatar_url} onSignOut={signOut} userId={user?.id} profile={profile} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
         <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
@@ -346,35 +349,82 @@ export default function Dashboard() {
   );
 }
 
-function DashboardHeader({ email, displayName, onSignOut, userId }: { email?: string; displayName?: string | null; onSignOut: () => void; userId?: string }) {
+function DashboardHeader({ email, displayName, avatarUrl, onSignOut, userId, profile }: { 
+  email?: string; displayName?: string | null; avatarUrl?: string | null; onSignOut: () => void; userId?: string; profile?: any;
+}) {
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const initials = (displayName || email || 'U')
+    .split(' ')
+    .map(w => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
-      <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <Clock className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold text-foreground">WorkSchedule</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:block text-sm text-muted-foreground">{displayName || email}</span>
-          {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
+    <>
+      <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
+        <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <Clock className="h-7 w-7 text-primary" />
+            <span className="text-xl font-bold text-foreground">WorkSchedule</span>
+          </div>
+          <div className="flex items-center gap-4">
+            {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/admin/analytics">
+                  <BarChart3 className="h-4 w-4" />
+                  <span className="hidden sm:inline">Analytics</span>
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" asChild>
-              <Link to="/admin/analytics">
-                <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Analytics</span>
+              <Link to="/employee">
+                <UserCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Employee View</span>
               </Link>
             </Button>
-          )}
-          <Button variant="outline" size="sm" asChild>
-            <Link to="/employee">
-              <UserCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Employee View</span>
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onSignOut}>
-            <LogOut className="h-4 w-4" />
-          </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2 px-2">
+                  <Avatar className="h-7 w-7">
+                    {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName || ''} /> : null}
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:block text-sm max-w-[150px] truncate">{displayName || email}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium truncate">{displayName || 'User'}</p>
+                  <p className="text-xs text-muted-foreground truncate">{email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setProfileOpen(true)}>
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onSignOut} className="text-destructive focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      <EmployerProfileModal
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
+        email={email}
+        profile={profile}
+      />
+    </>
   );
 }
