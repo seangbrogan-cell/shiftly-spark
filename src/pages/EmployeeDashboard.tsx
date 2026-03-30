@@ -298,13 +298,14 @@ export default function EmployeeDashboard() {
           )}
 
           {/* Full Schedule Tab */}
-          {fullScheduleAllowed && activeWorkplaceId && (
+          {showFullSchedule && activeWorkplaceId && (
             <TabsContent value="full-schedule">
               <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} employerId={employerId} />
             </TabsContent>
           )}
 
-          {/* Time Off Tab */}
+          {/* Time Off Tab – hidden for employer preview */}
+          {!isEmployerPreview && (
           <TabsContent value="time-off">
             <div className="flex justify-end mb-4">
               <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
