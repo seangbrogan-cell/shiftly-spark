@@ -274,26 +274,28 @@ export default function EmployeeDashboard() {
             </div>
           )}
 
-          {/* Schedule Tab */}
-          <TabsContent value="schedule">
-            {calendarView === 'weekly' ? (
-              loadingWeek ? (
-                <div className="flex justify-center py-16">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                </div>
+          {/* Schedule Tab – hidden for employer preview */}
+          {!isEmployerPreview && (
+            <TabsContent value="schedule">
+              {calendarView === 'weekly' ? (
+                loadingWeek ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  </div>
+                ) : (
+                  <EmployeeWeeklyView assignments={weeklyAssignments} weekStart={currentWeek} />
+                )
               ) : (
-                <EmployeeWeeklyView assignments={weeklyAssignments} weekStart={currentWeek} />
-              )
-            ) : (
-              loadingMonth ? (
-                <div className="flex justify-center py-16">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                </div>
-              ) : (
-                <EmployeeMonthlyView assignments={monthlyAssignments} monthDate={currentMonth} />
-              )
-            )}
-          </TabsContent>
+                loadingMonth ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  </div>
+                ) : (
+                  <EmployeeMonthlyView assignments={monthlyAssignments} monthDate={currentMonth} />
+                )
+              )}
+            </TabsContent>
+          )}
 
           {/* Full Schedule Tab */}
           {fullScheduleAllowed && activeWorkplaceId && (
