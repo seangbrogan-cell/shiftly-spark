@@ -191,6 +191,20 @@ export default function Signup() {
                   />
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+44 7700 900000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="pl-10"
+                      maxLength={20}
+                    />
+                  </div>
+                </div>
                   <Label htmlFor="password">Password</Label>
                   <Input
                     id="password"
