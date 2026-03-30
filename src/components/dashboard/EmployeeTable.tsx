@@ -320,9 +320,6 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
     </div>
   );
 }
-    const mgmt: Employee[] = [];
-    const stf: Employee[] = [];
-    employees.forEach((e) => {
       if (e.role === 'Staff') stf.push(e);
       else mgmt.push(e);
     });
