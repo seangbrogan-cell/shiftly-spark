@@ -182,13 +182,13 @@ export default function EmployeeDashboard() {
                   id="employee-workplace"
                   value={activeWorkplaceId ?? ''}
                   onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
-                  disabled={employeeWorkplaces.length === 0}
+                  disabled={workplaces.length === 0}
                   className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none max-w-[140px] sm:max-w-none"
                 >
-                  {employeeWorkplaces.length === 0 ? (
+                  {workplaces.length === 0 ? (
                     <option value="">No workplaces</option>
                   ) : (
-                    employeeWorkplaces.map((wp) => (
+                    workplaces.map((wp) => (
                       <option key={wp.id} value={wp.id}>{wp.name}</option>
                     ))
                   )}
