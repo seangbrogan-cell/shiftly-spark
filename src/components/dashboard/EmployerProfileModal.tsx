@@ -181,7 +181,7 @@ export function EmployerProfileModal({ open, onOpenChange, email, profile }: Emp
               <Label htmlFor="profile-email">Email</Label>
               <Input
                 id="profile-email"
-                value={profile?.user_id ? '' : ''}
+                value={email ?? ''}
                 disabled
                 className="bg-muted"
                 placeholder="Loading..."
