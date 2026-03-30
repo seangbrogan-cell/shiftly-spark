@@ -320,7 +320,6 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
     </div>
   );
 }
-      if (e.role === 'Staff') stf.push(e);
       else mgmt.push(e);
     });
     // Sort management by role priority then name
