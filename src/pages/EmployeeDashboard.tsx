@@ -13,6 +13,7 @@ import {
   useScheduleLastUpdated,
   useEmployeeWorkplacesList,
   useEmployeeApprovedTimeOff,
+  useEmployerWorkplacesList,
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,6 +31,9 @@ export default function EmployeeDashboard() {
   const { data: profile } = useProfile();
   const { data: employee } = useCurrentEmployee();
 
+  const isEmployerPreview = profile?.role === 'employer' && !employee;
+  const employerId = employee?.employer_id ?? profile?.employer_id;
+
   const [calendarView, setCalendarView] = useState<'weekly' | 'monthly'>('weekly');
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
@@ -40,28 +44,30 @@ export default function EmployeeDashboard() {
   
 
   const employeeId = employee?.id;
-  const employerId = employee?.employer_id ?? profile?.employer_id;
 
   const weekDays = getWeekDays(currentWeek);
   const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
+  const { data: employerWorkplaces = [] } = useEmployerWorkplacesList(isEmployerPreview ? employerId ?? undefined : undefined);
+
+  const workplaces = isEmployerPreview ? employerWorkplaces : employeeWorkplaces;
 
   useEffect(() => {
-    if (!selectedWorkplaceId && employeeWorkplaces.length > 0) {
-      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+    if (!selectedWorkplaceId && workplaces.length > 0) {
+      setSelectedWorkplaceId(workplaces[0].id);
       return;
     }
 
     if (
       selectedWorkplaceId &&
-      employeeWorkplaces.length > 0 &&
-      !employeeWorkplaces.some((wp) => wp.id === selectedWorkplaceId)
+      workplaces.length > 0 &&
+      !workplaces.some((wp) => wp.id === selectedWorkplaceId)
     ) {
-      setSelectedWorkplaceId(employeeWorkplaces[0].id);
+      setSelectedWorkplaceId(workplaces[0].id);
     }
-  }, [employeeWorkplaces, selectedWorkplaceId]);
+  }, [workplaces, selectedWorkplaceId]);
 
   // Always lock schedule view to a single selected workplace (no combined/all view)
-  const activeWorkplaceId = selectedWorkplaceId ?? employeeWorkplaces[0]?.id;
+  const activeWorkplaceId = selectedWorkplaceId ?? workplaces[0]?.id;
   const scheduleEmployeeId = activeWorkplaceId ? employeeId : undefined;
 
   // Check if the active workplace has full_schedule_visible enabled
@@ -109,7 +115,7 @@ export default function EmployeeDashboard() {
     [monthlyAssignmentsRaw, timeOffDates]
   );
 
-  if (!employee) {
+  if (!employee && !isEmployerPreview) {
     return (
       <div className="min-h-screen bg-background">
         <EmployeeHeader email={user?.email} displayName={profile?.display_name} onSignOut={signOut} isAdmin={profile?.role === 'employer'} />
@@ -123,33 +129,48 @@ export default function EmployeeDashboard() {
     );
   }
 
+  // For employer preview, force full-schedule tab and default active tab
+  const effectiveActiveTab = isEmployerPreview ? (activeTab === 'time-off' ? 'full-schedule' : activeTab) : activeTab;
+  // Employer preview always shows full schedule
+  const showFullSchedule = isEmployerPreview || (workplaceSettings?.full_schedule_visible ?? false);
+
   return (
     <div className="min-h-screen bg-background">
-      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
+      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee?.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
-        {employee.status === 'pending' && (
+        {employee?.status === 'pending' && (
           <div className="mb-4 flex items-center gap-2 rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
             <Clock className="h-5 w-5 shrink-0" />
             <span className="font-medium">Your account is pending manager approval. Some features may be limited until you are approved.</span>
           </div>
         )}
-        <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
+        {isEmployerPreview && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border-2 border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 text-sm text-blue-800 dark:text-blue-300">
+            <Users className="h-5 w-5 shrink-0" />
+            <span className="font-medium">Admin Preview — You're viewing the employee portal as an employer. Only the Full Schedule is available.</span>
+          </div>
+        )}
+        <Tabs defaultValue={isEmployerPreview ? 'full-schedule' : 'schedule'} onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           {/* Combined toolbar: tabs + controls on one line */}
           <div className="flex flex-col gap-2 mb-4 print:hidden">
             <div className="overflow-x-auto pb-1 -mb-1">
               <TabsList className="shrink-0">
-                <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <CalendarDays className="h-4 w-4" /> <span className="hidden xs:inline">My</span> Schedule
-                </TabsTrigger>
-                {fullScheduleAllowed && (
+                {!isEmployerPreview && (
+                  <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <CalendarDays className="h-4 w-4" /> <span className="hidden xs:inline">My</span> Schedule
+                  </TabsTrigger>
+                )}
+                {showFullSchedule && (
                   <TabsTrigger value="full-schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <Users className="h-4 w-4" /> <span className="hidden xs:inline">Full Schedule</span><span className="xs:hidden">Full</span>
                   </TabsTrigger>
                 )}
-                <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <History className="h-4 w-4" /> Time Off
-                </TabsTrigger>
+                {!isEmployerPreview && (
+                  <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <History className="h-4 w-4" /> Time Off
+                  </TabsTrigger>
+                )}
               </TabsList>
             </div>
 
@@ -161,20 +182,20 @@ export default function EmployeeDashboard() {
                   id="employee-workplace"
                   value={activeWorkplaceId ?? ''}
                   onChange={(e) => setSelectedWorkplaceId(e.target.value || undefined)}
-                  disabled={employeeWorkplaces.length === 0}
+                  disabled={workplaces.length === 0}
                   className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none max-w-[140px] sm:max-w-none"
                 >
-                  {employeeWorkplaces.length === 0 ? (
+                  {workplaces.length === 0 ? (
                     <option value="">No workplaces</option>
                   ) : (
-                    employeeWorkplaces.map((wp) => (
+                    workplaces.map((wp) => (
                       <option key={wp.id} value={wp.id}>{wp.name}</option>
                     ))
                   )}
                 </select>
 
                 {/* View toggle – only for My Schedule */}
-                {activeTab === 'schedule' && (
+                {activeTab === 'schedule' && !isEmployerPreview && (
                   <div className="flex rounded-md border border-border overflow-hidden">
                     <button
                       onClick={() => setCalendarView('weekly')}
@@ -240,7 +261,7 @@ export default function EmployeeDashboard() {
             <div className="flex flex-col sm:flex-row sm:items-baseline gap-0 sm:gap-3 mb-4">
               <h1 className="text-xl font-bold text-foreground">
                 {(() => {
-                  const wpName = employeeWorkplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
+                  const wpName = workplaces.find(wp => wp.id === activeWorkplaceId)?.name ?? 'My';
                   return activeTab === 'full-schedule' ? `${wpName} Full Schedule` : `${wpName} Schedule`;
                 })()}
               </h1>
@@ -253,48 +274,52 @@ export default function EmployeeDashboard() {
             </div>
           )}
 
-          {/* Schedule Tab */}
-          <TabsContent value="schedule">
-            {calendarView === 'weekly' ? (
-              loadingWeek ? (
-                <div className="flex justify-center py-16">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                </div>
+          {/* Schedule Tab – hidden for employer preview */}
+          {!isEmployerPreview && (
+            <TabsContent value="schedule">
+              {calendarView === 'weekly' ? (
+                loadingWeek ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  </div>
+                ) : (
+                  <EmployeeWeeklyView assignments={weeklyAssignments} weekStart={currentWeek} />
+                )
               ) : (
-                <EmployeeWeeklyView assignments={weeklyAssignments} weekStart={currentWeek} />
-              )
-            ) : (
-              loadingMonth ? (
-                <div className="flex justify-center py-16">
-                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-                </div>
-              ) : (
-                <EmployeeMonthlyView assignments={monthlyAssignments} monthDate={currentMonth} />
-              )
-            )}
-          </TabsContent>
+                loadingMonth ? (
+                  <div className="flex justify-center py-16">
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  </div>
+                ) : (
+                  <EmployeeMonthlyView assignments={monthlyAssignments} monthDate={currentMonth} />
+                )
+              )}
+            </TabsContent>
+          )}
 
           {/* Full Schedule Tab */}
-          {fullScheduleAllowed && activeWorkplaceId && (
+          {showFullSchedule && activeWorkplaceId && (
             <TabsContent value="full-schedule">
               <FullScheduleView workplaceId={activeWorkplaceId} weekStart={currentWeek} employerId={employerId} />
             </TabsContent>
           )}
 
-          {/* Time Off Tab */}
-          <TabsContent value="time-off">
-            <div className="flex justify-end mb-4">
-              <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
-                <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
-              </Button>
-            </div>
-            <TimeOffHistory
-              requests={timeOffRequests}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              isLoading={loadingRequests}
-            />
-          </TabsContent>
+          {/* Time Off Tab – hidden for employer preview */}
+          {!isEmployerPreview && (
+            <TabsContent value="time-off">
+              <div className="flex justify-end mb-4">
+                <Button size="sm" onClick={() => setTimeOffModalOpen(true)}>
+                  <Plus className="h-4 w-4 mr-1.5" /> Request Time Off
+                </Button>
+              </div>
+              <TimeOffHistory
+                requests={timeOffRequests}
+                statusFilter={statusFilter}
+                onStatusFilterChange={setStatusFilter}
+                isLoading={loadingRequests}
+              />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
 
