@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Users } from 'lucide-react';
+import { Building2, Users, Phone } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,9 @@ export default function Signup() {
     setLoading(true);
 
     const metadata: Record<string, string> = { account_type: accountType!, display_name: fullName.trim() };
+    if (phone.trim()) {
+      metadata.phone = phone.trim();
+    }
     if (accountType === 'employee') {
       metadata.company_name = companyName.trim();
     }
@@ -185,6 +189,21 @@ export default function Signup() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+44 7700 900000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="pl-10"
+                      maxLength={20}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
