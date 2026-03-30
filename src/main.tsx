@@ -4,7 +4,6 @@ Sentry.init({
   dsn: "https://a0dafcb42bb26df1b6c4e294dfca37c3@o4511135694979072.ingest.de.sentry.io/4511135698387024",
   integrations: [
     Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
   ],
   tracesSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
