@@ -136,7 +136,7 @@ export default function EmployeeDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
+      <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee?.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
         {employee.status === 'pending' && (
