@@ -9,7 +9,8 @@ export default function Index() {
   if (loading) return null;
 
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    // Will be routed properly by RoleRouter
+    return <Navigate to="/route" replace />;
   }
 
   return (
