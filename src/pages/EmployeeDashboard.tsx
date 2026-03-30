@@ -128,6 +128,12 @@ export default function EmployeeDashboard() {
       <EmployeeHeader email={user?.email} displayName={profile?.display_name ?? employee.name} onSignOut={signOut} employeeId={employeeId} isAdmin={profile?.role === 'employer'} />
 
       <main className="mx-auto max-w-6xl px-3 sm:px-6 py-4 sm:py-8">
+        {employee.status === 'pending' && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg border-2 border-amber-300 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
+            <Clock className="h-5 w-5 shrink-0" />
+            <span className="font-medium">Your account is pending manager approval. Some features may be limited until you are approved.</span>
+          </div>
+        )}
         <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           {/* Combined toolbar: tabs + controls on one line */}
           <div className="flex flex-col gap-2 mb-4 print:hidden">
