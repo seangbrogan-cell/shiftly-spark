@@ -151,22 +151,26 @@ export default function EmployeeDashboard() {
             <span className="font-medium">Admin Preview — You're viewing the employee portal as an employer. Only the Full Schedule is available.</span>
           </div>
         )}
-        <Tabs defaultValue="schedule" onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
+        <Tabs defaultValue={isEmployerPreview ? 'full-schedule' : 'schedule'} onValueChange={(v) => setActiveTab(v as 'schedule' | 'full-schedule' | 'time-off')}>
           {/* Combined toolbar: tabs + controls on one line */}
           <div className="flex flex-col gap-2 mb-4 print:hidden">
             <div className="overflow-x-auto pb-1 -mb-1">
               <TabsList className="shrink-0">
-                <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <CalendarDays className="h-4 w-4" /> <span className="hidden xs:inline">My</span> Schedule
-                </TabsTrigger>
-                {fullScheduleAllowed && (
+                {!isEmployerPreview && (
+                  <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <CalendarDays className="h-4 w-4" /> <span className="hidden xs:inline">My</span> Schedule
+                  </TabsTrigger>
+                )}
+                {showFullSchedule && (
                   <TabsTrigger value="full-schedule" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                     <Users className="h-4 w-4" /> <span className="hidden xs:inline">Full Schedule</span><span className="xs:hidden">Full</span>
                   </TabsTrigger>
                 )}
-                <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <History className="h-4 w-4" /> Time Off
-                </TabsTrigger>
+                {!isEmployerPreview && (
+                  <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <History className="h-4 w-4" /> Time Off
+                  </TabsTrigger>
+                )}
               </TabsList>
             </div>
 
