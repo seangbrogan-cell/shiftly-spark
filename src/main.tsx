@@ -1,5 +1,3 @@
-
-
 import * as Sentry from "@sentry/react";
 import { BrowserTracing } from "@sentry/tracing";
 
@@ -14,6 +12,7 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   environment: "production",
 });
+
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
