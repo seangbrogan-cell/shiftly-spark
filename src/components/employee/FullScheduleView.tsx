@@ -179,44 +179,56 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             const dateStr = format(day, 'yyyy-MM-dd');
             const cellId = `${empId}:${dateStr}`;
             const dayShifts = assignmentMap[cellId] ?? [];
+            const timeOffReason = timeOffMap.get(cellId);
+            const isOnLeave = !!timeOffReason;
             return (
               <div
                 key={dateStr}
                 className={cn(
                   'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 min-w-0 overflow-hidden',
-                  isToday(day) && 'bg-primary-light/10'
+                  isToday(day) && 'bg-primary-light/10',
+                  isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20'
                 )}
               >
-                {dayShifts.map((s) => {
-                  const colorDef = getShiftColor({
-                    color: s.shifts?.color ?? null,
-                    is_all_day: s.shifts?.is_all_day ?? false,
-                    start_time: s.shifts?.start_time ?? null,
-                  });
-                  return (
-                    <div
-                      key={s.id}
-                      className={cn(
-                        'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
-                        colorDef.bg,
-                        colorDef.border
-                      )}
-                    >
-                      <div className="flex items-center gap-1">
-                        <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
-                          {s.actual_start && s.actual_end ? (
-                            <div className="font-bold lg:whitespace-nowrap">
-                              <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                              <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                            </div>
-                          ) : (
-                            <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
-                          )}
+                {isOnLeave ? (
+                  <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-1">
+                    <Palmtree className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
+                    <span className="text-[8px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400 text-center leading-tight truncate max-w-full px-0.5">
+                      {timeOffReason}
+                    </span>
+                  </div>
+                ) : (
+                  dayShifts.map((s) => {
+                    const colorDef = getShiftColor({
+                      color: s.shifts?.color ?? null,
+                      is_all_day: s.shifts?.is_all_day ?? false,
+                      start_time: s.shifts?.start_time ?? null,
+                    });
+                    return (
+                      <div
+                        key={s.id}
+                        className={cn(
+                          'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
+                          colorDef.bg,
+                          colorDef.border
+                        )}
+                      >
+                        <div className="flex items-center gap-1">
+                          <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                            {s.actual_start && s.actual_end ? (
+                              <div className="font-bold lg:whitespace-nowrap">
+                                <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                                <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                              </div>
+                            ) : (
+                              <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             );
           })}
