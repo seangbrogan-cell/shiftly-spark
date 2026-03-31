@@ -67,7 +67,8 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Token is required' }, 400)
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  // deno-lint-ignore no-explicit-any
+  const supabase: any = createClient(supabaseUrl, supabaseServiceKey)
 
   // Look up the token
   const { data: tokenRecord, error: lookupError } = await supabase
