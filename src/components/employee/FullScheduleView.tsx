@@ -49,7 +49,41 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
     enabled: !!workplaceId,
   });
 
-  // Group by employee
+  // Fetch approved time-off requests for all employees in this date range
+  const { data: timeOffRequests = [] } = useQuery({
+    queryKey: ['full-schedule-time-off', workplaceId, start],
+    queryFn: async () => {
+      if (!employerId) return [];
+      const { data, error } = await supabase
+        .from('time_off_requests')
+        .select('employee_id, start_date, end_date, reason')
+        .eq('employer_id', employerId)
+        .eq('status', 'approved')
+        .lte('start_date', end)
+        .gte('end_date', start);
+      if (error) throw error;
+      return data as { employee_id: string; start_date: string; end_date: string; reason: string }[];
+    },
+    enabled: !!employerId,
+  });
+
+  // Build a set of empId:date keys that are on approved time-off
+  const timeOffMap = useMemo(() => {
+    const map = new Map<string, string>(); // key -> reason
+    timeOffRequests.forEach((req) => {
+      const s = parseISO(req.start_date);
+      const e = parseISO(req.end_date);
+      // iterate each day in the week range that falls within this request
+      weekDays.forEach((day) => {
+        if (isWithinInterval(day, { start: s, end: e })) {
+          map.set(`${req.employee_id}:${format(day, 'yyyy-MM-dd')}`, req.reason);
+        }
+      });
+    });
+    return map;
+  }, [timeOffRequests, weekDays]);
+
+  // Group by employee — include employees with time-off even if they have no assignments
   const employees = useMemo(() => {
     const employeeMap = new Map<string, { name: string; role: string; assignments: FullAssignment[] }>();
     assignments.forEach((a) => {
