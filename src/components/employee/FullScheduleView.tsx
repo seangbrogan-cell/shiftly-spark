@@ -51,18 +51,18 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
 
   // Fetch approved time-off requests for all employees in this date range
   const { data: timeOffRequests = [] } = useQuery({
-    queryKey: ['full-schedule-time-off', workplaceId, start],
+    queryKey: ['full-schedule-time-off', employerId, start],
     queryFn: async () => {
       if (!employerId) return [];
       const { data, error } = await supabase
         .from('time_off_requests')
-        .select('employee_id, start_date, end_date, reason')
+        .select('employee_id, start_date, end_date, reason, employees!time_off_requests_employee_id_fkey(name, role)')
         .eq('employer_id', employerId)
         .eq('status', 'approved')
         .lte('start_date', end)
         .gte('end_date', start);
       if (error) throw error;
-      return data as { employee_id: string; start_date: string; end_date: string; reason: string }[];
+      return data as unknown as { employee_id: string; start_date: string; end_date: string; reason: string; employees: { name: string; role: string } | null }[];
     },
     enabled: !!employerId,
   });
@@ -94,12 +94,22 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
+    // Also add employees who only appear via time-off
+    timeOffRequests.forEach((req) => {
+      if (!employeeMap.has(req.employee_id)) {
+        employeeMap.set(req.employee_id, {
+          name: req.employees?.name ?? 'Unknown',
+          role: req.employees?.role ?? '',
+          assignments: [],
+        });
+      }
+    });
     return Array.from(employeeMap.entries()).sort((a, b) => {
       const priorityDiff = roleSortPriority(a[1].role) - roleSortPriority(b[1].role);
       if (priorityDiff !== 0) return priorityDiff;
       return a[1].name.localeCompare(b[1].name);
     });
-  }, [assignments]);
+  }, [assignments, timeOffRequests]);
 
   // Build assignment map: empId:date -> assignments[]
   const assignmentMap = useMemo(() => {
