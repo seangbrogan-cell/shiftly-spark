@@ -183,7 +183,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
     return format(d, 'h:mma').toLowerCase();
   };
 
-  if (isLoading) {
+  if (isLoading || loadingEmployees) {
     return (
       <div className="flex justify-center py-16">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -192,7 +192,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
   }
 
   if (employees.length === 0) {
-    return <p className="text-center text-muted-foreground py-8">No shifts scheduled this week.</p>;
+    return <p className="text-center text-muted-foreground py-8">No employees assigned to this workplace.</p>;
   }
 
   return (
