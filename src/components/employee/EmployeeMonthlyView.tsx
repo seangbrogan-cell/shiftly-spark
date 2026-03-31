@@ -29,7 +29,7 @@ const formatHours = (h: number) => {
   return h % 1 === 0 ? `${h}h` : `${h.toFixed(1)}h`;
 };
 
-export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyViewProps) {
+export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: EmployeeMonthlyViewProps) {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const monthStart = startOfMonth(monthDate);
