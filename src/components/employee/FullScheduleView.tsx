@@ -33,6 +33,26 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleSortPriority = useMemo(() => buildRoleSortPriority(dbRoles), [dbRoles]);
 
+  // Fetch all employees linked to this workplace
+  const { data: workplaceEmployees = [], isLoading: loadingEmployees } = useQuery({
+    queryKey: ['full-schedule-employees', workplaceId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('employee_workplaces')
+        .select('employee_id, employees(name, role, status)')
+        .eq('workplace_id', workplaceId);
+      if (error) throw error;
+      return (data ?? [])
+        .filter((r: any) => r.employees && r.employees.status === 'active')
+        .map((r: any) => ({
+          employee_id: r.employee_id as string,
+          name: r.employees.name as string,
+          role: r.employees.role as string,
+        }));
+    },
+    enabled: !!workplaceId,
+  });
+
   const { data: assignments = [], isLoading } = useQuery({
     queryKey: ['full-schedule', workplaceId, start],
     queryFn: async () => {
@@ -67,13 +87,36 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
     enabled: !!employerId,
   });
 
+  // Fetch employee availability restrictions
+  const { data: availabilityData = [] } = useQuery({
+    queryKey: ['full-schedule-availability', employerId],
+    queryFn: async () => {
+      if (!employerId) return [];
+      const { data, error } = await supabase
+        .from('employee_availability')
+        .select('employee_id, day_of_week, start_time, end_time');
+      if (error) throw error;
+      return data as { employee_id: string; day_of_week: string; start_time: string; end_time: string }[];
+    },
+    enabled: !!employerId,
+  });
+
+  // Build availability map: empId -> set of restricted day names
+  const availabilityMap = useMemo(() => {
+    const map = new Map<string, Map<string, { start: string; end: string }>>();
+    availabilityData.forEach((a) => {
+      if (!map.has(a.employee_id)) map.set(a.employee_id, new Map());
+      map.get(a.employee_id)!.set(a.day_of_week, { start: a.start_time, end: a.end_time });
+    });
+    return map;
+  }, [availabilityData]);
+
   // Build a set of empId:date keys that are on approved time-off
   const timeOffMap = useMemo(() => {
     const map = new Map<string, string>(); // key -> reason
     timeOffRequests.forEach((req) => {
       const s = parseISO(req.start_date);
       const e = parseISO(req.end_date);
-      // iterate each day in the week range that falls within this request
       weekDays.forEach((day) => {
         if (isWithinInterval(day, { start: s, end: e })) {
           map.set(`${req.employee_id}:${format(day, 'yyyy-MM-dd')}`, req.reason);
@@ -83,9 +126,14 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
     return map;
   }, [timeOffRequests, weekDays]);
 
-  // Group by employee — include employees with time-off even if they have no assignments
+  // Group by employee — start with all workplace employees, then merge in assignment/time-off data
   const employees = useMemo(() => {
     const employeeMap = new Map<string, { name: string; role: string; assignments: FullAssignment[] }>();
+    // Start with all workplace employees
+    workplaceEmployees.forEach((emp) => {
+      employeeMap.set(emp.employee_id, { name: emp.name, role: emp.role, assignments: [] });
+    });
+    // Add assignments
     assignments.forEach((a) => {
       const name = a.employees?.name ?? 'Unknown';
       const role = a.employees?.role ?? '';
@@ -109,7 +157,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       if (priorityDiff !== 0) return priorityDiff;
       return a[1].name.localeCompare(b[1].name);
     });
-  }, [assignments, timeOffRequests]);
+  }, [assignments, timeOffRequests, workplaceEmployees]);
 
   // Build assignment map: empId:date -> assignments[]
   const assignmentMap = useMemo(() => {
@@ -135,7 +183,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
     return format(d, 'h:mma').toLowerCase();
   };
 
-  if (isLoading) {
+  if (isLoading || loadingEmployees) {
     return (
       <div className="flex justify-center py-16">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -144,7 +192,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
   }
 
   if (employees.length === 0) {
-    return <p className="text-center text-muted-foreground py-8">No shifts scheduled this week.</p>;
+    return <p className="text-center text-muted-foreground py-8">No employees assigned to this workplace.</p>;
   }
 
   return (
@@ -191,6 +239,11 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             const dayShifts = assignmentMap[cellId] ?? [];
             const timeOffReason = timeOffMap.get(cellId);
             const isOnLeave = !!timeOffReason;
+            const dayName = format(day, 'EEE'); // Mon, Tue, etc.
+            const empAvailability = availabilityMap.get(empId);
+            const dayAvail = empAvailability?.get(dayName);
+            const hasRestriction = dayAvail && !(dayAvail.start === '00:00:00' && dayAvail.end === '23:59:00');
+
             return (
               <div
                 key={dateStr}
@@ -208,36 +261,45 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                     </span>
                   </div>
                 ) : (
-                  dayShifts.map((s) => {
-                    const colorDef = getShiftColor({
-                      color: s.shifts?.color ?? null,
-                      is_all_day: s.shifts?.is_all_day ?? false,
-                      start_time: s.shifts?.start_time ?? null,
-                    });
-                    return (
-                      <div
-                        key={s.id}
-                        className={cn(
-                          'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
-                          colorDef.bg,
-                          colorDef.border
-                        )}
-                      >
-                        <div className="flex items-center gap-1">
-                          <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
-                            {s.actual_start && s.actual_end ? (
-                              <div className="font-bold lg:whitespace-nowrap">
-                                <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                                <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                              </div>
-                            ) : (
-                              <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
-                            )}
+                  <>
+                    {dayShifts.map((s) => {
+                      const colorDef = getShiftColor({
+                        color: s.shifts?.color ?? null,
+                        is_all_day: s.shifts?.is_all_day ?? false,
+                        start_time: s.shifts?.start_time ?? null,
+                      });
+                      return (
+                        <div
+                          key={s.id}
+                          className={cn(
+                            'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
+                            colorDef.bg,
+                            colorDef.border
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                              {s.actual_start && s.actual_end ? (
+                                <div className="font-bold lg:whitespace-nowrap">
+                                  <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                                  <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                                </div>
+                              ) : (
+                                <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
+                      );
+                    })}
+                    {hasRestriction && dayShifts.length === 0 && (
+                      <div className="flex items-center justify-center flex-1">
+                        <span className="text-[8px] sm:text-[9px] text-muted-foreground/60 text-center leading-tight">
+                          {dayAvail.start.slice(0, 5)}–{dayAvail.end.slice(0, 5)}
+                        </span>
                       </div>
-                    );
-                  })
+                    )}
+                  </>
                 )}
               </div>
             );
