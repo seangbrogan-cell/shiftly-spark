@@ -11,5 +11,5 @@ jobs:
         with:
           urls: |
             https://www.workschedule.uk
-          uploadArtifacts: true
+          uploadArtifacts: false
           temporaryPublicStorage: true
