@@ -51,18 +51,18 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
 
   // Fetch approved time-off requests for all employees in this date range
   const { data: timeOffRequests = [] } = useQuery({
-    queryKey: ['full-schedule-time-off', workplaceId, start],
+    queryKey: ['full-schedule-time-off', employerId, start],
     queryFn: async () => {
       if (!employerId) return [];
       const { data, error } = await supabase
         .from('time_off_requests')
-        .select('employee_id, start_date, end_date, reason')
+        .select('employee_id, start_date, end_date, reason, employees(name, role)')
         .eq('employer_id', employerId)
         .eq('status', 'approved')
         .lte('start_date', end)
         .gte('end_date', start);
       if (error) throw error;
-      return data as { employee_id: string; start_date: string; end_date: string; reason: string }[];
+      return data as { employee_id: string; start_date: string; end_date: string; reason: string; employees: { name: string; role: string } | null }[];
     },
     enabled: !!employerId,
   });
