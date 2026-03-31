@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, startOfWeek, endOfWeek, isToday } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isToday, isWithinInterval, parseISO } from 'date-fns';
+import { Palmtree } from 'lucide-react';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
