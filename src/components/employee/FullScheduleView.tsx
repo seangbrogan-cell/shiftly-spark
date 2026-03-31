@@ -56,13 +56,13 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       if (!employerId) return [];
       const { data, error } = await supabase
         .from('time_off_requests')
-        .select('employee_id, start_date, end_date, reason, employees(name, role)')
+        .select('employee_id, start_date, end_date, reason, employees!time_off_requests_employee_id_fkey(name, role)')
         .eq('employer_id', employerId)
         .eq('status', 'approved')
         .lte('start_date', end)
         .gte('end_date', start);
       if (error) throw error;
-      return data as { employee_id: string; start_date: string; end_date: string; reason: string; employees: { name: string; role: string } | null }[];
+      return data as unknown as { employee_id: string; start_date: string; end_date: string; reason: string; employees: { name: string; role: string } | null }[];
     },
     enabled: !!employerId,
   });
