@@ -6,10 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function Index() {
   const { user, loading } = useAuth();
 
-  if (loading) return null;
-
-  if (user) {
-    // Will be routed properly by RoleRouter
+  // Redirect authenticated users after auth resolves — but never block first paint
+  if (!loading && user) {
     return <Navigate to="/route" replace />;
   }
 
