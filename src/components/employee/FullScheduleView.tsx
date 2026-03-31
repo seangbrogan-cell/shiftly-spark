@@ -94,12 +94,22 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
+    // Also add employees who only appear via time-off
+    timeOffRequests.forEach((req) => {
+      if (!employeeMap.has(req.employee_id)) {
+        employeeMap.set(req.employee_id, {
+          name: req.employees?.name ?? 'Unknown',
+          role: req.employees?.role ?? '',
+          assignments: [],
+        });
+      }
+    });
     return Array.from(employeeMap.entries()).sort((a, b) => {
       const priorityDiff = roleSortPriority(a[1].role) - roleSortPriority(b[1].role);
       if (priorityDiff !== 0) return priorityDiff;
       return a[1].name.localeCompare(b[1].name);
     });
-  }, [assignments]);
+  }, [assignments, timeOffRequests]);
 
   // Build assignment map: empId:date -> assignments[]
   const assignmentMap = useMemo(() => {
