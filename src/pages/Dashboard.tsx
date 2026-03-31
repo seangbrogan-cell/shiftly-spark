@@ -371,12 +371,20 @@ function DashboardHeader({ email, displayName, avatarUrl, onSignOut, userId, pro
           </div>
           <div className="flex items-center gap-4">
             {userId === '2ce85d0c-543c-4f02-96f7-9fc6c3f5a444' && (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/admin/analytics">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Analytics</span>
-                </Link>
-              </Button>
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/admin/analytics">
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Analytics</span>
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="https://github.com/seangbrogan-cell/shiftly-spark/actions/workflows/lighthouse.yml" target="_blank" rel="noopener noreferrer">
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Lighthouse</span>
+                  </a>
+                </Button>
+              </>
             )}
             <Button variant="outline" size="sm" asChild>
               <Link to="/employee">
