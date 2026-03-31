@@ -79,7 +79,8 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Internal error' }, 500)
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  // deno-lint-ignore no-explicit-any
+  const supabase: any = createClient(supabaseUrl, supabaseServiceKey)
   const normalizedEmail = payload.email.toLowerCase()
 
   // 1. Upsert to suppressed_emails (idempotent — safe for retries)
