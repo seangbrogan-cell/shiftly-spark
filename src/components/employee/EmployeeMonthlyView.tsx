@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay, differenceInMinutes } from 'date-fns';
-import { Clock, X } from 'lucide-react';
+import { Clock, X, Palmtree } from 'lucide-react';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
 import type { EmployeeAssignment } from '@/hooks/use-employee-data';
@@ -8,6 +8,7 @@ import type { EmployeeAssignment } from '@/hooks/use-employee-data';
 interface EmployeeMonthlyViewProps {
   assignments: EmployeeAssignment[];
   monthDate: Date;
+  timeOffDates?: Set<string>;
 }
 
 const formatTime = (ts: string | null, short = false) => {
