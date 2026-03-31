@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay, differenceInMinutes } from 'date-fns';
-import { Clock, X } from 'lucide-react';
+import { Clock, X, Palmtree } from 'lucide-react';
 import { getShiftColor } from '@/lib/shift-colors';
 import { cn } from '@/lib/utils';
 import type { EmployeeAssignment } from '@/hooks/use-employee-data';
@@ -8,6 +8,7 @@ import type { EmployeeAssignment } from '@/hooks/use-employee-data';
 interface EmployeeMonthlyViewProps {
   assignments: EmployeeAssignment[];
   monthDate: Date;
+  timeOffDates?: Set<string>;
 }
 
 const formatTime = (ts: string | null, short = false) => {
@@ -28,7 +29,7 @@ const formatHours = (h: number) => {
   return h % 1 === 0 ? `${h}h` : `${h.toFixed(1)}h`;
 };
 
-export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyViewProps) {
+export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: EmployeeMonthlyViewProps) {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const monthStart = startOfMonth(monthDate);
@@ -102,6 +103,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
               const inMonth = isSameMonth(day, monthDate);
               const today = isToday(day);
               const isSelected = selectedDay && isSameDay(day, selectedDay);
+              const isOnLeave = timeOffDates?.has(dateStr);
 
               return (
                 <button
@@ -113,6 +115,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                     !inMonth && 'opacity-40',
                     today && 'bg-primary-light/10',
                     isSelected && 'ring-2 ring-primary/40',
+                    isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20',
                     'hover:bg-muted/50'
                   )}
                 >
@@ -121,7 +124,14 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                       {format(day, 'd')}
                     </p>
                   </div>
-                  {dayAssignments.length > 0 && (
+                  {isOnLeave ? (
+                    <div className="flex flex-col items-center justify-center flex-1 gap-0.5">
+                      <Palmtree className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
+                      <span className="text-[8px] sm:text-[9px] font-medium text-amber-600 dark:text-amber-400">
+                        Time Off
+                      </span>
+                    </div>
+                  ) : dayAssignments.length > 0 ? (
                     <div className="flex flex-col gap-0.5 flex-1">
                       {dayAssignments.slice(0, 2).map((a) => {
                         const color = getShiftColor({
@@ -139,16 +149,16 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                               color.text
                             )}
                           >
-                    <div className={cn('text-[9px] sm:text-xs leading-tight', color.text)}>
-                      {a.actual_start && a.actual_end ? (
-                        <div className="font-bold">
-                          <span className="sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
-                          <span className="hidden sm:inline">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
-                        </div>
-                      ) : (
-                        <span className="font-medium truncate">{a.shifts?.name ?? 'Shift'}</span>
-                      )}
-                    </div>
+                            <div className={cn('text-[9px] sm:text-xs leading-tight', color.text)}>
+                              {a.actual_start && a.actual_end ? (
+                                <div className="font-bold">
+                                  <span className="sm:hidden">{formatTime(a.actual_start, true)} – {formatTime(a.actual_end, true)}</span>
+                                  <span className="hidden sm:inline">{formatTime(a.actual_start)} – {formatTime(a.actual_end)}</span>
+                                </div>
+                              ) : (
+                                <span className="font-medium truncate">{a.shifts?.name ?? 'Shift'}</span>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
@@ -156,7 +166,7 @@ export function EmployeeMonthlyView({ assignments, monthDate }: EmployeeMonthlyV
                         <span className="text-[10px] text-muted-foreground pl-1">+{dayAssignments.length - 2} more</span>
                       )}
                     </div>
-                  )}
+                  ) : null}
                 </button>
               );
             })}
