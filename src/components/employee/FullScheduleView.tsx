@@ -239,6 +239,11 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             const dayShifts = assignmentMap[cellId] ?? [];
             const timeOffReason = timeOffMap.get(cellId);
             const isOnLeave = !!timeOffReason;
+            const dayName = format(day, 'EEE'); // Mon, Tue, etc.
+            const empAvailability = availabilityMap.get(empId);
+            const dayAvail = empAvailability?.get(dayName);
+            const hasRestriction = dayAvail && !(dayAvail.start === '00:00:00' && dayAvail.end === '23:59:00');
+
             return (
               <div
                 key={dateStr}
@@ -256,36 +261,45 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                     </span>
                   </div>
                 ) : (
-                  dayShifts.map((s) => {
-                    const colorDef = getShiftColor({
-                      color: s.shifts?.color ?? null,
-                      is_all_day: s.shifts?.is_all_day ?? false,
-                      start_time: s.shifts?.start_time ?? null,
-                    });
-                    return (
-                      <div
-                        key={s.id}
-                        className={cn(
-                          'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
-                          colorDef.bg,
-                          colorDef.border
-                        )}
-                      >
-                        <div className="flex items-center gap-1">
-                          <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
-                            {s.actual_start && s.actual_end ? (
-                              <div className="font-bold lg:whitespace-nowrap">
-                                <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
-                                <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
-                              </div>
-                            ) : (
-                              <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
-                            )}
+                  <>
+                    {dayShifts.map((s) => {
+                      const colorDef = getShiftColor({
+                        color: s.shifts?.color ?? null,
+                        is_all_day: s.shifts?.is_all_day ?? false,
+                        start_time: s.shifts?.start_time ?? null,
+                      });
+                      return (
+                        <div
+                          key={s.id}
+                          className={cn(
+                            'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
+                            colorDef.bg,
+                            colorDef.border
+                          )}
+                        >
+                          <div className="flex items-center gap-1">
+                            <div className={cn('text-[9px] sm:text-xs leading-tight flex-1', colorDef.text)}>
+                              {s.actual_start && s.actual_end ? (
+                                <div className="font-bold lg:whitespace-nowrap">
+                                  <span className="sm:hidden">{formatTime(s.actual_start, true)} – {formatTime(s.actual_end, true)}</span>
+                                  <span className="hidden sm:inline">{formatTime(s.actual_start)} – {formatTime(s.actual_end)}</span>
+                                </div>
+                              ) : (
+                                <span className="font-medium truncate">{s.shifts?.name ?? 'Shift'}</span>
+                              )}
+                            </div>
                           </div>
                         </div>
+                      );
+                    })}
+                    {hasRestriction && dayShifts.length === 0 && (
+                      <div className="flex items-center justify-center flex-1">
+                        <span className="text-[8px] sm:text-[9px] text-muted-foreground/60 text-center leading-tight">
+                          {dayAvail.start.slice(0, 5)}–{dayAvail.end.slice(0, 5)}
+                        </span>
                       </div>
-                    );
-                  })
+                    )}
+                  </>
                 )}
               </div>
             );
