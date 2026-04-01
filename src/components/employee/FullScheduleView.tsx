@@ -284,7 +284,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                   <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-1">
                     <Palmtree className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                     <span className="text-[8px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400 text-center leading-tight truncate max-w-full px-0.5">
-                      {timeOffReason}
+                      {timeOffReason?.toLowerCase() === 'holiday' ? 'Holiday' : 'Time Off'}
                     </span>
                   </div>
                 ) : (
