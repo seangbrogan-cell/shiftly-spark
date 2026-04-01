@@ -19,12 +19,13 @@ export function CalendarCell({ id, children, isToday, unavailable, unavailableLa
       ref={setNodeRef}
       onClick={unavailable ? undefined : onClick}
       className={cn(
-        'min-h-[40px] sm:min-h-[52px] border-r border-b border-border p-0.5 transition-colors',
+        'min-h-[36px] sm:min-h-[46px] print:min-h-[38px] border-r border-b border-border p-0.5 transition-colors',
         unavailable
           ? 'bg-muted/60 cursor-not-allowed'
           : 'cursor-pointer',
         !unavailable && isOver && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
-        !unavailable && isToday && 'bg-primary-light/30'
+        !unavailable && isToday && 'bg-primary-light/30',
+        'print:break-inside-avoid'
       )}
     >
       {unavailable ? (
