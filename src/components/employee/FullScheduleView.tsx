@@ -40,11 +40,11 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       // Fetch workplace-linked employees
       const { data: wpData, error: wpError } = await supabase
         .from('employee_workplaces')
-        .select('employee_id, employees(name, role, status)')
+        .select('employee_id, employees(name, role, status, availability)')
         .eq('workplace_id', workplaceId);
       if (wpError) throw wpError;
 
-      const empMap = new Map<string, { employee_id: string; name: string; role: string }>();
+      const empMap = new Map<string, { employee_id: string; name: string; role: string; availability: string[] }>();
       (wpData ?? [])
         .filter((r: any) => r.employees && r.employees.status === 'active')
         .forEach((r: any) => {
@@ -52,6 +52,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             employee_id: r.employee_id,
             name: r.employees.name,
             role: r.employees.role,
+            availability: r.employees.availability ?? [],
           });
         });
 
@@ -59,7 +60,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       if (employerId) {
         const { data: allEmps, error: allError } = await supabase
           .from('employees')
-          .select('id, name, role, status')
+          .select('id, name, role, status, availability')
           .eq('employer_id', employerId)
           .eq('status', 'active');
         if (!allError && allEmps) {
@@ -69,6 +70,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                 employee_id: emp.id,
                 name: emp.name,
                 role: emp.role,
+                availability: emp.availability ?? [],
               });
             }
           });
@@ -155,17 +157,17 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
 
   // Group by employee — start with all workplace employees, then merge in assignment/time-off data
   const employees = useMemo(() => {
-    const employeeMap = new Map<string, { name: string; role: string; assignments: FullAssignment[] }>();
+    const employeeMap = new Map<string, { name: string; role: string; availability: string[]; assignments: FullAssignment[] }>();
     // Start with all workplace employees
     workplaceEmployees.forEach((emp) => {
-      employeeMap.set(emp.employee_id, { name: emp.name, role: emp.role, assignments: [] });
+      employeeMap.set(emp.employee_id, { name: emp.name, role: emp.role, availability: emp.availability, assignments: [] });
     });
     // Add assignments
     assignments.forEach((a) => {
       const name = a.employees?.name ?? 'Unknown';
       const role = a.employees?.role ?? '';
       if (!employeeMap.has(a.employee_id)) {
-        employeeMap.set(a.employee_id, { name, role, assignments: [] });
+        employeeMap.set(a.employee_id, { name, role, availability: [], assignments: [] });
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
@@ -175,6 +177,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
         employeeMap.set(req.employee_id, {
           name: req.employees?.name ?? 'Unknown',
           role: req.employees?.role ?? '',
+          availability: [],
           assignments: [],
         });
       }
@@ -249,7 +252,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       </div>
 
       {/* Employee Rows */}
-      {employees.map(([empId, { name, role }]) => (
+      {employees.map(([empId, { name, role, availability }]) => (
         <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
           {/* Employee Name Cell */}
           <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start min-w-0">
@@ -267,6 +270,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             const timeOffReason = timeOffMap.get(cellId);
             const isOnLeave = !!timeOffReason;
             const dayName = format(day, 'EEE'); // Mon, Tue, etc.
+            const isUnavailable = availability.length > 0 && !availability.includes(dayName);
             const empAvailability = availabilityMap.get(empId);
             const dayAvail = empAvailability?.get(dayName);
             const hasRestriction = dayAvail && !(dayAvail.start === '00:00:00' && dayAvail.end === '23:59:00');
@@ -277,7 +281,8 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                 className={cn(
                   'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10',
-                  isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20'
+                  isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20',
+                  !isOnLeave && isUnavailable && 'bg-muted/60'
                 )}
               >
                 {isOnLeave ? (
@@ -286,6 +291,10 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                     <span className="text-[8px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400 text-center leading-tight truncate max-w-full px-0.5">
                       {timeOffReason?.toLowerCase() === 'holiday' ? 'Holiday' : 'Time Off'}
                     </span>
+                  </div>
+                ) : isUnavailable && dayShifts.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-[10px] text-muted-foreground/50 select-none">N/A</span>
                   </div>
                 ) : (
                   <>
