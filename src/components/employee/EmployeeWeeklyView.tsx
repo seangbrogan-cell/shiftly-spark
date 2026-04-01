@@ -8,7 +8,7 @@ import type { EmployeeAssignment } from '@/hooks/use-employee-data';
 interface EmployeeWeeklyViewProps {
   assignments: EmployeeAssignment[];
   weekStart: Date;
-  timeOffDates?: Set<string>;
+  timeOffDates?: Map<string, string>;
 }
 
 const formatTime = (ts: string | null, short = false) => {
