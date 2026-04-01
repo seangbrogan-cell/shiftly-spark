@@ -124,10 +124,10 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                       {format(day, 'd')}
                     </p>
                   </div>
-                  {isOnLeave ? (
-                    <div className="flex flex-col items-center justify-center flex-1 gap-0.5">
-                      <Palmtree className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
-                      <span className="text-[8px] sm:text-[9px] font-medium text-amber-600 dark:text-amber-400">
+              {isOnLeave ? (
+                    <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-2">
+                      <Palmtree className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+                      <span className="text-[9px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400">
                         {timeOffDates?.get(dateStr) ?? 'Time Off'}
                       </span>
                     </div>
