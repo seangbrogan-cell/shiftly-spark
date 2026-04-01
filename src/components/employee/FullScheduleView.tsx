@@ -157,17 +157,17 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
 
   // Group by employee — start with all workplace employees, then merge in assignment/time-off data
   const employees = useMemo(() => {
-    const employeeMap = new Map<string, { name: string; role: string; assignments: FullAssignment[] }>();
+    const employeeMap = new Map<string, { name: string; role: string; availability: string[]; assignments: FullAssignment[] }>();
     // Start with all workplace employees
     workplaceEmployees.forEach((emp) => {
-      employeeMap.set(emp.employee_id, { name: emp.name, role: emp.role, assignments: [] });
+      employeeMap.set(emp.employee_id, { name: emp.name, role: emp.role, availability: emp.availability, assignments: [] });
     });
     // Add assignments
     assignments.forEach((a) => {
       const name = a.employees?.name ?? 'Unknown';
       const role = a.employees?.role ?? '';
       if (!employeeMap.has(a.employee_id)) {
-        employeeMap.set(a.employee_id, { name, role, assignments: [] });
+        employeeMap.set(a.employee_id, { name, role, availability: [], assignments: [] });
       }
       employeeMap.get(a.employee_id)!.assignments.push(a);
     });
@@ -177,6 +177,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
         employeeMap.set(req.employee_id, {
           name: req.employees?.name ?? 'Unknown',
           role: req.employees?.role ?? '',
+          availability: [],
           assignments: [],
         });
       }
