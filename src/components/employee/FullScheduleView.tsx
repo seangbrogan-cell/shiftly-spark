@@ -56,26 +56,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
           });
         });
 
-      // Also fetch all employer employees (including those not linked to any workplace)
-      if (employerId) {
-        const { data: allEmps, error: allError } = await supabase
-          .from('employees')
-          .select('id, name, role, status, availability')
-          .eq('employer_id', employerId)
-          .eq('status', 'active');
-        if (!allError && allEmps) {
-          allEmps.forEach((emp) => {
-            if (!empMap.has(emp.id)) {
-              empMap.set(emp.id, {
-                employee_id: emp.id,
-                name: emp.name,
-                role: emp.role,
-                availability: emp.availability ?? [],
-              });
-            }
-          });
-        }
-      }
+      // Only show employees linked to this workplace (no fallback to all employer employees)
 
       return Array.from(empMap.values());
     },
