@@ -24,7 +24,8 @@ export function CalendarCell({ id, children, isToday, unavailable, unavailableLa
           ? 'bg-muted/60 cursor-not-allowed'
           : 'cursor-pointer',
         !unavailable && isOver && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
-        !unavailable && isToday && 'bg-primary-light/30'
+        !unavailable && isToday && 'bg-primary-light/30',
+        'print:break-inside-avoid'
       )}
     >
       {unavailable ? (
