@@ -62,6 +62,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setEmail(targetEmployee?.email ?? '');
     setPhone(targetEmployee?.phone ?? '');
     setRole(nextRole);
+    setEmploymentType(((targetEmployee as any)?.employment_type as 'full_time' | 'part_time') ?? 'full_time');
     setCustomRole(!roleNames.includes(nextRole) ? nextRole : '');
     setAvailability(nextAvailability);
     setDayTimeRanges(buildDayTimeRanges(nextAvailability, targetEmployee ? availabilityRows : []));
