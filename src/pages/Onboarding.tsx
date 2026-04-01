@@ -42,6 +42,12 @@ export default function Onboarding() {
 
       if (empError) throw empError;
 
+      // 1b. Create default workplace using the company name
+      const { error: wpError } = await supabase
+        .from('workplaces')
+        .insert({ employer_id: employerId, name: companyName.trim() } as any);
+      if (wpError) throw wpError;
+
       // 2. Update (or create) profile with employer_id and display_name
       const profilePayload = {
         employer_id: employerId,
