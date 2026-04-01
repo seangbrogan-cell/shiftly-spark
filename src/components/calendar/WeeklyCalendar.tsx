@@ -330,10 +330,28 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
               </div>
             </div>
 
-            {/* Employee Rows – Sorted by role order, then alphabetically */}
+            {/* Employee Rows – Sorted by: managers first (by role), then full-time alpha, then part-time alpha, then no-shift employees last */}
             {[...employees].sort((a, b) => {
+              // Employees with no shifts this week go to the bottom
+              const aHasShifts = weekDays.some(day => {
+                const key = `${a.id}:${format(day, 'yyyy-MM-dd')}`;
+                return (assignmentMap[key]?.length ?? 0) > 0;
+              });
+              const bHasShifts = weekDays.some(day => {
+                const key = `${b.id}:${format(day, 'yyyy-MM-dd')}`;
+                return (assignmentMap[key]?.length ?? 0) > 0;
+              });
+              if (aHasShifts !== bHasShifts) return aHasShifts ? -1 : 1;
+
+              // Role priority (managers first)
               const priorityDiff = roleSortPriority(a.role) - roleSortPriority(b.role);
               if (priorityDiff !== 0) return priorityDiff;
+
+              // Part-time employees after full-time within same role
+              const aPartTime = (a as any).employment_type === 'part_time';
+              const bPartTime = (b as any).employment_type === 'part_time';
+              if (aPartTime !== bPartTime) return aPartTime ? 1 : -1;
+
               return a.name.localeCompare(b.name);
             }).map((emp) => (
               <div key={emp.id} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
