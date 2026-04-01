@@ -87,10 +87,13 @@ export function CsvUploadModal({ open, onOpenChange, employerId, existingEmails 
     let success = 0;
     let failed = 0;
 
+    // Use the first workplace (oldest) as default
+    const defaultWorkplaceId = workplaces && workplaces.length > 0 ? workplaces[0].id : null;
+
     for (const row of validRows) {
       try {
         const name = `${row.firstName} ${row.lastName}`.trim();
-        await createEmployee.mutateAsync({
+        const created = await createEmployee.mutateAsync({
           employer_id: employerId,
           name,
           email: row.email.trim(),
@@ -98,6 +101,13 @@ export function CsvUploadModal({ open, onOpenChange, employerId, existingEmails 
           role: 'Staff',
           availability: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
         });
+        // Assign default workplace
+        if (defaultWorkplaceId && created?.id) {
+          await saveEmployeeWorkplaces.mutateAsync({
+            employeeId: created.id,
+            workplaceIds: [defaultWorkplaceId],
+          });
+        }
         success++;
       } catch {
         failed++;
