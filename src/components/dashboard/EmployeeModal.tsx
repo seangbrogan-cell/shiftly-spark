@@ -206,6 +206,31 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
           </div>
 
+          {/* Employment Type Section */}
+          <div className="space-y-2">
+            <Label>Employment Type</Label>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={employmentType === 'full_time'}
+                  onCheckedChange={(checked) => {
+                    if (checked) setEmploymentType('full_time');
+                  }}
+                />
+                <span className="text-sm font-medium">Full Time</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={employmentType === 'part_time'}
+                  onCheckedChange={(checked) => {
+                    if (checked) setEmploymentType('part_time');
+                  }}
+                />
+                <span className="text-sm font-medium">Part Time</span>
+              </label>
+            </div>
+          </div>
+
           {/* Workplaces Section */}
           {workplaces.length > 0 && (
             <div className="space-y-3">
