@@ -270,6 +270,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             const timeOffReason = timeOffMap.get(cellId);
             const isOnLeave = !!timeOffReason;
             const dayName = format(day, 'EEE'); // Mon, Tue, etc.
+            const isUnavailable = availability.length > 0 && !availability.includes(dayName);
             const empAvailability = availabilityMap.get(empId);
             const dayAvail = empAvailability?.get(dayName);
             const hasRestriction = dayAvail && !(dayAvail.start === '00:00:00' && dayAvail.end === '23:59:00');
@@ -280,7 +281,8 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                 className={cn(
                   'min-h-[40px] sm:min-h-[52px] px-0.5 py-0.5 border-r border-b border-border flex flex-col gap-0.5 min-w-0 overflow-hidden',
                   isToday(day) && 'bg-primary-light/10',
-                  isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20'
+                  isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20',
+                  !isOnLeave && isUnavailable && 'bg-muted/60'
                 )}
               >
                 {isOnLeave ? (
@@ -289,6 +291,10 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                     <span className="text-[8px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400 text-center leading-tight truncate max-w-full px-0.5">
                       {timeOffReason?.toLowerCase() === 'holiday' ? 'Holiday' : 'Time Off'}
                     </span>
+                  </div>
+                ) : isUnavailable && dayShifts.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-[10px] text-muted-foreground/50 select-none">N/A</span>
                   </div>
                 ) : (
                   <>
