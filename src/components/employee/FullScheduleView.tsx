@@ -35,20 +35,47 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
 
   // Fetch all employees linked to this workplace
   const { data: workplaceEmployees = [], isLoading: loadingEmployees } = useQuery({
-    queryKey: ['full-schedule-employees', workplaceId],
+    queryKey: ['full-schedule-employees', workplaceId, employerId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch workplace-linked employees
+      const { data: wpData, error: wpError } = await supabase
         .from('employee_workplaces')
         .select('employee_id, employees(name, role, status)')
         .eq('workplace_id', workplaceId);
-      if (error) throw error;
-      return (data ?? [])
+      if (wpError) throw wpError;
+
+      const empMap = new Map<string, { employee_id: string; name: string; role: string }>();
+      (wpData ?? [])
         .filter((r: any) => r.employees && r.employees.status === 'active')
-        .map((r: any) => ({
-          employee_id: r.employee_id as string,
-          name: r.employees.name as string,
-          role: r.employees.role as string,
-        }));
+        .forEach((r: any) => {
+          empMap.set(r.employee_id, {
+            employee_id: r.employee_id,
+            name: r.employees.name,
+            role: r.employees.role,
+          });
+        });
+
+      // Also fetch all employer employees (including those not linked to any workplace)
+      if (employerId) {
+        const { data: allEmps, error: allError } = await supabase
+          .from('employees')
+          .select('id, name, role, status')
+          .eq('employer_id', employerId)
+          .eq('status', 'active');
+        if (!allError && allEmps) {
+          allEmps.forEach((emp) => {
+            if (!empMap.has(emp.id)) {
+              empMap.set(emp.id, {
+                employee_id: emp.id,
+                name: emp.name,
+                role: emp.role,
+              });
+            }
+          });
+        }
+      }
+
+      return Array.from(empMap.values());
     },
     enabled: !!workplaceId,
   });
