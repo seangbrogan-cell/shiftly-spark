@@ -252,7 +252,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       </div>
 
       {/* Employee Rows */}
-      {employees.map(([empId, { name, role }]) => (
+      {employees.map(([empId, { name, role, availability }]) => (
         <div key={empId} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
           {/* Employee Name Cell */}
           <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start min-w-0">
