@@ -143,7 +143,7 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                           <div
                             key={a.id}
                             className={cn(
-                              'rounded px-1 py-0.5 text-xs border flex-1',
+                              'rounded px-1 py-0.5 text-xs border flex-1 flex flex-col justify-center',
                               color.bg,
                               color.border,
                               color.text
