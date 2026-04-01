@@ -43,6 +43,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
   );
   const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
+  const [employmentType, setEmploymentType] = useState<'full_time' | 'part_time'>('full_time');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
@@ -61,6 +62,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     setEmail(targetEmployee?.email ?? '');
     setPhone(targetEmployee?.phone ?? '');
     setRole(nextRole);
+    setEmploymentType(((targetEmployee as any)?.employment_type as 'full_time' | 'part_time') ?? 'full_time');
     setCustomRole(!roleNames.includes(nextRole) ? nextRole : '');
     setAvailability(nextAvailability);
     setDayTimeRanges(buildDayTimeRanges(nextAvailability, targetEmployee ? availabilityRows : []));
@@ -122,7 +124,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           phone: phone.trim() || null,
           role,
           availability,
-        });
+          employment_type: employmentType,
+        } as any);
         await saveAvailability.mutateAsync({
           employeeId: employee.id,
           availability,
@@ -138,7 +141,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           phone: phone.trim() || null,
           role,
           availability,
-        });
+          employment_type: employmentType,
+        } as any);
         if (created?.id) {
           await saveAvailability.mutateAsync({
             employeeId: created.id,
@@ -200,6 +204,31 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
               />
             )}
             {errors.role && <p className="text-sm text-destructive">{errors.role}</p>}
+          </div>
+
+          {/* Employment Type Section */}
+          <div className="space-y-2">
+            <Label>Employment Type</Label>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={employmentType === 'full_time'}
+                  onCheckedChange={(checked) => {
+                    if (checked) setEmploymentType('full_time');
+                  }}
+                />
+                <span className="text-sm font-medium">Full Time</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  checked={employmentType === 'part_time'}
+                  onCheckedChange={(checked) => {
+                    if (checked) setEmploymentType('part_time');
+                  }}
+                />
+                <span className="text-sm font-medium">Part Time</span>
+              </label>
+            </div>
           </div>
 
           {/* Workplaces Section */}

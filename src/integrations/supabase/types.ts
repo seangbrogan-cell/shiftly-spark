@@ -178,6 +178,7 @@ export type Database = {
           created_at: string
           email: string
           employer_id: string
+          employment_type: string
           id: string
           name: string
           phone: string | null
@@ -191,6 +192,7 @@ export type Database = {
           created_at?: string
           email: string
           employer_id: string
+          employment_type?: string
           id?: string
           name: string
           phone?: string | null
@@ -204,6 +206,7 @@ export type Database = {
           created_at?: string
           email?: string
           employer_id?: string
+          employment_type?: string
           id?: string
           name?: string
           phone?: string | null

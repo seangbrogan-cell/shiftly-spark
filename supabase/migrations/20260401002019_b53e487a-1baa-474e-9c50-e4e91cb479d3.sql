@@ -1,0 +1,1 @@
+ALTER TABLE public.employees ADD COLUMN employment_type text NOT NULL DEFAULT 'full_time';
