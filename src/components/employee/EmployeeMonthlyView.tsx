@@ -111,7 +111,7 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                   type="button"
                   onClick={() => setSelectedDay(isSelected ? null : day)}
                   className={cn(
-                    'px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] text-left transition-colors flex flex-col',
+                    'relative px-0.5 py-0.5 border-r border-b border-border min-h-[4rem] h-full text-left transition-colors flex flex-col',
                     !inMonth && 'opacity-40',
                     today && 'bg-primary-light/10',
                     isSelected && 'ring-2 ring-primary/40',
@@ -119,20 +119,26 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                     'hover:bg-muted/50'
                   )}
                 >
-                  <div className="text-center mb-0.5">
+                  <div className="pointer-events-none absolute inset-x-0 top-0.5 z-10 text-center">
                     <p className={cn('text-xs font-bold', today ? 'text-primary' : 'text-foreground')}>
                       {format(day, 'd')}
                     </p>
                   </div>
-              {isOnLeave ? (
-                    <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-2">
+
+                  {isOnLeave ? (
+                    <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-2 pt-4">
                       <Palmtree className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                       <span className="text-[9px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400">
                         {timeOffDates?.get(dateStr) ?? 'Time Off'}
                       </span>
                     </div>
                   ) : dayAssignments.length > 0 ? (
-                    <div className="flex flex-col gap-0.5 flex-1">
+                    <div
+                      className={cn(
+                        'flex flex-col gap-0.5 flex-1 min-h-0',
+                        dayAssignments.length > 1 && 'pt-4'
+                      )}
+                    >
                       {dayAssignments.slice(0, 2).map((a) => {
                         const color = getShiftColor({
                           color: a.shifts?.color ?? null,
@@ -143,7 +149,8 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                           <div
                             key={a.id}
                             className={cn(
-                              'rounded px-1 py-0.5 text-xs border flex-1 flex flex-col justify-center',
+                              'rounded px-1 py-0.5 text-xs border flex-1 flex flex-col justify-center min-h-0',
+                              dayAssignments.length === 1 && 'h-full pt-4',
                               color.bg,
                               color.border,
                               color.text
