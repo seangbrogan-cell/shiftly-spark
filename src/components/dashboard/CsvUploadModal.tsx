@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateEmployee } from '@/hooks/use-dashboard-data';
+import { useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
+import { useWorkplaces } from '@/hooks/use-workplaces';
 import { Upload, FileText, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
