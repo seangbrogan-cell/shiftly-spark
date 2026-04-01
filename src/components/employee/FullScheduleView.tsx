@@ -40,11 +40,11 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       // Fetch workplace-linked employees
       const { data: wpData, error: wpError } = await supabase
         .from('employee_workplaces')
-        .select('employee_id, employees(name, role, status)')
+        .select('employee_id, employees(name, role, status, availability)')
         .eq('workplace_id', workplaceId);
       if (wpError) throw wpError;
 
-      const empMap = new Map<string, { employee_id: string; name: string; role: string }>();
+      const empMap = new Map<string, { employee_id: string; name: string; role: string; availability: string[] }>();
       (wpData ?? [])
         .filter((r: any) => r.employees && r.employees.status === 'active')
         .forEach((r: any) => {
@@ -52,6 +52,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
             employee_id: r.employee_id,
             name: r.employees.name,
             role: r.employees.role,
+            availability: r.employees.availability ?? [],
           });
         });
 
