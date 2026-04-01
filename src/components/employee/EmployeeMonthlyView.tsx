@@ -128,7 +128,7 @@ export function EmployeeMonthlyView({ assignments, monthDate, timeOffDates }: Em
                     <div className="flex flex-col items-center justify-center flex-1 gap-0.5">
                       <Palmtree className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400" />
                       <span className="text-[8px] sm:text-[9px] font-medium text-amber-600 dark:text-amber-400">
-                        Time Off
+                        {timeOffDates?.get(dateStr) ?? 'Time Off'}
                       </span>
                     </div>
                   ) : dayAssignments.length > 0 ? (

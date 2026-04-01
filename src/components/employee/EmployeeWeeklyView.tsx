@@ -97,7 +97,7 @@ export function EmployeeWeeklyView({ assignments, weekStart, timeOffDates }: Emp
                 <div className="flex flex-col items-center justify-center flex-1 gap-0.5 py-2">
                   <Palmtree className="h-4 w-4 text-amber-500 dark:text-amber-400" />
                   <span className="text-[9px] sm:text-[10px] font-medium text-amber-600 dark:text-amber-400">
-                    Time Off
+                    {timeOffDates?.get(dateStr) ?? 'Time Off'}
                   </span>
                 </div>
               ) : (
