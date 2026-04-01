@@ -132,6 +132,16 @@
     max-width: 100% !important;
   }
 
+  /* Prevent rows/cells from splitting across pages */
+  tr, td, th, [class*="grid"] > * {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  table, [class*="grid"] {
+    break-inside: auto !important;
+  }
+
   /* Hide right sidebar in calendar */
   .print-hide {
     display: none !important;
