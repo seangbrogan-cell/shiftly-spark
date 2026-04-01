@@ -101,11 +101,26 @@ export default function Dashboard() {
     enabled: !!selectedWorkplaceId,
   });
 
-  // Filter employees to those assigned to the selected workplace
+  // Fetch all employee IDs that have ANY workplace link (to identify unlinked employees)
+  const { data: allLinkedEmployeeIds } = useQuery({
+    queryKey: ['all-employee-workplace-links', employerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('employee_workplaces' as any)
+        .select('employee_id');
+      if (error) throw error;
+      return new Set((data as any[]).map(r => r.employee_id));
+    },
+    enabled: !!employerId,
+  });
+
+  // Include employees linked to this workplace + employees with no workplace links at all
   const workplaceEmployees = useMemo(() => {
     if (!workplaceEmployeeIds) return employees;
-    return employees.filter(e => workplaceEmployeeIds.has(e.id));
-  }, [employees, workplaceEmployeeIds]);
+    return employees.filter(e =>
+      workplaceEmployeeIds.has(e.id) || !(allLinkedEmployeeIds?.has(e.id))
+    );
+  }, [employees, workplaceEmployeeIds, allLinkedEmployeeIds]);
 
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
