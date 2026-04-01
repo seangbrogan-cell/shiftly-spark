@@ -289,7 +289,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                         <div
                           key={s.id}
                           className={cn(
-                            'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 transition-shadow hover:shadow-md',
+                            'group relative rounded border px-0.5 sm:px-1.5 py-1 @container flex-1 flex items-center transition-shadow hover:shadow-md',
                             colorDef.bg,
                             colorDef.border
                           )}
