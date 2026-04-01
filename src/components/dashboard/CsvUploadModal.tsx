@@ -54,7 +54,8 @@ export function CsvUploadModal({ open, onOpenChange, employerId, existingEmails 
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
-
+  const saveEmployeeWorkplaces = useSaveEmployeeWorkplaces();
+  const { data: workplaces } = useWorkplaces(employerId);
   const existingSet = new Set(existingEmails.map(e => e.toLowerCase()));
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
