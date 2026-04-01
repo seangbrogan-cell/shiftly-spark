@@ -130,11 +130,11 @@ export function useEmployeeApprovedTimeOff(employeeId: string | undefined) {
       if (!employeeId) return [];
       const { data, error } = await supabase
         .from('time_off_requests')
-        .select('employee_id, start_date, end_date')
+        .select('employee_id, start_date, end_date, reason')
         .eq('employee_id', employeeId)
         .eq('status', 'approved');
       if (error) throw error;
-      return data as { employee_id: string; start_date: string; end_date: string }[];
+      return data as { employee_id: string; start_date: string; end_date: string; reason: string }[];
     },
     enabled: !!employeeId,
   });
