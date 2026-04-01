@@ -226,7 +226,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
         <TableHead className="hidden md:table-cell text-xs">Email</TableHead>
         <TableHead className="hidden lg:table-cell">Phone</TableHead>
         <TableHead className="text-xs md:text-sm px-1 md:px-4">Role</TableHead>
-        <TableHead className="text-center text-xs md:text-sm px-1 md:px-4">Shifts</TableHead>
+        
         <TableHead className="text-right text-xs md:text-sm px-1 md:px-4">Actions</TableHead>
       </TableRow>
     </TableHeader>
