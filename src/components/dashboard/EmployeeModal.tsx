@@ -124,7 +124,8 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
           phone: phone.trim() || null,
           role,
           availability,
-        });
+          employment_type: employmentType,
+        } as any);
         await saveAvailability.mutateAsync({
           employeeId: employee.id,
           availability,
