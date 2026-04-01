@@ -43,6 +43,7 @@ export function EmployeeModal({ open, onOpenChange, employee, employerId }: Empl
     DAYS_OF_WEEK.map(day => ({ day, enabled: true, start_time: '00:00', end_time: '23:59' }))
   );
   const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
+  const [employmentType, setEmploymentType] = useState<'full_time' | 'part_time'>('full_time');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createEmployee = useCreateEmployee();
