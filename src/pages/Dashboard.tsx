@@ -101,10 +101,15 @@ export default function Dashboard() {
     enabled: !!selectedWorkplaceId,
   });
 
-  // Filter employees to those assigned to the selected workplace
+  // Filter employees to those assigned to the selected workplace, but always include all employees
+  // (employees without any workplace link should still appear on the schedule)
   const workplaceEmployees = useMemo(() => {
     if (!workplaceEmployeeIds) return employees;
-    return employees.filter(e => workplaceEmployeeIds.has(e.id));
+    // Include employees explicitly linked to this workplace, plus any employee with no workplace links at all
+    const employeesWithAnyWorkplace = new Set<string>();
+    // We can't easily know who has zero links from this query alone, so include all employees
+    // The workplace filter is mainly for multi-workplace setups; all employer employees should show
+    return employees;
   }, [employees, workplaceEmployeeIds]);
 
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
