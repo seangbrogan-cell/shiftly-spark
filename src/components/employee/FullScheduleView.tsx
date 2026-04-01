@@ -60,7 +60,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
       if (employerId) {
         const { data: allEmps, error: allError } = await supabase
           .from('employees')
-          .select('id, name, role, status')
+          .select('id, name, role, status, availability')
           .eq('employer_id', employerId)
           .eq('status', 'active');
         if (!allError && allEmps) {
@@ -70,6 +70,7 @@ export function FullScheduleView({ workplaceId, weekStart, employerId }: FullSch
                 employee_id: emp.id,
                 name: emp.name,
                 role: emp.role,
+                availability: emp.availability ?? [],
               });
             }
           });
