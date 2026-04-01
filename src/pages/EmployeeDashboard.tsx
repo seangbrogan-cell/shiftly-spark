@@ -93,17 +93,17 @@ export default function EmployeeDashboard() {
   const { data: scheduleUpdated } = useScheduleLastUpdated(employerId ?? undefined);
   const { data: approvedTimeOff = [] } = useEmployeeApprovedTimeOff(employeeId);
 
-  // Build set of dates with approved time off to filter out assignments
+  // Build map of dates with approved time off (date -> reason)
   const timeOffDates = useMemo(() => {
-    const set = new Set<string>();
+    const map = new Map<string, string>();
     approvedTimeOff.forEach((req) => {
       const start = new Date(req.start_date + 'T00:00:00');
       const end = new Date(req.end_date + 'T00:00:00');
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        set.add(format(d, 'yyyy-MM-dd'));
+        map.set(format(d, 'yyyy-MM-dd'), req.reason);
       }
     });
-    return set;
+    return map;
   }, [approvedTimeOff]);
 
   const weeklyAssignments = useMemo(
