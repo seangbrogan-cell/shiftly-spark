@@ -101,16 +101,26 @@ export default function Dashboard() {
     enabled: !!selectedWorkplaceId,
   });
 
-  // Filter employees to those assigned to the selected workplace, but always include all employees
-  // (employees without any workplace link should still appear on the schedule)
+  // Fetch all employee IDs that have ANY workplace link (to identify unlinked employees)
+  const { data: allLinkedEmployeeIds } = useQuery({
+    queryKey: ['all-employee-workplace-links', employerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('employee_workplaces' as any)
+        .select('employee_id');
+      if (error) throw error;
+      return new Set((data as any[]).map(r => r.employee_id));
+    },
+    enabled: !!employerId,
+  });
+
+  // Include employees linked to this workplace + employees with no workplace links at all
   const workplaceEmployees = useMemo(() => {
     if (!workplaceEmployeeIds) return employees;
-    // Include employees explicitly linked to this workplace, plus any employee with no workplace links at all
-    const employeesWithAnyWorkplace = new Set<string>();
-    // We can't easily know who has zero links from this query alone, so include all employees
-    // The workplace filter is mainly for multi-workplace setups; all employer employees should show
-    return employees;
-  }, [employees, workplaceEmployeeIds]);
+    return employees.filter(e =>
+      workplaceEmployeeIds.has(e.id) || !(allLinkedEmployeeIds?.has(e.id))
+    );
+  }, [employees, workplaceEmployeeIds, allLinkedEmployeeIds]);
 
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
