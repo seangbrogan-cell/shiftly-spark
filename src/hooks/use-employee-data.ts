@@ -173,49 +173,20 @@ export function useEmployeeWorkplacesList(employeeId: string | undefined, employ
     queryFn: async () => {
       if (!employeeId) return [];
 
-      const workplaceMap = new Map<string, { id: string; name: string }>();
-
-      // 1) Explicit employee-workplace links
+      // Only show workplaces the employee is explicitly assigned to
       const { data: linkedRows, error: linkedErr } = await supabase
         .from('employee_workplaces')
         .select('workplaces(id, name)')
         .eq('employee_id', employeeId);
       if (linkedErr) throw linkedErr;
 
+      const results: { id: string; name: string }[] = [];
       (linkedRows ?? []).forEach((row: any) => {
         const wp = row.workplaces;
-        if (wp?.id) workplaceMap.set(wp.id, { id: wp.id, name: wp.name });
+        if (wp?.id) results.push({ id: wp.id, name: wp.name });
       });
 
-      // 2) Workplaces where the employee actually has scheduled shifts
-      const { data: scheduledRows, error: scheduledErr } = await supabase
-        .from('shift_assignments')
-        .select('workplaces(id, name)')
-        .eq('employee_id', employeeId)
-        .not('workplace_id', 'is', null);
-      if (scheduledErr) throw scheduledErr;
-
-      (scheduledRows ?? []).forEach((row: any) => {
-        const wp = row.workplaces;
-        if (wp?.id) workplaceMap.set(wp.id, { id: wp.id, name: wp.name });
-      });
-
-      if (workplaceMap.size > 0) {
-        return Array.from(workplaceMap.values());
-      }
-
-      // 3) Last fallback: employer workplaces
-      if (employerId) {
-        const { data: allWp, error } = await supabase
-          .from('workplaces')
-          .select('id, name')
-          .eq('employer_id', employerId)
-          .order('created_at');
-        if (error) throw error;
-        return (allWp ?? []).map((w) => ({ id: w.id, name: w.name }));
-      }
-
-      return [];
+      return results;
     },
     enabled: !!employeeId,
   });
