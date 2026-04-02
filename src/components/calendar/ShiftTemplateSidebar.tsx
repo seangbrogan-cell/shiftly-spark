@@ -128,12 +128,15 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
                 const config = PERIODS_CONFIG[key];
                 const Icon = config.icon;
                 const periodShifts = grouped[key];
+                const isPeriodCollapsed = collapsedPeriods.has(key);
                 return (
                   <div key={key} className={`rounded-md border ${config.borderClass} ${config.bgClass} p-2.5`}>
-                    <div className="flex items-center gap-1.5 mb-2">
+                    <div className="flex items-center gap-1.5 cursor-pointer select-none" onClick={() => togglePeriodCollapsed(key)}>
+                      <ChevronRight className={cn('h-3 w-3 text-muted-foreground transition-transform', !isPeriodCollapsed && 'rotate-90')} />
                       <Icon className={`h-3.5 w-3.5 ${config.iconClass}`} />
                       <span className="text-xs font-semibold text-foreground flex-1">{config.label}</span>
-                      <div className="flex">
+                      <span className="text-[10px] text-muted-foreground">{periodShifts.length}</span>
+                      <div className="flex" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => movePeriod(index, -1)}
                           disabled={index === 0}
@@ -152,13 +155,17 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
                         </button>
                       </div>
                     </div>
-                    {periodShifts.length === 0 ? (
-                      <p className="text-[10px] text-muted-foreground text-center py-1 italic">No shifts</p>
-                    ) : (
-                      <div className="space-y-1.5">
-                        {periodShifts.map((shift) => (
-                          <DraggableShiftTemplate key={shift.id} shift={shift} />
-                        ))}
+                    {!isPeriodCollapsed && (
+                      <div className="mt-2">
+                        {periodShifts.length === 0 ? (
+                          <p className="text-[10px] text-muted-foreground text-center py-1 italic">No shifts</p>
+                        ) : (
+                          <div className="space-y-1.5">
+                            {periodShifts.map((shift) => (
+                              <DraggableShiftTemplate key={shift.id} shift={shift} />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
