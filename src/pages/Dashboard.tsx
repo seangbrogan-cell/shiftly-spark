@@ -328,6 +328,14 @@ export default function Dashboard() {
           />
         </>
       )}
+      {employerId && (
+        <EmployeeProfileDrawer
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          employee={drawerEmployee}
+          employerId={employerId}
+        />
+      )}
       <DeleteEmployeeDialog
         open={!!deletingEmployee}
         onOpenChange={(open) => { if (!open) setDeletingEmployee(null); }}
