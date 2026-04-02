@@ -6,9 +6,10 @@ interface DeleteEmployeeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   employee: Employee | null;
+  onDeleted?: () => void;
 }
 
-export function DeleteEmployeeDialog({ open, onOpenChange, employee }: DeleteEmployeeDialogProps) {
+export function DeleteEmployeeDialog({ open, onOpenChange, employee, onDeleted }: DeleteEmployeeDialogProps) {
   const deleteEmployee = useDeleteEmployee();
   const { toast } = useToast();
 
@@ -18,6 +19,7 @@ export function DeleteEmployeeDialog({ open, onOpenChange, employee }: DeleteEmp
       await deleteEmployee.mutateAsync(employee.id);
       toast({ title: 'Employee deleted', description: `${employee.name} has been removed.` });
       onOpenChange(false);
+      onDeleted?.();
     } catch (err: any) {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
     }
@@ -27,7 +29,7 @@ export function DeleteEmployeeDialog({ open, onOpenChange, employee }: DeleteEmp
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Employee</AlertDialogTitle>
+          <AlertDialogTitle>Delete {employee?.name}?</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete <span className="font-semibold text-foreground">{employee?.name}</span>?
             This will also remove all their shift assignments. This action cannot be undone.
