@@ -27,7 +27,7 @@ interface EmployeeProfileDrawerProps {
   initialEdit?: boolean;
 }
 
-export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId }: EmployeeProfileDrawerProps) {
+export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId, initialEdit = false }: EmployeeProfileDrawerProps) {
   const [editing, setEditing] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [name, setName] = useState('');
