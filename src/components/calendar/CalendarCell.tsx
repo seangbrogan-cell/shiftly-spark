@@ -19,7 +19,7 @@ export function CalendarCell({ id, children, isToday, unavailable, unavailableLa
       ref={setNodeRef}
       onClick={unavailable ? undefined : onClick}
       className={cn(
-        'min-h-[34px] sm:min-h-[46px] border-r border-b border-border p-0.5 transition-colors',
+        'min-h-[31px] sm:min-h-[43px] border-r border-b border-border p-0.5 transition-colors',
         unavailable
           ? 'bg-muted/60 cursor-not-allowed'
           : 'cursor-pointer',
