@@ -24,6 +24,7 @@ interface EmployeeProfileDrawerProps {
   onOpenChange: (open: boolean) => void;
   employee: Employee | null;
   employerId: string;
+  initialEdit?: boolean;
 }
 
 export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId }: EmployeeProfileDrawerProps) {
