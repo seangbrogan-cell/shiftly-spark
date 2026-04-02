@@ -90,6 +90,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const cancelEditing = () => {
     setEditing(false);
     setErrors({});
+    onOpenChange(false);
   };
 
   const handleToggleDay = useCallback((day: string) => {
