@@ -334,6 +334,7 @@ export default function Dashboard() {
           onOpenChange={setDrawerOpen}
           employee={drawerEmployee}
           employerId={employerId}
+          initialEdit
         />
       )}
       <DeleteEmployeeDialog
