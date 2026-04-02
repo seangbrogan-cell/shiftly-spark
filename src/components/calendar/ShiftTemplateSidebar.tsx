@@ -91,7 +91,7 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
     <aside
       ref={setNodeRef}
       className={cn(
-        'hidden lg:flex flex-col shrink-0 border-l border-border bg-card overflow-y-auto transition-all duration-200 print:hidden',
+        'hidden lg:flex flex-col shrink-0 border-l border-border bg-card overflow-y-auto overflow-x-hidden transition-all duration-200 print:hidden',
         collapsed ? 'w-12' : 'w-52',
         isOver && 'border-destructive/50 bg-destructive/5'
       )}
