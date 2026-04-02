@@ -40,10 +40,19 @@ function getStartHour(shift: Shift): number {
   return d.getHours() + d.getMinutes() / 60;
 }
 
+function loadCollapsedPeriods(): Set<Period> {
+  try {
+    const stored = localStorage.getItem(COLLAPSED_KEY);
+    if (stored) return new Set(JSON.parse(stored) as Period[]);
+  } catch {}
+  return new Set();
+}
+
 export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [periodOrder, setPeriodOrder] = useState<Period[]>(loadOrder);
+  const [collapsedPeriods, setCollapsedPeriods] = useState<Set<Period>>(loadCollapsedPeriods);
   const { setNodeRef, isOver } = useDroppable({ id: 'sidebar-templates' });
 
   const movePeriod = useCallback((index: number, direction: -1 | 1) => {
