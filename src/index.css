@@ -146,4 +146,15 @@
   .print-hide {
     display: none !important;
   }
+
+  /* Widen employee name column so it doesn't clip */
+  [class*="grid-cols-[110px"] {
+    grid-template-columns: 140px repeat(7, 1fr) 46px !important;
+  }
+
+  /* Keep shift times on one line */
+  .print-time-single-line {
+    font-size: 8px !important;
+    white-space: nowrap !important;
+  }
 }
