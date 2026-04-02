@@ -45,6 +45,7 @@ interface WeeklyCalendarProps {
   workplaceId?: string;
   renderSidebar?: (onAssignShift: () => void) => React.ReactNode;
   sidebarPortalRef?: React.RefObject<HTMLDivElement>;
+  onEmployeeClick?: (employee: Employee) => void;
 }
 
 export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef }: WeeklyCalendarProps) {
