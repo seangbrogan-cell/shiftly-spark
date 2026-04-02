@@ -1,5 +1,20 @@
-import { useState, useMemo } from 'react';
-import { Clock, Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
+import { Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
@@ -43,12 +58,54 @@ const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconC
   evening: { label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50 dark:bg-indigo-950/30' },
 };
 
-function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
+const STORAGE_KEY = 'shift-list-order';
+
+function loadSavedOrder(): Record<string, string[]> {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return {};
+}
+
+function saveSortOrder(order: Record<string, string[]>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+}
+
+function SortableShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
   const allDay = isAllDay(shift);
   const color = getShiftColor({ color: (shift as any).color, is_all_day: allDay, start_time: shift.start_time });
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: shift.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : 1,
+  };
+
   return (
-    <div className={`group flex items-center gap-2 rounded-md border ${color.border} ${color.bg} p-2.5 transition-shadow hover:shadow-md`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center gap-2 rounded-md border ${color.border} ${color.bg} p-2.5 transition-shadow hover:shadow-md ${isDragging ? 'shadow-lg ring-2 ring-primary/30' : ''}`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none shrink-0"
+        aria-label="Drag to reorder"
+      >
+        <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />
+      </button>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <div className={`h-2 w-2 rounded-full ${color.dot} shrink-0`} />
@@ -73,8 +130,68 @@ function ShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => vo
   );
 }
 
+function SortablePeriodGroup({
+  period,
+  shifts,
+  onEdit,
+  onDelete,
+  onReorder,
+}: {
+  period: Period;
+  shifts: Shift[];
+  onEdit: (shift: Shift) => void;
+  onDelete: (shift: Shift) => void;
+  onReorder: (period: Period, oldIndex: number, newIndex: number) => void;
+}) {
+  const config = PERIOD_CONFIG[period];
+  const Icon = config.icon;
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = shifts.findIndex(s => s.id === active.id);
+    const newIndex = shifts.findIndex(s => s.id === over.id);
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onReorder(period, oldIndex, newIndex);
+    }
+  };
+
+  return (
+    <div className={`w-52 rounded-lg border ${config.borderClass} ${config.bgClass} p-4`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className={`h-5 w-5 ${config.iconClass}`} />
+        <h3 className="text-sm font-semibold text-foreground">{config.label}</h3>
+        <span className="text-xs text-muted-foreground ml-auto">{shifts.length} shift{shifts.length !== 1 ? 's' : ''}</span>
+      </div>
+      {shifts.length === 0 ? (
+        <p className="text-xs text-muted-foreground text-center py-4 italic">No shifts</p>
+      ) : (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={shifts.map(s => s.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {shifts.map((shift) => (
+                <SortableShiftCard
+                  key={shift.id}
+                  shift={shift}
+                  onEdit={() => onEdit(shift)}
+                  onDelete={() => onDelete(shift)}
+                />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
+      )}
+    </div>
+  );
+}
+
 export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const [deletingShift, setDeletingShift] = useState<Shift | null>(null);
+  const [sortOrder, setSortOrder] = useState<Record<string, string[]>>(loadSavedOrder);
   const deleteShift = useDeleteShift();
   const { toast } = useToast();
 
@@ -87,8 +204,33 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
       else if (h >= 12 && h < 18) groups.afternoon.push(s);
       else groups.evening.push(s);
     });
+
+    // Apply saved sort order
+    for (const period of Object.keys(groups) as Period[]) {
+      const savedIds = sortOrder[period];
+      if (savedIds && savedIds.length > 0) {
+        const shiftMap = new Map(groups[period].map(s => [s.id, s]));
+        const sorted: Shift[] = [];
+        for (const id of savedIds) {
+          const s = shiftMap.get(id);
+          if (s) { sorted.push(s); shiftMap.delete(id); }
+        }
+        // Append any new shifts not in saved order
+        shiftMap.forEach(s => sorted.push(s));
+        groups[period] = sorted;
+      }
+    }
+
     return groups;
-  }, [shifts]);
+  }, [shifts, sortOrder]);
+
+  const handleReorder = useCallback((period: Period, oldIndex: number, newIndex: number) => {
+    const periodShifts = grouped[period];
+    const reordered = arrayMove(periodShifts, oldIndex, newIndex);
+    const newOrder = { ...sortOrder, [period]: reordered.map(s => s.id) };
+    setSortOrder(newOrder);
+    saveSortOrder(newOrder);
+  }, [grouped, sortOrder]);
 
   const handleDelete = async () => {
     if (!deletingShift) return;
@@ -112,35 +254,16 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   return (
     <>
       <div className="flex flex-wrap gap-4">
-        {(['morning', 'afternoon', 'evening', 'allday'] as Period[]).map((period) => {
-          const config = PERIOD_CONFIG[period];
-          const Icon = config.icon;
-          const periodShifts = grouped[period];
-
-          return (
-            <div key={period} className={`w-52 rounded-lg border ${config.borderClass} ${config.bgClass} p-4`}>
-              <div className="flex items-center gap-2 mb-3">
-                <Icon className={`h-5 w-5 ${config.iconClass}`} />
-                <h3 className="text-sm font-semibold text-foreground">{config.label}</h3>
-                <span className="text-xs text-muted-foreground ml-auto">{periodShifts.length} shift{periodShifts.length !== 1 ? 's' : ''}</span>
-              </div>
-              {periodShifts.length === 0 ? (
-                <p className="text-xs text-muted-foreground text-center py-4 italic">No shifts</p>
-              ) : (
-                <div className="space-y-2">
-                  {periodShifts.map((shift) => (
-                    <ShiftCard
-                      key={shift.id}
-                      shift={shift}
-                      onEdit={() => onEdit(shift)}
-                      onDelete={() => setDeletingShift(shift)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+        {(['morning', 'afternoon', 'evening', 'allday'] as Period[]).map((period) => (
+          <SortablePeriodGroup
+            key={period}
+            period={period}
+            shifts={grouped[period]}
+            onEdit={onEdit}
+            onDelete={setDeletingShift}
+            onReorder={handleReorder}
+          />
+        ))}
       </div>
 
       <AlertDialog open={!!deletingShift} onOpenChange={(o) => { if (!o) setDeletingShift(null); }}>
