@@ -296,10 +296,15 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
 
           <DrawerFooter className="border-t border-border">
             {editing ? (
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={cancelEditing}>Cancel</Button>
-                <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
-                  {isSaving ? 'Saving…' : 'Save'}
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={cancelEditing}>Cancel</Button>
+                  <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? 'Saving…' : 'Save'}
+                  </Button>
+                </div>
+                <Button variant="destructive" className="w-full" onClick={() => setDeleteOpen(true)}>
+                  <Trash2 className="h-4 w-4 mr-1.5" /> Delete
                 </Button>
               </div>
             ) : (
