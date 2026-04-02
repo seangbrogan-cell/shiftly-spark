@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose,
 } from '@/components/ui/drawer';
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { useUpdateEmployee, useDeleteEmployee, type Employee } from '@/hooks/use-dashboard-data';
+import { useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { Mail, Phone, UserCircle, Pencil, Trash2, X } from 'lucide-react';
@@ -30,11 +30,21 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const prevEmployeeId = useRef<string | null>(null);
 
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleNames = useMemo(() => getRoleNames(dbRoles), [dbRoles]);
   const updateEmployee = useUpdateEmployee();
   const { toast } = useToast();
+
+  // Reset edit mode when switching employees
+  useEffect(() => {
+    if (employee?.id !== prevEmployeeId.current) {
+      setEditing(false);
+      setErrors({});
+      prevEmployeeId.current = employee?.id ?? null;
+    }
+  }, [employee?.id]);
 
   const startEditing = () => {
     if (!employee) return;
@@ -75,13 +85,14 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
       toast({ title: 'Employee updated' });
       setEditing(false);
     } catch (err: any) {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      const msg = err.message ?? '';
+      // Handle duplicate email (unique constraint violation)
+      if (msg.includes('duplicate') || msg.includes('unique') || msg.includes('already exists')) {
+        setErrors(prev => ({ ...prev, email: 'Email already in use' }));
+      } else {
+        toast({ title: 'Failed to save. Please try again.', description: msg, variant: 'destructive' });
+      }
     }
-  };
-
-  const handleDeleteSuccess = () => {
-    setDeleteOpen(false);
-    onOpenChange(false);
   };
 
   if (!employee) return null;
@@ -93,7 +104,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
           <div className="mx-0 mt-0 h-0 w-0" /> {/* Override default drag handle */}
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
-              <DrawerTitle>Employee Profile</DrawerTitle>
+              <DrawerTitle>{employee.name}</DrawerTitle>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
                   <X className="h-4 w-4" />
@@ -159,7 +170,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
               {editing && (
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">Role</Label>
-                  <Select value={roleNames.includes(role) ? role : role} onValueChange={setRole}>
+                  <Select value={role} onValueChange={setRole}>
                     <SelectTrigger className="h-8 text-sm">
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
@@ -215,18 +226,12 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
 
       <DeleteEmployeeDialog
         open={deleteOpen}
-        onOpenChange={(o) => {
-          setDeleteOpen(o);
-          // After dialog closes and employee was deleted, close the drawer
-          if (!o) {
-            // Small delay to let the delete mutation invalidate queries
-            setTimeout(() => {
-              onOpenChange(false);
-              setEditing(false);
-            }, 100);
-          }
-        }}
+        onOpenChange={setDeleteOpen}
         employee={employee}
+        onDeleted={() => {
+          onOpenChange(false);
+          setEditing(false);
+        }}
       />
     </>
   );
