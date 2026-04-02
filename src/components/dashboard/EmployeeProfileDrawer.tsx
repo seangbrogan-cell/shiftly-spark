@@ -33,6 +33,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
+  const [employmentType, setEmploymentType] = useState('full_time');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
   const [availabilityDays, setAvailabilityDays] = useState<string[]>([]);
