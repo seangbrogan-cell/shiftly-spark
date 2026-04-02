@@ -66,6 +66,15 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
     });
   }, []);
 
+  const togglePeriodCollapsed = useCallback((period: Period) => {
+    setCollapsedPeriods(prev => {
+      const next = new Set(prev);
+      if (next.has(period)) next.delete(period); else next.add(period);
+      localStorage.setItem(COLLAPSED_KEY, JSON.stringify([...next]));
+      return next;
+    });
+  }, []);
+
   const grouped = useMemo(() => {
     const groups: Record<Period, Shift[]> = { allday: [], morning: [], afternoon: [], evening: [] };
     shifts.forEach((s) => {
