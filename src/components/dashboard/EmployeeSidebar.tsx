@@ -80,6 +80,7 @@ export function EmployeeSidebar({ employees, shiftCounts, employerId }: Employee
         onOpenChange={setDrawerOpen}
         employee={selectedEmployee}
         employerId={employerId}
+        initialEdit
       />
     </>
   );
