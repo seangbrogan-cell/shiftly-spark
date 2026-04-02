@@ -111,6 +111,8 @@ export default function Dashboard() {
   const [employeeModalOpen, setEmployeeModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
   const [deletingEmployee, setDeletingEmployee] = useState<Employee | null>(null);
+  const [drawerEmployee, setDrawerEmployee] = useState<Employee | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const [editingShift, setEditingShift] = useState<Shift | null>(null);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -119,8 +121,8 @@ export default function Dashboard() {
   const sidebarPortalRef = useRef<HTMLDivElement>(null);
 
   const handleEdit = (emp: Employee) => {
-    setEditingEmployee(emp);
-    setEmployeeModalOpen(true);
+    setDrawerEmployee(emp);
+    setDrawerOpen(true);
   };
 
   const handleCloseEmployeeModal = (open: boolean) => {
