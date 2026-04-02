@@ -271,9 +271,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
           </div>
           <p className="text-sm text-muted-foreground">
             {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
-          </p>
-          <p className="hidden print:block text-xs text-muted-foreground mt-0.5">
-            Printed {format(new Date(), 'MMM d, yyyy h:mm a')}
+            <span className="hidden print:inline ml-2 text-xs">· Printed {format(new Date(), 'MMM d, yyyy h:mm a')}</span>
           </p>
         </div>
         <div className="flex items-center gap-2 print:hidden">
