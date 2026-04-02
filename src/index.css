@@ -157,9 +157,9 @@
     grid-template-columns: 150px repeat(7, 1fr) 0px !important;
   }
 
-  /* Prevent left edge clipping in print */
-  .rounded-lg {
-    margin-left: 14mm !important;
+  /* Shift the printed schedule header and grid together */
+  .print-schedule-offset {
+    margin-left: 8mm !important;
   }
 
   /* Keep shift times on one line */
