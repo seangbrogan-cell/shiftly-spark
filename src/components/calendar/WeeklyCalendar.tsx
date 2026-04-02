@@ -272,8 +272,11 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
           <p className="text-sm text-muted-foreground">
             {format(weekDays[0], 'MMM d')} – {format(weekDays[6], 'MMM d, yyyy')}
           </p>
+          <p className="hidden print:block text-xs text-muted-foreground mt-0.5">
+            Printed {format(new Date(), 'MMM d, yyyy h:mm a')}
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
           <Button variant="outline" size="sm" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
