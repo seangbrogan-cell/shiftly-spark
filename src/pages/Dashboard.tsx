@@ -13,6 +13,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { EmployerProfileModal } from '@/components/dashboard/EmployerProfileModal';
 import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
+import { EmployeeProfileDrawer } from '@/components/dashboard/EmployeeProfileDrawer';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
 import { EmployeeModal } from '@/components/dashboard/EmployeeModal';
