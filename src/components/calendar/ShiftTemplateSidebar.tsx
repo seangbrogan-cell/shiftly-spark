@@ -122,7 +122,7 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
       <div className="p-3 border-b border-border flex items-center justify-between gap-2">
         {!collapsed && (
           <Button size="sm" variant="default" className="w-full" onClick={() => navigate('/dashboard?tab=shifts')}>
-            <LayoutGrid className="h-4 w-4 mr-1.5" /> Shift Templates
+            <LayoutGrid className="h-4 w-4 mr-1.5" /> Shifts
           </Button>
         )}
         <Button
