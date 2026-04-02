@@ -222,6 +222,7 @@ export default function Dashboard() {
                   renderSidebar={() => (
                     <ShiftTemplateSidebar shifts={shifts} />
                   )}
+                  onEmployeeClick={handleEdit}
                 />
               )}
             </TabsContent>
