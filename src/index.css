@@ -154,7 +154,7 @@
 
   /* Widen employee name column so it doesn't clip */
   [class*="grid-cols-[110px"] {
-    grid-template-columns: 150px repeat(7, 1fr) 0px !important;
+    grid-template-columns: 150px repeat(7, 1fr) 36px !important;
   }
 
   /* Shift the printed schedule header and grid together */
