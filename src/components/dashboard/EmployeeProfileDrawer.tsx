@@ -115,6 +115,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
           email: email.trim(),
           phone: phone.trim() || null,
           role,
+          employment_type: employmentType,
           availability: availabilityDays,
         } as any),
         saveWorkplaces.mutateAsync({
