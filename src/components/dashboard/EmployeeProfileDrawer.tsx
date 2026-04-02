@@ -24,9 +24,10 @@ interface EmployeeProfileDrawerProps {
   onOpenChange: (open: boolean) => void;
   employee: Employee | null;
   employerId: string;
+  initialEdit?: boolean;
 }
 
-export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId }: EmployeeProfileDrawerProps) {
+export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId, initialEdit = false }: EmployeeProfileDrawerProps) {
   const [editing, setEditing] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [name, setName] = useState('');
@@ -50,14 +51,26 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
-  // Reset edit mode when switching employees
+  // Auto-enter edit mode and reset when switching employees
   useEffect(() => {
     if (employee?.id !== prevEmployeeId.current) {
-      setEditing(false);
       setErrors({});
       prevEmployeeId.current = employee?.id ?? null;
+      if (open && initialEdit && employee) {
+        // Defer startEditing to after state settles
+        setTimeout(() => startEditing(), 0);
+      } else {
+        setEditing(false);
+      }
     }
   }, [employee?.id]);
+
+  // Enter edit mode when drawer opens with initialEdit
+  useEffect(() => {
+    if (open && initialEdit && employee && !editing) {
+      startEditing();
+    }
+  }, [open]);
 
   const startEditing = () => {
     if (!employee) return;
@@ -283,10 +296,15 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
 
           <DrawerFooter className="border-t border-border">
             {editing ? (
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={cancelEditing}>Cancel</Button>
-                <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
-                  {isSaving ? 'Saving…' : 'Save'}
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex-1" onClick={cancelEditing}>Cancel</Button>
+                  <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? 'Saving…' : 'Save'}
+                  </Button>
+                </div>
+                <Button variant="destructive" className="w-full" onClick={() => setDeleteOpen(true)}>
+                  <Trash2 className="h-4 w-4 mr-1.5" /> Delete
                 </Button>
               </div>
             ) : (
