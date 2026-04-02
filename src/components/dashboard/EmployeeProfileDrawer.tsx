@@ -215,7 +215,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
                 <Button variant="outline" className="flex-1" onClick={startEditing}>
                   <Pencil className="h-4 w-4 mr-1.5" /> Edit
                 </Button>
-                <Button variant="destructive" className="flex-1" onClick={() => { setDidDelete(false); setDeleteOpen(true); }}>
+                <Button variant="destructive" className="flex-1" onClick={() => setDeleteOpen(true)}>
                   <Trash2 className="h-4 w-4 mr-1.5" /> Delete
                 </Button>
               </div>
@@ -226,15 +226,12 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
 
       <DeleteEmployeeDialog
         open={deleteOpen}
-        onOpenChange={(o) => {
-          setDeleteOpen(o);
-          // Only close drawer if the delete was actually performed
-          if (!o && didDelete) {
-            onOpenChange(false);
-            setEditing(false);
-          }
-        }}
+        onOpenChange={setDeleteOpen}
         employee={employee}
+        onDeleted={() => {
+          onOpenChange(false);
+          setEditing(false);
+        }}
       />
     </>
   );
