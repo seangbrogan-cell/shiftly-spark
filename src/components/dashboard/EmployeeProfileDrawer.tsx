@@ -252,9 +252,9 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
               </div>
 
               {/* Status */}
-              <div className="space-y-2">
+              <div className="flex flex-col gap-3">
                 <Label className="text-xs text-muted-foreground">Status</Label>
-                <Badge variant={employee.status === 'active' ? 'default' : 'outline'} className="text-xs capitalize">
+                <Badge variant={employee.status === 'active' ? 'default' : 'outline'} className="text-xs capitalize w-fit">
                   {employee.status}
                 </Badge>
               </div>
