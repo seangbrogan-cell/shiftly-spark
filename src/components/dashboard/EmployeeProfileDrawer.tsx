@@ -65,6 +65,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setEmail(employee.email);
     setPhone(employee.phone ?? '');
     setRole(employee.role);
+    setEmploymentType(employee.employment_type ?? 'full_time');
     setSelectedWorkplaceIds(empWorkplaces.map(ew => ew.workplace_id));
     const avail = employee.availability ?? [];
     setAvailabilityDays(avail);
