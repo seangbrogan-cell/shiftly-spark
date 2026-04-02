@@ -51,14 +51,26 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
-  // Reset edit mode when switching employees
+  // Auto-enter edit mode and reset when switching employees
   useEffect(() => {
     if (employee?.id !== prevEmployeeId.current) {
-      setEditing(false);
       setErrors({});
       prevEmployeeId.current = employee?.id ?? null;
+      if (open && initialEdit && employee) {
+        // Defer startEditing to after state settles
+        setTimeout(() => startEditing(), 0);
+      } else {
+        setEditing(false);
+      }
     }
   }, [employee?.id]);
+
+  // Enter edit mode when drawer opens with initialEdit
+  useEffect(() => {
+    if (open && initialEdit && employee && !editing) {
+      startEditing();
+    }
+  }, [open]);
 
   const startEditing = () => {
     if (!employee) return;
