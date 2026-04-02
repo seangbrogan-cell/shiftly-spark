@@ -22,7 +22,7 @@ const PERIODS_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; icon
 
 const DEFAULT_ORDER: Period[] = ['morning', 'afternoon', 'evening', 'allday'];
 const STORAGE_KEY = 'shift-sidebar-period-order';
-
+const COLLAPSED_KEY = 'shift-sidebar-collapsed-periods';
 function loadOrder(): Period[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
