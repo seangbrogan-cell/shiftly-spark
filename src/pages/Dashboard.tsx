@@ -12,7 +12,7 @@ import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, C
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { EmployerProfileModal } from '@/components/dashboard/EmployerProfileModal';
-import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
+
 import { EmployeeProfileDrawer } from '@/components/dashboard/EmployeeProfileDrawer';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
@@ -152,8 +152,6 @@ export default function Dashboard() {
       <DashboardHeader email={user?.email} displayName={profile?.display_name} avatarUrl={(profile as any)?.avatar_url} onSignOut={signOut} userId={user?.id} profile={profile} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
-        <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} employerId={employerId} />
-
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8">
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -224,6 +222,7 @@ export default function Dashboard() {
                   renderSidebar={() => (
                     <ShiftTemplateSidebar shifts={shifts} />
                   )}
+                  onEmployeeClick={handleEdit}
                 />
               )}
             </TabsContent>

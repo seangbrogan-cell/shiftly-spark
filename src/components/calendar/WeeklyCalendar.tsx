@@ -45,9 +45,10 @@ interface WeeklyCalendarProps {
   workplaceId?: string;
   renderSidebar?: (onAssignShift: () => void) => React.ReactNode;
   sidebarPortalRef?: React.RefObject<HTMLDivElement>;
+  onEmployeeClick?: (employee: Employee) => void;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef, onEmployeeClick }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
@@ -356,7 +357,13 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
             }).map((emp) => (
               <div key={emp.id} className="grid grid-cols-[80px_repeat(7,1fr)_36px] sm:grid-cols-[110px_repeat(7,1fr)_46px]">
                 {/* Employee Name Cell */}
-                <div className="px-1 sm:px-2 py-1 border-r border-b border-border flex items-start">
+                <div
+                  className={cn(
+                    "px-1 sm:px-2 py-1 border-r border-b border-border flex items-start",
+                    onEmployeeClick && "cursor-pointer hover:bg-muted/50 transition-colors"
+                  )}
+                  onClick={() => onEmployeeClick?.(emp)}
+                >
                   <div className="min-w-0">
                     <p className="text-[10px] sm:text-xs font-medium text-foreground truncate">{emp.name}</p>
                     <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{emp.role}</p>
