@@ -48,7 +48,7 @@ interface WeeklyCalendarProps {
   onEmployeeClick?: (employee: Employee) => void;
 }
 
-export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ employees, shifts, employerId, companyName, workplaceId, renderSidebar, sidebarPortalRef, onEmployeeClick }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [modalOpen, setModalOpen] = useState(false);
   const [editingAssignment, setEditingAssignment] = useState<AssignmentWithDetails | null>(null);
