@@ -12,7 +12,7 @@ import { Clock, LogOut, Plus, CalendarPlus, Users, Calendar, LayoutGrid, Mail, C
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { EmployerProfileModal } from '@/components/dashboard/EmployerProfileModal';
-import { EmployeeSidebar } from '@/components/dashboard/EmployeeSidebar';
+
 import { EmployeeProfileDrawer } from '@/components/dashboard/EmployeeProfileDrawer';
 import { RoleManager } from '@/components/dashboard/RoleManager';
 import { EmployeeTable } from '@/components/dashboard/EmployeeTable';
