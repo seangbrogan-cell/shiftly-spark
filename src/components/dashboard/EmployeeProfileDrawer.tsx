@@ -142,7 +142,6 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
         }),
       ]);
       toast({ title: 'Employee updated' });
-      setEditing(false);
     } catch (err: any) {
       const msg = err.message ?? '';
       if (msg.includes('duplicate') || msg.includes('unique') || msg.includes('already exists')) {
