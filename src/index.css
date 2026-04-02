@@ -159,7 +159,7 @@
 
   /* Prevent left edge clipping in print */
   .rounded-lg {
-    margin-left: 8mm !important;
+    margin-left: 14mm !important;
   }
 
   /* Keep shift times on one line */
