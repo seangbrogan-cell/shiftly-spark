@@ -231,13 +231,25 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
               {/* Employment type */}
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Employment Type</Label>
-                <p className="text-sm text-foreground capitalize">
-                  {(employee.employment_type ?? 'full_time').replace('_', ' ')}
-                </p>
+                {editing ? (
+                  <Select value={employmentType} onValueChange={setEmploymentType}>
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full_time">Full Time</SelectItem>
+                      <SelectItem value="part_time">Part Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-foreground capitalize">
+                    {(employee.employment_type ?? 'full_time').replace('_', ' ')}
+                  </p>
+                )}
               </div>
 
               {/* Status */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Status</Label>
                 <Badge variant={employee.status === 'active' ? 'default' : 'outline'} className="text-xs capitalize">
                   {employee.status}
