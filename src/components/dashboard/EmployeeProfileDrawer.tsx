@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose,
 } from '@/components/ui/drawer';
@@ -12,8 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
+import { useEmployeeWorkplaces, useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
+import { useEmployeeAvailability, useSaveEmployeeAvailability, buildDayTimeRanges, type DayTimeRange } from '@/hooks/use-employee-availability';
 import { Mail, Phone, UserCircle, Pencil, Trash2, X } from 'lucide-react';
 import { DeleteEmployeeDialog } from './DeleteEmployeeDialog';
+import { EmployeeWorkplacesEditor } from './EmployeeWorkplacesEditor';
+import { EmployeeAvailabilityEditor } from './EmployeeAvailabilityEditor';
 
 interface EmployeeProfileDrawerProps {
   open: boolean;
@@ -30,12 +34,20 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
+  const [availabilityDays, setAvailabilityDays] = useState<string[]>([]);
+  const [dayRanges, setDayRanges] = useState<DayTimeRange[]>([]);
   const prevEmployeeId = useRef<string | null>(null);
 
   const { data: dbRoles = [] } = useRoleTypes(employerId);
   const roleNames = useMemo(() => getRoleNames(dbRoles), [dbRoles]);
   const updateEmployee = useUpdateEmployee();
+  const saveWorkplaces = useSaveEmployeeWorkplaces();
+  const saveAvailability = useSaveEmployeeAvailability();
   const { toast } = useToast();
+
+  const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
+  const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
   // Reset edit mode when switching employees
   useEffect(() => {
@@ -52,6 +64,10 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setEmail(employee.email);
     setPhone(employee.phone ?? '');
     setRole(employee.role);
+    setSelectedWorkplaceIds(empWorkplaces.map(ew => ew.workplace_id));
+    const avail = employee.availability ?? [];
+    setAvailabilityDays(avail);
+    setDayRanges(buildDayTimeRanges(avail, availabilityRows));
     setErrors({});
     setEditing(true);
   };
@@ -60,6 +76,21 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setEditing(false);
     setErrors({});
   };
+
+  const handleToggleDay = useCallback((day: string) => {
+    setAvailabilityDays(prev =>
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+    setDayRanges(prev =>
+      prev.map(dr => dr.day === day ? { ...dr, enabled: !dr.enabled } : dr)
+    );
+  }, []);
+
+  const handleChangeTime = useCallback((day: string, field: 'start_time' | 'end_time', value: string) => {
+    setDayRanges(prev =>
+      prev.map(dr => dr.day === day ? { ...dr, [field]: value } : dr)
+    );
+  }, []);
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -75,18 +106,29 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const handleSave = async () => {
     if (!employee || !validate()) return;
     try {
-      await updateEmployee.mutateAsync({
-        id: employee.id,
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim() || null,
-        role,
-      } as any);
+      await Promise.all([
+        updateEmployee.mutateAsync({
+          id: employee.id,
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          role,
+          availability: availabilityDays,
+        } as any),
+        saveWorkplaces.mutateAsync({
+          employeeId: employee.id,
+          workplaceIds: selectedWorkplaceIds,
+        }),
+        saveAvailability.mutateAsync({
+          employeeId: employee.id,
+          availability: availabilityDays,
+          dayAvailability: dayRanges,
+        }),
+      ]);
       toast({ title: 'Employee updated' });
       setEditing(false);
     } catch (err: any) {
       const msg = err.message ?? '';
-      // Handle duplicate email (unique constraint violation)
       if (msg.includes('duplicate') || msg.includes('unique') || msg.includes('already exists')) {
         setErrors(prev => ({ ...prev, email: 'Email already in use' }));
       } else {
@@ -95,13 +137,15 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     }
   };
 
+  const isSaving = updateEmployee.isPending || saveWorkplaces.isPending || saveAvailability.isPending;
+
   if (!employee) return null;
 
   return (
     <>
       <Drawer open={open} onOpenChange={(o) => { if (!o) setEditing(false); onOpenChange(o); }} direction="right">
         <DrawerContent className="fixed inset-y-0 right-0 left-auto w-full sm:w-[400px] rounded-t-none rounded-l-[10px] h-full mt-0">
-          <div className="mx-0 mt-0 h-0 w-0" /> {/* Override default drag handle */}
+          <div className="mx-0 mt-0 h-0 w-0" />
           <DrawerHeader className="text-left">
             <div className="flex items-center justify-between">
               <DrawerTitle>{employee.name}</DrawerTitle>
@@ -199,6 +243,26 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
                   {employee.status}
                 </Badge>
               </div>
+
+              <Separator />
+
+              {/* Workplaces */}
+              <EmployeeWorkplacesEditor
+                employeeId={employee.id}
+                employerId={employerId}
+                editing={editing}
+                selectedIds={selectedWorkplaceIds}
+                onChangeIds={setSelectedWorkplaceIds}
+              />
+
+              {/* Availability */}
+              <EmployeeAvailabilityEditor
+                editing={editing}
+                availability={editing ? availabilityDays : (employee.availability ?? [])}
+                dayRanges={dayRanges}
+                onToggleDay={handleToggleDay}
+                onChangeTime={handleChangeTime}
+              />
             </div>
           </div>
 
@@ -206,8 +270,8 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
             {editing ? (
               <div className="flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={cancelEditing}>Cancel</Button>
-                <Button className="flex-1" onClick={handleSave} disabled={updateEmployee.isPending}>
-                  {updateEmployee.isPending ? 'Saving…' : 'Save'}
+                <Button className="flex-1" onClick={handleSave} disabled={isSaving}>
+                  {isSaving ? 'Saving…' : 'Save'}
                 </Button>
               </div>
             ) : (
