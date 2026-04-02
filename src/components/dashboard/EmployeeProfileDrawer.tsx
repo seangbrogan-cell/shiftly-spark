@@ -33,6 +33,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
+  const [employmentType, setEmploymentType] = useState('full_time');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedWorkplaceIds, setSelectedWorkplaceIds] = useState<string[]>([]);
   const [availabilityDays, setAvailabilityDays] = useState<string[]>([]);
@@ -64,6 +65,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setEmail(employee.email);
     setPhone(employee.phone ?? '');
     setRole(employee.role);
+    setEmploymentType(employee.employment_type ?? 'full_time');
     setSelectedWorkplaceIds(empWorkplaces.map(ew => ew.workplace_id));
     const avail = employee.availability ?? [];
     setAvailabilityDays(avail);
@@ -113,6 +115,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
           email: email.trim(),
           phone: phone.trim() || null,
           role,
+          employment_type: employmentType,
           availability: availabilityDays,
         } as any),
         saveWorkplaces.mutateAsync({
@@ -231,13 +234,25 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
               {/* Employment type */}
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">Employment Type</Label>
-                <p className="text-sm text-foreground capitalize">
-                  {(employee.employment_type ?? 'full_time').replace('_', ' ')}
-                </p>
+                {editing ? (
+                  <Select value={employmentType} onValueChange={setEmploymentType}>
+                    <SelectTrigger className="h-8 text-sm">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="full_time">Full Time</SelectItem>
+                      <SelectItem value="part_time">Part Time</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-sm text-foreground capitalize">
+                    {(employee.employment_type ?? 'full_time').replace('_', ' ')}
+                  </p>
+                )}
               </div>
 
               {/* Status */}
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label className="text-xs text-muted-foreground">Status</Label>
                 <Badge variant={employee.status === 'active' ? 'default' : 'outline'} className="text-xs capitalize">
                   {employee.status}
