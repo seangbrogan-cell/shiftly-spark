@@ -149,7 +149,7 @@ export default function Dashboard() {
       <DashboardHeader email={user?.email} displayName={profile?.display_name} avatarUrl={(profile as any)?.avatar_url} onSignOut={signOut} userId={user?.id} profile={profile} />
 
       <div className="flex flex-1" style={{ minHeight: 'calc(100vh - 4rem)' }}>
-        <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} />
+        <EmployeeSidebar employees={employees} shiftCounts={shiftCounts} employerId={employerId} />
 
         <main className="flex-1 overflow-y-auto p-3 sm:p-6 lg:p-8">
 
