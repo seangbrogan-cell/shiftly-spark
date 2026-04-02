@@ -154,7 +154,12 @@
 
   /* Widen employee name column so it doesn't clip */
   [class*="grid-cols-[110px"] {
-    grid-template-columns: 140px repeat(7, 1fr) 46px !important;
+    grid-template-columns: 150px repeat(7, 1fr) 0px !important;
+  }
+
+  /* Prevent left edge clipping in print */
+  .rounded-lg {
+    margin-left: 2mm !important;
   }
 
   /* Keep shift times on one line */
