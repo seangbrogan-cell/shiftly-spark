@@ -215,7 +215,17 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
 
       <DeleteEmployeeDialog
         open={deleteOpen}
-        onOpenChange={(o) => { setDeleteOpen(o); if (!o && !employee) onOpenChange(false); }}
+        onOpenChange={(o) => {
+          setDeleteOpen(o);
+          // After dialog closes and employee was deleted, close the drawer
+          if (!o) {
+            // Small delay to let the delete mutation invalidate queries
+            setTimeout(() => {
+              onOpenChange(false);
+              setEditing(false);
+            }, 100);
+          }
+        }}
         employee={employee}
       />
     </>
