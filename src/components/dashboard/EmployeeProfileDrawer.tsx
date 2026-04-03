@@ -13,6 +13,7 @@ import { useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { useEmployeeWorkplaces, useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
+import { useWorkplaces } from '@/hooks/use-workplaces';
 import { useEmployeeAvailability, useSaveEmployeeAvailability, buildDayTimeRanges, type DayTimeRange } from '@/hooks/use-employee-availability';
 import { Mail, Phone, UserCircle, Pencil, Trash2, X } from 'lucide-react';
 import { DeleteEmployeeDialog } from './DeleteEmployeeDialog';
@@ -49,6 +50,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const { toast } = useToast();
 
   const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
+  const { data: workplaces = [] } = useWorkplaces(employerId);
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
   // Auto-enter edit mode and reset when switching employees
@@ -79,7 +81,11 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setPhone(employee.phone ?? '');
     setRole(employee.role);
     setEmploymentType(employee.employment_type ?? 'full_time');
-    setSelectedWorkplaceIds(empWorkplaces.map(ew => ew.workplace_id));
+    // If workplace data hasn't loaded yet, default to all workplaces
+    const wpIds = empWorkplaces.length > 0
+      ? empWorkplaces.map(ew => ew.workplace_id)
+      : workplaces.map(w => w.id);
+    setSelectedWorkplaceIds(wpIds);
     const avail = employee.availability ?? [];
     setAvailabilityDays(avail);
     setDayRanges(buildDayTimeRanges(avail, availabilityRows));
