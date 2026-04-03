@@ -13,6 +13,7 @@ import { useUpdateEmployee, type Employee } from '@/hooks/use-dashboard-data';
 import { getRoleNames } from '@/lib/roles';
 import { useRoleTypes } from '@/hooks/use-role-types';
 import { useEmployeeWorkplaces, useSaveEmployeeWorkplaces } from '@/hooks/use-employee-workplaces';
+import { useWorkplaces } from '@/hooks/use-workplaces';
 import { useEmployeeAvailability, useSaveEmployeeAvailability, buildDayTimeRanges, type DayTimeRange } from '@/hooks/use-employee-availability';
 import { Mail, Phone, UserCircle, Pencil, Trash2, X } from 'lucide-react';
 import { DeleteEmployeeDialog } from './DeleteEmployeeDialog';
