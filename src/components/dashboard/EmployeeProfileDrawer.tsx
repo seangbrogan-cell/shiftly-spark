@@ -50,6 +50,7 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
   const { toast } = useToast();
 
   const { data: empWorkplaces = [] } = useEmployeeWorkplaces(employee?.id);
+  const { data: workplaces = [] } = useWorkplaces(employerId);
   const { data: availabilityRows = [] } = useEmployeeAvailability(employee?.id);
 
   // Auto-enter edit mode and reset when switching employees
