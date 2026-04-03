@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Pencil, Check, X, Trash2, Building2 } from 'lucide-react';
-import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, type Workplace } from '@/hooks/use-workplaces';
+import { Pencil, Check, X, Trash2, Building2, Plus } from 'lucide-react';
+import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, useCreateWorkplace, type Workplace } from '@/hooks/use-workplaces';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -19,16 +19,36 @@ import {
 
 interface WorkplaceManagerProps {
   workplaces: Workplace[];
+  employerId: string;
 }
 
-export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
+export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [deletingWp, setDeletingWp] = useState<Workplace | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
   const updateWorkplace = useUpdateWorkplace();
   const deleteWorkplace = useDeleteWorkplace();
   const toggleVisible = useToggleFullScheduleVisible();
+  const createWorkplace = useCreateWorkplace();
   const { toast } = useToast();
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    try {
+      await createWorkplace.mutateAsync({
+        employerId,
+        name: newName.trim(),
+        copyFromWorkplaceId: workplaces.length > 0 ? workplaces[0].id : undefined,
+      });
+      setAdding(false);
+      setNewName('');
+      toast({ title: 'Workplace created', description: `${newName.trim()} is ready.` });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
 
   const startEdit = (wp: Workplace) => {
     setEditingId(wp.id);
@@ -60,11 +80,37 @@ export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Building2 className="h-4 w-4" /> Workplaces
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Building2 className="h-4 w-4" /> Workplaces
+          </CardTitle>
+          <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5" /> Add
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
+        {adding && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-muted/30 p-2">
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="New workplace name"
+              className="h-7 text-sm flex-1"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAdd();
+                if (e.key === 'Escape') { setAdding(false); setNewName(''); }
+              }}
+            />
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleAdd} disabled={createWorkplace.isPending}>
+              <Check className="h-3.5 w-3.5 text-success" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setAdding(false); setNewName(''); }}>
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
         {workplaces.map((wp) => (
           <div key={wp.id} className="flex items-center gap-2 rounded-md border border-border p-2">
             {editingId === wp.id ? (
