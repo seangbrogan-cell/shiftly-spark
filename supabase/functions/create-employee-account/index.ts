@@ -124,6 +124,29 @@ Deno.serve(async (req) => {
       .update({ user_id: userId })
       .eq("id", employeeId);
 
+    // Ensure employee is assigned to at least the default (first) workplace
+    const { data: existingWp } = await supabaseAdmin
+      .from("employee_workplaces")
+      .select("id")
+      .eq("employee_id", employeeId)
+      .limit(1);
+
+    if (!existingWp || existingWp.length === 0) {
+      // Get the first workplace for this employer
+      const { data: defaultWp } = await supabaseAdmin
+        .from("workplaces")
+        .select("id")
+        .eq("employer_id", employee.employer_id)
+        .order("created_at", { ascending: true })
+        .limit(1);
+
+      if (defaultWp && defaultWp.length > 0) {
+        await supabaseAdmin
+          .from("employee_workplaces")
+          .insert({ employee_id: employeeId, workplace_id: defaultWp[0].id });
+      }
+    }
+
     // Send password reset email so employee can set their own password
     // We need to use the site URL for the redirect
     const siteUrl = req.headers.get("origin") || req.headers.get("referer")?.replace(/\/+$/, "") || supabaseUrl;
