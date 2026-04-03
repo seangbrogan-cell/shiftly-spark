@@ -71,6 +71,15 @@ export default function Dashboard() {
   const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
   const { data: shifts = [], isLoading: loadingShifts } = useShifts(selectedWorkplaceId);
   const { data: shiftCounts = {} } = useShiftAssignmentCounts();
+  const [employeeSearch, setEmployeeSearch] = useState('');
+
+  const filteredEmployees = useMemo(() => {
+    const q = employeeSearch.trim().toLowerCase();
+    if (!q) return employees;
+    return employees.filter(e =>
+      e.name.toLowerCase().includes(q) || e.email.toLowerCase().includes(q)
+    );
+  }, [employees, employeeSearch]);
 
   // Pending time-off request count
   const { data: pendingTimeOffCount = 0 } = useQuery({
