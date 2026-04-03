@@ -46,7 +46,8 @@ function loadCollapsedPeriods(): Set<Period> {
     const stored = localStorage.getItem(COLLAPSED_KEY);
     if (stored) return new Set(JSON.parse(stored) as Period[]);
   } catch {}
-  return new Set();
+  // Default: all periods start collapsed
+  return new Set<Period>(['morning', 'afternoon', 'evening', 'allday']);
 }
 
 export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
