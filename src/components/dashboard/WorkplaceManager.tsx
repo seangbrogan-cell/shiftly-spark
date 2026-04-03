@@ -22,10 +22,13 @@ interface WorkplaceManagerProps {
   employerId: string;
 }
 
-export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
+export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [deletingWp, setDeletingWp] = useState<Workplace | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const createWorkplace = useCreateWorkplace();
   const updateWorkplace = useUpdateWorkplace();
   const deleteWorkplace = useDeleteWorkplace();
   const toggleVisible = useToggleFullScheduleVisible();
