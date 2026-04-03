@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Pencil, Check, X, Trash2, Building2 } from 'lucide-react';
-import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, type Workplace } from '@/hooks/use-workplaces';
+import { Pencil, Check, X, Trash2, Building2, Plus } from 'lucide-react';
+import { useUpdateWorkplace, useDeleteWorkplace, useToggleFullScheduleVisible, useCreateWorkplace, type Workplace } from '@/hooks/use-workplaces';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -19,16 +19,36 @@ import {
 
 interface WorkplaceManagerProps {
   workplaces: Workplace[];
+  employerId: string;
 }
 
-export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
+export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [deletingWp, setDeletingWp] = useState<Workplace | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
   const updateWorkplace = useUpdateWorkplace();
   const deleteWorkplace = useDeleteWorkplace();
   const toggleVisible = useToggleFullScheduleVisible();
+  const createWorkplace = useCreateWorkplace();
   const { toast } = useToast();
+
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    try {
+      await createWorkplace.mutateAsync({
+        employerId,
+        name: newName.trim(),
+        copyFromWorkplaceId: workplaces.length > 0 ? workplaces[0].id : undefined,
+      });
+      setAdding(false);
+      setNewName('');
+      toast({ title: 'Workplace created', description: `${newName.trim()} is ready.` });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
 
   const startEdit = (wp: Workplace) => {
     setEditingId(wp.id);
