@@ -80,9 +80,14 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base flex items-center gap-2">
-          <Building2 className="h-4 w-4" /> Workplaces
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Building2 className="h-4 w-4" /> Workplaces
+          </CardTitle>
+          <Button variant="outline" size="sm" className="h-7 gap-1 text-xs" onClick={() => setAdding(true)}>
+            <Plus className="h-3.5 w-3.5" /> Add
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-2">
         {workplaces.map((wp) => (
