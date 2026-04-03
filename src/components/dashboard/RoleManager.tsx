@@ -113,7 +113,7 @@ export function RoleManager({ employerId }: RoleManagerProps) {
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAdd(); } }}
           />
           <Button size="sm" onClick={handleAdd} disabled={!newRoleName.trim() || createRole.isPending}>
-            <Plus className="h-4 w-4 mr-1" /> Add
+            <Plus className="mr-1.5 h-4 w-4" /> Add
           </Button>
         </div>
       </CardContent>
