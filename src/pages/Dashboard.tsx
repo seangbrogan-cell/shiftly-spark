@@ -405,7 +405,7 @@ function DashboardHeader({ email, displayName, avatarUrl, onSignOut, userId, pro
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/admin/analytics">
                     <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Analytics</span>
+                    <span className="hidden lg:inline">Analytics</span>
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
