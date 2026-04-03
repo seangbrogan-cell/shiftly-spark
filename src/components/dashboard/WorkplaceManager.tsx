@@ -95,8 +95,8 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
           <CardTitle className="text-base flex items-center gap-2">
             <Building2 className="h-4 w-4" /> Workplaces
           </CardTitle>
-          <Button size="sm" className="h-9 gap-1" onClick={openCreateDialog}>
-            <Plus className="h-4 w-4" /> Add
+          <Button size="sm" onClick={openCreateDialog}>
+            <Plus className="mr-1.5 h-4 w-4" /> Add
           </Button>
         </div>
       </CardHeader>
