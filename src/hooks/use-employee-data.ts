@@ -43,8 +43,8 @@ export function useEmployeeWeeklySchedule(employeeId: string | undefined, weekSt
 }
 
 export function useEmployeeMonthlySchedule(employeeId: string | undefined, monthDate: Date, workplaceId?: string) {
-  const start = format(startOfMonth(monthDate), 'yyyy-MM-dd');
-  const end = format(endOfMonth(monthDate), 'yyyy-MM-dd');
+  const start = format(startOfWeek(startOfMonth(monthDate), { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  const end = format(endOfWeek(endOfMonth(monthDate), { weekStartsOn: 1 }), 'yyyy-MM-dd');
 
   return useQuery({
     queryKey: ['employee-schedule-month', employeeId, start, workplaceId],
