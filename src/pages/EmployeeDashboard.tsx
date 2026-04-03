@@ -244,6 +244,9 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
+                    <Button size="sm" variant="outline" className="h-8 text-xs sm:text-sm" onClick={() => window.print()}>
+                      <Printer className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Print</span>
+                    </Button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 shrink-0">
@@ -261,12 +264,11 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
+                    <Button size="sm" variant="outline" className="h-8 text-xs sm:text-sm" onClick={() => window.print()}>
+                      <Printer className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Print</span>
+                    </Button>
                   </div>
                 )}
-
-                <Button size="sm" variant="outline" className="h-8 text-xs sm:text-sm" onClick={() => window.print()}>
-                  <Printer className="h-4 w-4 sm:mr-1" /> <span className="hidden sm:inline">Print</span>
-                </Button>
               </div>
             )}
           </div>
