@@ -20,13 +20,15 @@ export default function Index() {
             <Clock className="h-7 w-7 text-primary" />
             <span className="text-xl font-bold text-foreground">WorkSchedule</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link to="/auth/login">
-              <Button variant="ghost" size="sm">Sign in</Button>
+              <Button variant="ghost" size="sm" className="px-2 sm:px-3">Sign in</Button>
             </Link>
             <Link to="/auth/signup">
-              <Button size="sm">
-                Get started <ArrowRight className="ml-1 h-4 w-4" />
+              <Button size="sm" className="px-2 sm:px-4">
+                <span className="hidden sm:inline">Get started</span>
+                <span className="sm:hidden">Start</span>
+                <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
             </Link>
           </div>
