@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { format, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, startOfMonth, isSameWeek, isSameMonth as isSameMonthFn } from 'date-fns';
+import { format, addDays, addWeeks, subWeeks, addMonths, subMonths, startOfWeek, isSameWeek, isSameMonth as isSameMonthFn } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,7 +36,7 @@ export default function EmployeeDashboard() {
 
   const [calendarView, setCalendarView] = useState<'weekly' | 'monthly'>('weekly');
   const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
-  const [currentMonth, setCurrentMonth] = useState(() => startOfMonth(new Date()));
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [timeOffModalOpen, setTimeOffModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedWorkplaceId, setSelectedWorkplaceId] = useState<string | undefined>(undefined);
@@ -44,6 +44,7 @@ export default function EmployeeDashboard() {
   
 
   const employeeId = employee?.id;
+  const getWeekReferenceDate = (weekDate: Date) => addDays(startOfWeek(weekDate, { weekStartsOn: 1 }), 3);
 
   const weekDays = getWeekDays(currentWeek);
   const { data: employeeWorkplaces = [] } = useEmployeeWorkplacesList(employeeId, employerId);
@@ -217,7 +218,7 @@ export default function EmployeeDashboard() {
                     <button
                       onClick={() => {
                         setCalendarView('monthly');
-                        setCurrentMonth(startOfMonth(currentWeek));
+                        setCurrentMonth(getWeekReferenceDate(currentWeek));
                       }}
                       className={`px-2.5 py-1 text-xs font-medium transition-colors border-l border-border ${calendarView === 'monthly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
                     >
@@ -253,7 +254,7 @@ export default function EmployeeDashboard() {
                       variant={isSameMonthFn(currentMonth, new Date()) ? 'default' : 'outline'}
                       size="sm"
                       className={isSameMonthFn(currentMonth, new Date()) ? '' : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:hover:bg-amber-900/50'}
-                      onClick={() => setCurrentMonth(startOfMonth(new Date()))}
+                      onClick={() => setCurrentMonth(new Date())}
                     >
                       <CalendarDays className="h-4 w-4 mr-1.5" /> Today
                     </Button>
