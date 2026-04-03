@@ -96,7 +96,7 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
               onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             />
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleAdd} disabled={createWorkplace.isPending}>
-              <Check className="h-3.5 w-3.5 text-green-600" />
+              <Check className="h-3.5 w-3.5 text-primary" />
             </Button>
             <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setAdding(false); setNewName(''); }}>
               <X className="h-3.5 w-3.5" />
