@@ -247,6 +247,16 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email…"
+                  value={employeeSearch}
+                  onChange={(e) => setEmployeeSearch(e.target.value)}
+                  className="pl-9 h-9"
+                />
+              </div>
+
               <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
                 <div>
                   {loadingEmployees ? (
