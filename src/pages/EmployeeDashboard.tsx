@@ -206,19 +206,13 @@ export default function EmployeeDashboard() {
                 {activeTab === 'schedule' && !isEmployerPreview && (
                   <div className="flex rounded-md border border-border overflow-hidden">
                     <button
-                      onClick={() => {
-                        setCurrentWeek(startOfWeek(currentMonth, { weekStartsOn: 1 }));
-                        setCalendarView('weekly');
-                      }}
+                      onClick={() => setCalendarView('weekly')}
                       className={`px-2.5 py-1 text-xs font-medium transition-colors ${calendarView === 'weekly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
                     >
                       Week
                     </button>
                     <button
-                      onClick={() => {
-                        setCurrentMonth(startOfMonth(currentWeek));
-                        setCalendarView('monthly');
-                      }}
+                      onClick={() => setCalendarView('monthly')}
                       className={`px-2.5 py-1 text-xs font-medium transition-colors border-l border-border ${calendarView === 'monthly' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground hover:bg-muted'}`}
                     >
                       Month
