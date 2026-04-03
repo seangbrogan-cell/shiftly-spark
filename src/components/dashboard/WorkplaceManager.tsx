@@ -19,6 +19,7 @@ import {
 
 interface WorkplaceManagerProps {
   workplaces: Workplace[];
+  employerId: string;
 }
 
 export function WorkplaceManager({ workplaces }: WorkplaceManagerProps) {
