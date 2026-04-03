@@ -79,8 +79,8 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Building2 className="h-4 w-4" /> Workplaces
-          <Button size="sm" className="h-7 ml-1" onClick={() => setAdding(true)}>
-            <Plus className="mr-1 h-3.5 w-3.5" /> Add
+          <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={() => setAdding(true)} title="Add workplace">
+            <Plus className="h-3.5 w-3.5" />
           </Button>
         </CardTitle>
       </CardHeader>
