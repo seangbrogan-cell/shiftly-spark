@@ -244,7 +244,16 @@ export default function Dashboard() {
                   <h2 className="text-xl sm:text-2xl font-bold text-foreground">Employees</h2>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search…"
+                      value={employeeSearch}
+                      onChange={(e) => setEmployeeSearch(e.target.value)}
+                      className="pl-9 h-9 w-40 sm:w-48"
+                    />
+                  </div>
                   <Button variant="outline" size="sm" onClick={() => setCsvModalOpen(true)} disabled={!employerId}>
                     <Upload className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">CSV Import</span><span className="sm:hidden">CSV</span>
                   </Button>
@@ -255,16 +264,6 @@ export default function Dashboard() {
                     <Plus className="mr-1.5 h-4 w-4" /> Add
                   </Button>
                 </div>
-              </div>
-
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name or email…"
-                  value={employeeSearch}
-                  onChange={(e) => setEmployeeSearch(e.target.value)}
-                  className="pl-9 h-9"
-                />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-6">
