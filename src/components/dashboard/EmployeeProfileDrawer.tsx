@@ -79,7 +79,11 @@ export function EmployeeProfileDrawer({ open, onOpenChange, employee, employerId
     setPhone(employee.phone ?? '');
     setRole(employee.role);
     setEmploymentType(employee.employment_type ?? 'full_time');
-    setSelectedWorkplaceIds(empWorkplaces.map(ew => ew.workplace_id));
+    // If workplace data hasn't loaded yet, default to all workplaces
+    const wpIds = empWorkplaces.length > 0
+      ? empWorkplaces.map(ew => ew.workplace_id)
+      : workplaces.map(w => w.id);
+    setSelectedWorkplaceIds(wpIds);
     const avail = employee.availability ?? [];
     setAvailabilityDays(avail);
     setDayRanges(buildDayTimeRanges(avail, availabilityRows));
