@@ -43,10 +43,17 @@ export default function Onboarding() {
       if (empError) throw empError;
 
       // 1b. Create default workplace using the company name
+      const workplaceId = crypto.randomUUID();
       const { error: wpError } = await supabase
         .from('workplaces')
-        .insert({ employer_id: employerId, name: companyName.trim() } as any);
+        .insert({ id: workplaceId, employer_id: employerId, name: companyName.trim() } as any);
       if (wpError) throw wpError;
+
+      // 1c. Seed default shifts into the new workplace
+      await supabase.rpc('seed_default_shifts', {
+        _employer_id: employerId,
+        _workplace_id: workplaceId,
+      });
 
       // 2. Update (or create) profile with employer_id and display_name
       const profilePayload = {
