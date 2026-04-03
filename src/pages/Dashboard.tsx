@@ -266,7 +266,7 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-6">
                   {employerId && <RoleManager employerId={employerId} />}
-                  {employerId && <WorkplaceManager workplaces={workplaces} employerId={employerId} />}
+                  {workplaces.length > 0 && <WorkplaceManager workplaces={workplaces} />}
                 </div>
               </div>
             </TabsContent>
