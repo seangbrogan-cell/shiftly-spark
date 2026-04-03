@@ -275,7 +275,7 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <EmployeeTable
-                      employees={employees}
+                      employees={filteredEmployees}
                       shiftCounts={shiftCounts}
                       employerId={employerId}
                       onEdit={handleEdit}
