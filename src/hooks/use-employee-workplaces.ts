@@ -14,11 +14,11 @@ export function useEmployeeWorkplaces(employeeId: string | undefined) {
     queryFn: async () => {
       if (!employeeId) return [];
       const { data, error } = await supabase
-        .from('employee_workplaces' as any)
+        .from('employee_workplaces')
         .select('*')
         .eq('employee_id', employeeId);
       if (error) throw error;
-      return data as unknown as EmployeeWorkplace[];
+      return data as EmployeeWorkplace[];
     },
     enabled: !!employeeId,
   });
@@ -29,18 +29,18 @@ export function useSaveEmployeeWorkplaces() {
   return useMutation({
     mutationFn: async ({ employeeId, workplaceIds }: { employeeId: string; workplaceIds: string[] }) => {
       // Delete all existing
-      const { error: delErr } = await (supabase
-        .from('employee_workplaces' as any)
+      const { error: delErr } = await supabase
+        .from('employee_workplaces')
         .delete()
-        .eq('employee_id', employeeId) as any);
+        .eq('employee_id', employeeId);
       if (delErr) throw delErr;
 
       // Insert new
       if (workplaceIds.length > 0) {
         const rows = workplaceIds.map(wid => ({ employee_id: employeeId, workplace_id: wid }));
         const { error: insErr } = await supabase
-          .from('employee_workplaces' as any)
-          .insert(rows as any);
+          .from('employee_workplaces')
+          .insert(rows);
         if (insErr) throw insErr;
       }
     },
