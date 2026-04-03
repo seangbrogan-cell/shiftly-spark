@@ -294,7 +294,7 @@ export function EmployeeTable({ employees, shiftCounts, employerId, onEdit, onDe
         <div>
           <h3 className="text-sm font-semibold text-muted-foreground mb-2">Management</h3>
           <div className="rounded-lg border border-border bg-card overflow-x-auto">
-            <Table>
+            <Table className="table-fixed">
               {headers}
               <TableBody>
                 <EmployeeRows employees={management} shiftCounts={shiftCounts} onEdit={onEdit} onDelete={onDelete} onEmail={onEmail} />
