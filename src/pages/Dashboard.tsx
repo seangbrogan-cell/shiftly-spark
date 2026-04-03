@@ -245,6 +245,9 @@ export default function Dashboard() {
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage your team members and their roles.</p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
+                    <Plus className="mr-1.5 h-4 w-4" /> Add
+                  </Button>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -259,9 +262,6 @@ export default function Dashboard() {
                   </Button>
                   <Button variant="outline" size="sm" onClick={handleEmailAll} disabled={!employerId || employees.length === 0}>
                     <Mail className="mr-1.5 h-4 w-4" /> <span className="hidden sm:inline">Email All</span><span className="sm:hidden">Email</span>
-                  </Button>
-                  <Button size="sm" onClick={() => { setEditingEmployee(null); setEmployeeModalOpen(true); }} disabled={!employerId}>
-                    <Plus className="mr-1.5 h-4 w-4" /> Add
                   </Button>
                 </div>
               </div>
