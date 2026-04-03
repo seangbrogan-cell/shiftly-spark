@@ -90,6 +90,27 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
+        {adding && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/30 bg-muted/30 p-2">
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="New workplace name"
+              className="h-7 text-sm flex-1"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAdd();
+                if (e.key === 'Escape') { setAdding(false); setNewName(''); }
+              }}
+            />
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleAdd} disabled={createWorkplace.isPending}>
+              <Check className="h-3.5 w-3.5 text-success" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setAdding(false); setNewName(''); }}>
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
         {workplaces.map((wp) => (
           <div key={wp.id} className="flex items-center gap-2 rounded-md border border-border p-2">
             {editingId === wp.id ? (
