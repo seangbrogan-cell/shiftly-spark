@@ -229,7 +229,7 @@ export default function EmployeeDashboard() {
 
                 {/* Navigation */}
                 {(activeTab === 'full-schedule' || calendarView === 'weekly') ? (
-                  <>
+                  <div className="flex items-center gap-2 shrink-0">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -244,9 +244,9 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
-                  </>
+                  </div>
                 ) : (
-                  <>
+                  <div className="flex items-center gap-2 shrink-0">
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
@@ -261,7 +261,7 @@ export default function EmployeeDashboard() {
                     <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
-                  </>
+                  </div>
                 )}
 
                 <Button size="sm" variant="outline" className="h-8 text-xs sm:text-sm" onClick={() => window.print()}>
