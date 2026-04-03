@@ -61,14 +61,48 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
     }
   };
 
+  const handleAdd = async () => {
+    if (!newName.trim()) return;
+    try {
+      const copyFrom = workplaces.length > 0 ? workplaces[0].id : undefined;
+      await createWorkplace.mutateAsync({ employerId, name: newName.trim(), copyFromWorkplaceId: copyFrom });
+      setNewName('');
+      setAdding(false);
+      toast({ title: 'Workplace added' });
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Building2 className="h-4 w-4" /> Workplaces
+          <Button variant="ghost" size="icon" className="h-6 w-6 ml-1" onClick={() => setAdding(true)} title="Add workplace">
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
+        {adding && (
+          <div className="flex items-center gap-2 rounded-md border border-primary/50 bg-muted/30 p-2">
+            <Input
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Workplace name"
+              className="h-7 text-sm flex-1"
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+            />
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleAdd} disabled={createWorkplace.isPending}>
+              <Check className="h-3.5 w-3.5 text-green-600" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setAdding(false); setNewName(''); }}>
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
         {workplaces.map((wp) => (
           <div key={wp.id} className="flex items-center gap-2 rounded-md border border-border p-2">
             {editingId === wp.id ? (
