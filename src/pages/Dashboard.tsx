@@ -405,13 +405,13 @@ function DashboardHeader({ email, displayName, avatarUrl, onSignOut, userId, pro
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/admin/analytics">
                     <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Analytics</span>
+                    <span className="hidden lg:inline">Analytics</span>
                   </Link>
                 </Button>
                 <Button variant="outline" size="sm" asChild>
                   <a href="https://github.com/seangbrogan-cell/shiftly-spark/actions/workflows/lighthouse.yml" target="_blank" rel="noopener noreferrer">
                     <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Lighthouse</span>
+                    <span className="hidden lg:inline">Lighthouse</span>
                   </a>
                 </Button>
               </>
