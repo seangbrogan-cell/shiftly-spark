@@ -754,6 +754,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      seed_default_shifts: {
+        Args: { _employer_id: string; _workplace_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
