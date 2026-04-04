@@ -235,7 +235,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   );
 }
 
-function RequestCard({ request: r, onApprove, onReject, compact }: { request: TimeOffRequest; onApprove?: () => void; onReject?: () => void; compact?: boolean }) {
+function RequestCard({ request: r, onApprove, onReject, onDateClick, compact }: { request: TimeOffRequest; onApprove?: () => void; onReject?: () => void; onDateClick?: (date: Date) => void; compact?: boolean }) {
   if (compact) {
     return (
       <Card>
