@@ -366,7 +366,7 @@ export function WeeklyCalendar({ employees, shifts, employerId, companyName, wor
                   onClick={() => onEmployeeClick?.(emp)}
                 >
                   <div className="min-w-0">
-                    <p className="text-[10px] sm:text-xs font-medium text-foreground truncate">{emp.name}</p>
+                    <p className={cn("text-[10px] sm:text-xs font-medium truncate", onEmployeeClick ? "text-primary underline decoration-primary/40 hover:decoration-primary" : "text-foreground")}>{emp.name}</p>
                     <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">{emp.role}</p>
                   </div>
                 </div>
