@@ -22,6 +22,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -49,17 +50,20 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
     setStartDate('');
     setEndDate('');
     setReason('');
+    setCustomReason('');
     setNotes('');
     setErrors({});
   };
+
+  const finalReason = reason === '__other__' ? customReason.trim() : reason.trim();
 
   const validate = () => {
     const errs: Record<string, string> = {};
     if (!startDate) errs.startDate = 'Start date is required';
     if (!endDate) errs.endDate = 'End date is required';
     if (startDate && endDate && endDate < startDate) errs.endDate = 'End date must be on or after start date';
-    if (!reason.trim()) errs.reason = 'Reason is required';
-    if (reason.trim().length > 500) errs.reason = 'Reason must be under 500 characters';
+    if (!finalReason) errs.reason = 'Reason is required';
+    else if (finalReason.length > 500) errs.reason = 'Reason must be under 500 characters';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -74,7 +78,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         employer_id: employerId,
         start_date: startDate,
         end_date: endDate,
-        reason: reason.trim(),
+        reason: finalReason,
         notes: notes.trim() || null,
         status: 'pending',
       });
@@ -87,7 +91,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
 
         const formattedStart = format(parseISO(startDate), 'MMM d, yyyy');
         const formattedEnd = format(parseISO(endDate), 'MMM d, yyyy');
-        const trimmedReason = reason.trim();
+        const trimmedReason = finalReason;
 
         // Send confirmation to employee
         if (employeeEmail) {
@@ -160,7 +164,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
           <div className="space-y-1.5">
             <Label htmlFor="tor-reason">Reason *</Label>
             {timeOffTypes.length > 0 ? (
-              <Select value={reason} onValueChange={setReason}>
+              <Select value={reason} onValueChange={(v) => { setReason(v); if (v !== '__other__') setCustomReason(''); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a reason..." />
                 </SelectTrigger>
@@ -168,10 +172,19 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
                   {timeOffTypes.map((t) => (
                     <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
                   ))}
+                  <SelectItem value="__other__">Other</SelectItem>
                 </SelectContent>
               </Select>
             ) : (
               <Input id="tor-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Vacation, Personal day" />
+            )}
+            {reason === '__other__' && (
+              <Input
+                value={customReason}
+                onChange={(e) => setCustomReason(e.target.value)}
+                placeholder="Please specify your reason..."
+                className="mt-2"
+              />
             )}
             {errors.reason && <p className="text-sm text-error">{errors.reason}</p>}
           </div>
