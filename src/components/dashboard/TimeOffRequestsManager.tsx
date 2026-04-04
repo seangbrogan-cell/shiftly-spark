@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO, eachDayOfInterval, isSameDay, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addMonths, subMonths, getDay } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, parseISO, eachDayOfInterval, isSameDay } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
 import { Check, X, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -172,14 +172,30 @@ export function TimeOffRequestsManager({ employerId }: Props) {
       {/* Calendar Overview */}
       <section>
         <h3 className="text-lg font-semibold text-foreground mb-3">Calendar Overview</h3>
-        <TimeOffCalendarGrid
-          calendarMonth={calendarMonth}
-          onPrev={() => setCalendarMonth(prev => subMonths(prev, 1))}
-          onNext={() => setCalendarMonth(prev => addMonths(prev, 1))}
-          approvedDays={approvedDays}
-          pendingDays={pendingDays}
-          deniedDays={deniedDays}
-        />
+        <div className="flex flex-col items-center">
+          <Calendar
+            mode="multiple"
+            selected={[...approvedDays, ...pendingDays, ...deniedDays]}
+            month={calendarMonth}
+            onMonthChange={setCalendarMonth}
+            modifiers={{
+              approved: approvedDays,
+              pending: pendingDays,
+              denied: deniedDays,
+            }}
+            modifiersClassNames={{
+              approved: 'bg-success/20 text-success font-semibold',
+              pending: 'bg-warning/20 text-warning font-semibold',
+              denied: 'bg-destructive/20 text-destructive font-semibold',
+            }}
+            className="rounded-md border border-border"
+          />
+          <div className="flex gap-4 mt-3 text-xs">
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-success/60" /> Approved</span>
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-warning/60" /> Pending</span>
+            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-destructive/60" /> Denied</span>
+          </div>
+        </div>
       </section>
 
       {/* Resolved */}
@@ -273,83 +289,5 @@ function RequestCard({ request: r, onApprove, onReject, compact }: { request: Ti
         )}
       </CardContent>
     </Card>
-  );
-}
-
-function TimeOffCalendarGrid({
-  calendarMonth,
-  onPrev,
-  onNext,
-  approvedDays,
-  pendingDays,
-  deniedDays,
-}: {
-  calendarMonth: Date;
-  onPrev: () => void;
-  onNext: () => void;
-  approvedDays: Date[];
-  pendingDays: Date[];
-  deniedDays: Date[];
-}) {
-  const monthStart = startOfMonth(calendarMonth);
-  const monthEnd = endOfMonth(calendarMonth);
-  const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-  const days = eachDayOfInterval({ start: gridStart, end: gridEnd });
-  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  const getStatus = (day: Date) => {
-    if (approvedDays.some(d => isSameDay(d, day))) return 'approved';
-    if (pendingDays.some(d => isSameDay(d, day))) return 'pending';
-    if (deniedDays.some(d => isSameDay(d, day))) return 'denied';
-    return null;
-  };
-
-  const statusStyles: Record<string, string> = {
-    approved: 'bg-success/20 text-success font-semibold',
-    pending: 'bg-warning/20 text-warning font-semibold',
-    denied: 'bg-destructive/20 text-destructive font-semibold',
-  };
-
-  const isCurrentMonth = (day: Date) => day.getMonth() === calendarMonth.getMonth();
-
-  return (
-    <div className="rounded-md border border-border p-4 max-w-md mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onPrev}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm font-medium text-foreground">{format(calendarMonth, 'MMMM yyyy')}</span>
-        <Button variant="outline" size="icon" className="h-7 w-7" onClick={onNext}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className="grid grid-cols-7 gap-1 text-center">
-        {weekdays.map(d => (
-          <div key={d} className="text-xs font-medium text-muted-foreground py-1">{d}</div>
-        ))}
-        {days.map(day => {
-          const status = getStatus(day);
-          const inMonth = isCurrentMonth(day);
-          return (
-            <div
-              key={day.toISOString()}
-              className={`text-xs rounded-md h-8 flex items-center justify-center ${
-                !inMonth ? 'text-muted-foreground/40' : 'text-foreground'
-              } ${status ? statusStyles[status] : ''} ${
-                isSameDay(day, new Date()) ? 'ring-1 ring-primary' : ''
-              }`}
-            >
-              {day.getDate()}
-            </div>
-          );
-        })}
-      </div>
-      <div className="flex gap-4 mt-3 text-xs justify-center">
-        <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-success/60" /> Approved</span>
-        <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-warning/60" /> Pending</span>
-        <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-destructive/60" /> Denied</span>
-      </div>
-    </div>
   );
 }
