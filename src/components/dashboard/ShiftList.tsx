@@ -177,8 +177,8 @@ function SortablePeriodGroup({
 
 export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const [deletingShift, setDeletingShift] = useState<Shift | null>(null);
-  const [sortOrder, setSortOrder] = useState<Record<string, string[]>>(loadSavedOrder);
   const deleteShift = useDeleteShift();
+  const bulkUpdateOrder = useBulkUpdateShiftOrder();
   const { toast } = useToast();
 
   const grouped = useMemo(() => {
@@ -191,32 +191,21 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
       else groups.evening.push(s);
     });
 
-    // Apply saved sort order
+    // Sort by sort_order from database
     for (const period of Object.keys(groups) as Period[]) {
-      const savedIds = sortOrder[period];
-      if (savedIds && savedIds.length > 0) {
-        const shiftMap = new Map(groups[period].map(s => [s.id, s]));
-        const sorted: Shift[] = [];
-        for (const id of savedIds) {
-          const s = shiftMap.get(id);
-          if (s) { sorted.push(s); shiftMap.delete(id); }
-        }
-        // Append any new shifts not in saved order
-        shiftMap.forEach(s => sorted.push(s));
-        groups[period] = sorted;
-      }
+      groups[period].sort((a, b) => ((a as any).sort_order ?? 0) - ((b as any).sort_order ?? 0));
     }
 
     return groups;
-  }, [shifts, sortOrder]);
+  }, [shifts]);
 
   const handleReorder = useCallback((period: Period, oldIndex: number, newIndex: number) => {
     const periodShifts = grouped[period];
     const reordered = arrayMove(periodShifts, oldIndex, newIndex);
-    const newOrder = { ...sortOrder, [period]: reordered.map(s => s.id) };
-    setSortOrder(newOrder);
-    saveSortOrder(newOrder);
-  }, [grouped, sortOrder]);
+    // Persist new sort_order to database
+    const updates = reordered.map((s, i) => ({ id: s.id, sort_order: i }));
+    bulkUpdateOrder.mutate(updates);
+  }, [grouped, bulkUpdateOrder]);
 
   const handleDelete = async () => {
     if (!deletingShift) return;
