@@ -172,30 +172,14 @@ export function TimeOffRequestsManager({ employerId }: Props) {
       {/* Calendar Overview */}
       <section>
         <h3 className="text-lg font-semibold text-foreground mb-3">Calendar Overview</h3>
-        <div className="flex flex-col items-center">
-          <Calendar
-            mode="multiple"
-            selected={[...approvedDays, ...pendingDays, ...deniedDays]}
-            month={calendarMonth}
-            onMonthChange={setCalendarMonth}
-            modifiers={{
-              approved: approvedDays,
-              pending: pendingDays,
-              denied: deniedDays,
-            }}
-            modifiersClassNames={{
-              approved: 'bg-success/20 text-success font-semibold',
-              pending: 'bg-warning/20 text-warning font-semibold',
-              denied: 'bg-destructive/20 text-destructive font-semibold',
-            }}
-            className="rounded-md border border-border"
-          />
-          <div className="flex gap-4 mt-3 text-xs">
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-success/60" /> Approved</span>
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-warning/60" /> Pending</span>
-            <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-full bg-destructive/60" /> Denied</span>
-          </div>
-        </div>
+        <TimeOffCalendarGrid
+          calendarMonth={calendarMonth}
+          onPrev={() => setCalendarMonth(prev => subMonths(prev, 1))}
+          onNext={() => setCalendarMonth(prev => addMonths(prev, 1))}
+          approvedDays={approvedDays}
+          pendingDays={pendingDays}
+          deniedDays={deniedDays}
+        />
       </section>
 
       {/* Resolved */}
