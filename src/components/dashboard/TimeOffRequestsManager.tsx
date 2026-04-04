@@ -195,7 +195,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
             <ScrollArea className="h-[calc(100vh-16rem)]">
               <div className="space-y-2 pr-2">
                 {resolved.map(r => (
-                  <RequestCard key={r.id} request={r} compact />
+                  <RequestCard key={r.id} request={r} compact onDateClick={(date) => setCalendarWeek(startOfWeek(date, { weekStartsOn: 1 }))} />
                 ))}
               </div>
             </ScrollArea>
