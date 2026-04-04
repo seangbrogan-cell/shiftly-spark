@@ -58,20 +58,6 @@ const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconC
   evening: { label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50 dark:bg-indigo-950/30' },
 };
 
-const STORAGE_KEY = 'shift-list-order';
-
-function loadSavedOrder(): Record<string, string[]> {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return {};
-}
-
-function saveSortOrder(order: Record<string, string[]>) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-}
-
 function SortableShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
   const allDay = isAllDay(shift);
   const color = getShiftColor({ color: (shift as any).color, is_all_day: allDay, start_time: shift.start_time });
