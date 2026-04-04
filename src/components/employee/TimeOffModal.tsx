@@ -37,7 +37,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         .select('id, name')
         .eq('employer_id', employerId)
         .eq('is_all_day', true)
-        .order('created_at');
+        .order('sort_order');
       if (error) throw error;
       // Deduplicate by name (shifts exist per-workplace)
       const unique = Array.from(new Map((data || []).map(s => [s.name, s])).values());

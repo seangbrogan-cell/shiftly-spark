@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff, GripVertical } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import {
   DndContext,
   closestCenter,
