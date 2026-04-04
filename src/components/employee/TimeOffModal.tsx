@@ -50,9 +50,12 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
     setStartDate('');
     setEndDate('');
     setReason('');
+    setCustomReason('');
     setNotes('');
     setErrors({});
   };
+
+  const finalReason = reason === '__other__' ? customReason.trim() : reason.trim();
 
   const validate = () => {
     const errs: Record<string, string> = {};
