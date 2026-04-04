@@ -7,9 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { RoleRouter } from "@/components/RoleRouter";
 
-// Eagerly load high-traffic pages to avoid preview import flakiness
+// Eagerly load landing page for instant FCP
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
 
 // Lazy-load the rest
 const Login = lazy(() => import("./pages/auth/Login"));
