@@ -1,5 +1,8 @@
+import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
+import { Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { TimeOffRequest } from '@/hooks/use-employee-data';
 
@@ -17,6 +20,28 @@ interface TimeOffHistoryProps {
 }
 
 export function TimeOffHistory({ requests, statusFilter, onStatusFilterChange, isLoading }: TimeOffHistoryProps) {
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return requests;
+    const q = search.toLowerCase().trim();
+    return requests.filter((req) => {
+      const startFormatted = format(new Date(req.start_date), 'MMM d, yyyy').toLowerCase();
+      const endFormatted = format(new Date(req.end_date), 'MMM d, yyyy').toLowerCase();
+      const rawStart = req.start_date.toLowerCase();
+      const rawEnd = req.end_date.toLowerCase();
+      return (
+        req.reason.toLowerCase().includes(q) ||
+        (req.notes && req.notes.toLowerCase().includes(q)) ||
+        startFormatted.includes(q) ||
+        endFormatted.includes(q) ||
+        rawStart.includes(q) ||
+        rawEnd.includes(q) ||
+        req.status.toLowerCase().includes(q)
+      );
+    });
+  }, [requests, search]);
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -24,32 +49,43 @@ export function TimeOffHistory({ requests, statusFilter, onStatusFilterChange, i
           <h2 className="text-xl font-bold text-foreground">Time-Off Requests</h2>
           <p className="text-sm text-muted-foreground mt-1">View your submitted requests and their status.</p>
         </div>
-        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="denied">Denied</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by date or reason..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 w-[200px]"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={onStatusFilterChange}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="denied">Denied</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (
         <div className="flex justify-center py-12">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
         </div>
-      ) : requests.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center">
           <p className="text-muted-foreground">
-            {statusFilter === 'all' ? 'No time-off requests yet.' : `No ${statusFilter} requests.`}
+            {search.trim() ? 'No requests match your search.' : statusFilter === 'all' ? 'No time-off requests yet.' : `No ${statusFilter} requests.`}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {requests.map((req) => {
+          {filtered.map((req) => {
             const config = statusConfig[req.status as keyof typeof statusConfig] ?? statusConfig.pending;
             return (
               <div key={req.id} className="rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-sm">
