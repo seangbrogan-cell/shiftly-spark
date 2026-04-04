@@ -48,31 +48,27 @@ export function TimeOffHistory({ requests, statusFilter, onStatusFilterChange, i
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
           {requests.map((req) => {
             const config = statusConfig[req.status as keyof typeof statusConfig] ?? statusConfig.pending;
             return (
               <div key={req.id} className="rounded-lg border border-border bg-card p-4 transition-shadow hover:shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <p className="font-medium text-foreground">{req.reason}</p>
-                      <Badge variant="outline" className={config.className}>
-                        {config.label}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {format(new Date(req.start_date), 'MMM d, yyyy')}
-                      {req.start_date !== req.end_date && ` – ${format(new Date(req.end_date), 'MMM d, yyyy')}`}
-                    </p>
-                    {req.notes && (
-                      <p className="text-sm text-muted-foreground mt-1 truncate">{req.notes}</p>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground shrink-0">
-                    Submitted {format(new Date(req.created_at), 'MMM d, yyyy')}
-                  </p>
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <p className="font-medium text-foreground text-sm truncate">{req.reason}</p>
+                  <Badge variant="outline" className={config.className}>
+                    {config.label}
+                  </Badge>
                 </div>
+                <p className="text-sm text-muted-foreground">
+                  {format(new Date(req.start_date), 'MMM d, yyyy')}
+                  {req.start_date !== req.end_date && ` – ${format(new Date(req.end_date), 'MMM d, yyyy')}`}
+                </p>
+                {req.notes && (
+                  <p className="text-xs text-muted-foreground mt-1 truncate">{req.notes}</p>
+                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Submitted {format(new Date(req.created_at), 'MMM d, yyyy')}
+                </p>
               </div>
             );
           })}
