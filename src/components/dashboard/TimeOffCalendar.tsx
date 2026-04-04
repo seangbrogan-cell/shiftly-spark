@@ -107,7 +107,16 @@ export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekCha
           <Button variant="outline" size="icon" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentWeek(startOfWeek(new Date(), { weekStartsOn: 1 }))}
+            className={cn(
+              days.some(d => isToday(d))
+                ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90'
+                : 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
+            )}
+          >
             Today
           </Button>
           <Button variant="outline" size="icon" onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}>
