@@ -47,8 +47,7 @@ function statusBadge(status: string) {
 export function TimeOffRequestsManager({ employerId }: Props) {
   const { toast } = useToast();
   const qc = useQueryClient();
-  const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
-  const [rejectReason, setRejectReason] = useState('');
+  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['employer-time-off-requests', employerId],
