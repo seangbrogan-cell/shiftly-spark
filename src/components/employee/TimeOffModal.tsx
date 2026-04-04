@@ -91,7 +91,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
 
         const formattedStart = format(parseISO(startDate), 'MMM d, yyyy');
         const formattedEnd = format(parseISO(endDate), 'MMM d, yyyy');
-        const trimmedReason = reason.trim();
+        const trimmedReason = finalReason;
 
         // Send confirmation to employee
         if (employeeEmail) {
