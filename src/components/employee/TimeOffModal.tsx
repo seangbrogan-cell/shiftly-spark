@@ -78,7 +78,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
         employer_id: employerId,
         start_date: startDate,
         end_date: endDate,
-        reason: reason.trim(),
+        reason: finalReason,
         notes: notes.trim() || null,
         status: 'pending',
       });
