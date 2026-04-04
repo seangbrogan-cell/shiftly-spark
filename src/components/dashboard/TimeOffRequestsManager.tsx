@@ -164,7 +164,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
 
         {/* Time Off Calendar */}
         <section>
-          <TimeOffCalendar employees={employees} employerId={employerId} />
+          <TimeOffCalendar employees={employees} employerId={employerId} weekOverride={calendarWeek} onWeekChange={setCalendarWeek} />
         </section>
       </div>
 
