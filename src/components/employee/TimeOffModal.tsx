@@ -22,6 +22,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [reason, setReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
