@@ -244,9 +244,18 @@ function RequestCard({ request: r, onApprove, onReject, onDateClick, compact }: 
             <p className="font-medium text-sm text-foreground truncate">{r.employees?.name ?? 'Unknown'}</p>
             {statusBadge(r.status)}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
-          </p>
+          {onDateClick ? (
+            <button
+              className="text-xs text-primary hover:underline cursor-pointer text-left"
+              onClick={() => onDateClick(new Date(r.start_date))}
+            >
+              {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+            </button>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+            </p>
+          )}
           <p className="text-xs mt-1 truncate"><span className="font-medium">Reason:</span> {r.reason}</p>
           {r.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{r.notes}</p>}
         </CardContent>
