@@ -52,6 +52,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [calendarWeek, setCalendarWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { data: employees = [] } = useEmployees();
 
   const { data: requests = [], isLoading } = useQuery({
