@@ -155,6 +155,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
                   request={r}
                   onApprove={() => updateStatus.mutate({ id: r.id, status: 'approved', request: r })}
                   onReject={() => { setRejectTarget(r); setRejectReason(''); }}
+                  onDateClick={(date) => setCalendarWeek(startOfWeek(date, { weekStartsOn: 1 }))}
                 />
               ))}
             </div>
