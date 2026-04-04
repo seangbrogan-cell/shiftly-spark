@@ -10,6 +10,8 @@ import type { Employee } from '@/hooks/use-dashboard-data';
 
 interface TimeOffCalendarProps {
   employees: Employee[];
+  weekOverride?: Date;
+  onWeekChange?: (week: Date) => void;
   employerId: string;
 }
 
