@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO } from 'date-fns';
-import { Check, X, Clock } from 'lucide-react';
+import { Check, X, Clock, ChevronRight, ChevronLeft, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { TimeOffCalendar } from './TimeOffCalendar';
+import { useEmployees } from '@/hooks/use-dashboard-data';
 
 interface TimeOffRequest {
   id: string;
@@ -48,6 +51,8 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   const qc = useQueryClient();
   const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { data: employees = [] } = useEmployees();
 
   const { data: requests = [], isLoading } = useQuery({
     queryKey: ['employer-time-off-requests', employerId],
@@ -75,7 +80,6 @@ export function TimeOffRequestsManager({ employerId }: Props) {
         .eq('id', id);
       if (error) throw error;
 
-      // Send decision email to employee (best-effort)
       try {
         const employeeEmail = request.employees?.email;
         const employeeName = request.employees?.name;
@@ -103,6 +107,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: ['employer-time-off-requests'] });
       qc.invalidateQueries({ queryKey: ['pending-time-off-count'] });
+      qc.invalidateQueries({ queryKey: ['time-off-calendar'] });
       const label = status === 'approved' ? 'approved' : 'denied';
       toast({ title: `Request ${label}`, description: `The time-off request has been ${label}.` });
       setRejectTarget(null);
@@ -130,39 +135,70 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Pending */}
-      <section>
-        <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-amber-500" />
-          Pending Requests ({pending.length})
-        </h3>
-        {pending.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No pending requests.</p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {pending.map(r => (
-              <RequestCard
-                key={r.id}
-                request={r}
-                onApprove={() => updateStatus.mutate({ id: r.id, status: 'approved', request: r })}
-                onReject={() => { setRejectTarget(r); setRejectReason(''); }}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Resolved */}
-      {resolved.length > 0 && (
+    <div className="flex gap-0">
+      {/* Main content */}
+      <div className="flex-1 space-y-8 min-w-0">
+        {/* Pending */}
         <section>
-          <h3 className="text-lg font-semibold text-foreground mb-3">Past Requests ({resolved.length})</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {resolved.map(r => (
-              <RequestCard key={r.id} request={r} compact />
-            ))}
-          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Clock className="h-5 w-5 text-amber-500" />
+            Pending Requests ({pending.length})
+          </h3>
+          {pending.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No pending requests.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {pending.map(r => (
+                <RequestCard
+                  key={r.id}
+                  request={r}
+                  onApprove={() => updateStatus.mutate({ id: r.id, status: 'approved', request: r })}
+                  onReject={() => { setRejectTarget(r); setRejectReason(''); }}
+                />
+              ))}
+            </div>
+          )}
         </section>
+
+        {/* Time Off Calendar */}
+        <section>
+          <TimeOffCalendar employees={employees} employerId={employerId} />
+        </section>
+      </div>
+
+      {/* Past Requests Sidebar Toggle */}
+      <div className="flex flex-col items-start ml-1">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="flex items-center gap-1 text-muted-foreground hover:text-foreground mb-2 mt-1"
+          title={sidebarOpen ? 'Hide past requests' : 'Show past requests'}
+        >
+          <History className="h-4 w-4" />
+          {sidebarOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        </Button>
+      </div>
+
+      {/* Past Requests Sidebar */}
+      {sidebarOpen && (
+        <aside className="w-72 xl:w-80 shrink-0 border-l border-border pl-4 ml-2 hidden md:block">
+          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+            <History className="h-4 w-4 text-muted-foreground" />
+            Past Requests ({resolved.length})
+          </h3>
+          {resolved.length === 0 ? (
+            <p className="text-xs text-muted-foreground">No past requests.</p>
+          ) : (
+            <ScrollArea className="h-[calc(100vh-16rem)]">
+              <div className="space-y-2 pr-2">
+                {resolved.map(r => (
+                  <RequestCard key={r.id} request={r} compact />
+                ))}
+              </div>
+            </ScrollArea>
+          )}
+        </aside>
       )}
 
       {/* Reject Modal */}
