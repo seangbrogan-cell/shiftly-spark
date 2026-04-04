@@ -10,6 +10,6 @@ jobs:
       - uses: treosh/lighthouse-ci-action@v10
         with:
           urls: |
-            https://workschedule.uk
+            https://www.workschedule.uk
           uploadArtifacts: false
           temporaryPublicStorage: true
