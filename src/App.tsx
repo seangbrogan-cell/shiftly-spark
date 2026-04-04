@@ -22,7 +22,15 @@ const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60, // 1 min — serve cached data instantly, refetch in background
+      gcTime: 1000 * 60 * 5, // keep unused cache for 5 min
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const PageLoader = () => (
   <div className="flex h-screen items-center justify-center">
