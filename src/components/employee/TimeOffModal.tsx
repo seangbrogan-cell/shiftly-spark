@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useCreateTimeOffRequest } from '@/hooks/use-employee-data';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +26,22 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const createRequest = useCreateTimeOffRequest();
+
+  // Fetch employer's all-day shifts as time-off reason options
+  const { data: timeOffTypes = [] } = useQuery({
+    queryKey: ['time-off-types', employerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('shifts')
+        .select('id, name')
+        .eq('employer_id', employerId)
+        .eq('is_all_day', true)
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!employerId && open,
+  });
 
   const resetForm = () => {
     setStartDate('');
@@ -139,7 +157,20 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="tor-reason">Reason *</Label>
-            <Input id="tor-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Vacation, Personal day" />
+            {timeOffTypes.length > 0 ? (
+              <Select value={reason} onValueChange={setReason}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a reason..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeOffTypes.map((t) => (
+                    <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input id="tor-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Vacation, Personal day" />
+            )}
             {errors.reason && <p className="text-sm text-error">{errors.reason}</p>}
           </div>
           <div className="space-y-1.5">
