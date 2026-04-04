@@ -246,7 +246,7 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Shift</AlertDialogTitle>
             <AlertDialogDescription>
-              Delete <span className="font-semibold text-foreground">{deletingShift?.name}</span>? This will also remove all assignments using this shift.
+              Delete <span className="font-semibold text-foreground">{deletingShift?.name}</span>? This will also remove all assignments using this shift. <span className="font-bold text-destructive">This action cannot be undone.</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

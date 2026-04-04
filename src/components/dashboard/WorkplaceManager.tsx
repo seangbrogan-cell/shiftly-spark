@@ -191,7 +191,7 @@ export function WorkplaceManager({ workplaces, employerId }: WorkplaceManagerPro
             <AlertDialogHeader>
               <AlertDialogTitle>Delete {deletingWp?.name}?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will permanently delete this workplace and all its shifts and schedule assignments. This action cannot be undone.
+                This will permanently delete this workplace and all its shifts and schedule assignments. <span className="font-bold text-destructive">This action cannot be undone.</span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -32,7 +32,7 @@ export function DeleteEmployeeDialog({ open, onOpenChange, employee, onDeleted }
           <AlertDialogTitle>Delete {employee?.name}?</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete <span className="font-semibold text-foreground">{employee?.name}</span>?
-            This will also remove all their shift assignments. This action cannot be undone.
+            This will also remove all their shift assignments. <span className="font-bold text-destructive">This action cannot be undone.</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
