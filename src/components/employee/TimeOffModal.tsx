@@ -164,7 +164,7 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
           <div className="space-y-1.5">
             <Label htmlFor="tor-reason">Reason *</Label>
             {timeOffTypes.length > 0 ? (
-              <Select value={reason} onValueChange={setReason}>
+              <Select value={reason} onValueChange={(v) => { setReason(v); if (v !== '__other__') setCustomReason(''); }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select a reason..." />
                 </SelectTrigger>
@@ -172,10 +172,19 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
                   {timeOffTypes.map((t) => (
                     <SelectItem key={t.id} value={t.name}>{t.name}</SelectItem>
                   ))}
+                  <SelectItem value="__other__">Other</SelectItem>
                 </SelectContent>
               </Select>
             ) : (
               <Input id="tor-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Vacation, Personal day" />
+            )}
+            {reason === '__other__' && (
+              <Input
+                value={customReason}
+                onChange={(e) => setCustomReason(e.target.value)}
+                placeholder="Please specify your reason..."
+                className="mt-2"
+              />
             )}
             {errors.reason && <p className="text-sm text-error">{errors.reason}</p>}
           </div>
