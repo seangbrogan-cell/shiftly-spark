@@ -545,6 +545,7 @@ export type Database = {
           is_all_day: boolean
           name: string
           notes: string | null
+          sort_order: number
           start_time: string | null
           workplace_id: string | null
         }
@@ -557,6 +558,7 @@ export type Database = {
           is_all_day?: boolean
           name: string
           notes?: string | null
+          sort_order?: number
           start_time?: string | null
           workplace_id?: string | null
         }
@@ -569,6 +571,7 @@ export type Database = {
           is_all_day?: boolean
           name?: string
           notes?: string | null
+          sort_order?: number
           start_time?: string | null
           workplace_id?: string | null
         }
