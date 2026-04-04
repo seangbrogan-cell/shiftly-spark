@@ -121,6 +121,20 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   const pending = requests.filter(r => r.status === 'pending');
   const resolved = requests.filter(r => r.status !== 'pending');
 
+  // Build date maps for calendar modifiers
+  const { approvedDays, pendingDays, deniedDays } = useMemo(() => {
+    const approved: Date[] = [];
+    const pendingD: Date[] = [];
+    const denied: Date[] = [];
+    requests.forEach(r => {
+      const days = eachDayOfInterval({ start: parseISO(r.start_date), end: parseISO(r.end_date) });
+      if (r.status === 'approved') approved.push(...days);
+      else if (r.status === 'pending') pendingD.push(...days);
+      else denied.push(...days);
+    });
+    return { approvedDays: approved, pendingDays: pendingD, deniedDays: denied };
+  }, [requests]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
