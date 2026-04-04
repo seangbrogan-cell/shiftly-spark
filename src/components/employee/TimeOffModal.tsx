@@ -27,6 +27,22 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
   const { toast } = useToast();
   const createRequest = useCreateTimeOffRequest();
 
+  // Fetch employer's all-day shifts as time-off reason options
+  const { data: timeOffTypes = [] } = useQuery({
+    queryKey: ['time-off-types', employerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('shifts')
+        .select('id, name')
+        .eq('employer_id', employerId)
+        .eq('is_all_day', true)
+        .order('name');
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!employerId && open,
+  });
+
   const resetForm = () => {
     setStartDate('');
     setEndDate('');
