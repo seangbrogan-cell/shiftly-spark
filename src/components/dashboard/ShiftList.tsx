@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Pencil, Trash2, Sun, Sunrise, Moon, CalendarOff, GripVertical } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import {
   DndContext,
   closestCenter,
@@ -16,8 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
+import { useDeleteShift, useBulkUpdateShiftOrder, type Shift } from '@/hooks/use-dashboard-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import {
   AlertDialog,
@@ -57,20 +57,6 @@ const PERIOD_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; iconC
   afternoon: { label: 'Afternoon', icon: Sun, iconClass: 'text-orange-500', borderClass: 'border-orange-200 dark:border-orange-800', bgClass: 'bg-orange-50 dark:bg-orange-950/30' },
   evening: { label: 'Evening', icon: Moon, iconClass: 'text-indigo-500', borderClass: 'border-indigo-200 dark:border-indigo-800', bgClass: 'bg-indigo-50 dark:bg-indigo-950/30' },
 };
-
-const STORAGE_KEY = 'shift-list-order';
-
-function loadSavedOrder(): Record<string, string[]> {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return JSON.parse(stored);
-  } catch {}
-  return {};
-}
-
-function saveSortOrder(order: Record<string, string[]>) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-}
 
 function SortableShiftCard({ shift, onEdit, onDelete }: { shift: Shift; onEdit: () => void; onDelete: () => void }) {
   const allDay = isAllDay(shift);
@@ -191,8 +177,8 @@ function SortablePeriodGroup({
 
 export function ShiftList({ shifts, onEdit }: ShiftListProps) {
   const [deletingShift, setDeletingShift] = useState<Shift | null>(null);
-  const [sortOrder, setSortOrder] = useState<Record<string, string[]>>(loadSavedOrder);
   const deleteShift = useDeleteShift();
+  const bulkUpdateOrder = useBulkUpdateShiftOrder();
   const { toast } = useToast();
 
   const grouped = useMemo(() => {
@@ -205,32 +191,21 @@ export function ShiftList({ shifts, onEdit }: ShiftListProps) {
       else groups.evening.push(s);
     });
 
-    // Apply saved sort order
+    // Sort by sort_order from database
     for (const period of Object.keys(groups) as Period[]) {
-      const savedIds = sortOrder[period];
-      if (savedIds && savedIds.length > 0) {
-        const shiftMap = new Map(groups[period].map(s => [s.id, s]));
-        const sorted: Shift[] = [];
-        for (const id of savedIds) {
-          const s = shiftMap.get(id);
-          if (s) { sorted.push(s); shiftMap.delete(id); }
-        }
-        // Append any new shifts not in saved order
-        shiftMap.forEach(s => sorted.push(s));
-        groups[period] = sorted;
-      }
+      groups[period].sort((a, b) => ((a as any).sort_order ?? 0) - ((b as any).sort_order ?? 0));
     }
 
     return groups;
-  }, [shifts, sortOrder]);
+  }, [shifts]);
 
   const handleReorder = useCallback((period: Period, oldIndex: number, newIndex: number) => {
     const periodShifts = grouped[period];
     const reordered = arrayMove(periodShifts, oldIndex, newIndex);
-    const newOrder = { ...sortOrder, [period]: reordered.map(s => s.id) };
-    setSortOrder(newOrder);
-    saveSortOrder(newOrder);
-  }, [grouped, sortOrder]);
+    // Persist new sort_order to database
+    const updates = reordered.map((s, i) => ({ id: s.id, sort_order: i }));
+    bulkUpdateOrder.mutate(updates);
+  }, [grouped, bulkUpdateOrder]);
 
   const handleDelete = async () => {
     if (!deletingShift) return;

@@ -23,7 +23,7 @@ const PERIODS_CONFIG: Record<Period, { label: string; icon: typeof Sunrise; icon
 const DEFAULT_ORDER: Period[] = ['morning', 'afternoon', 'evening', 'allday'];
 const STORAGE_KEY = 'shift-sidebar-period-order';
 const COLLAPSED_KEY = 'shift-sidebar-collapsed-periods';
-const SHIFT_ORDER_KEY = 'shift-list-order';
+
 function loadOrder(): Period[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -87,26 +87,10 @@ export function ShiftTemplateSidebar({ shifts }: ShiftTemplateSidebarProps) {
       else groups.evening.push(s);
     });
 
-    // Apply saved sort order from Shifts tab
-    try {
-      const stored = localStorage.getItem(SHIFT_ORDER_KEY);
-      if (stored) {
-        const sortOrder = JSON.parse(stored) as Record<string, string[]>;
-        for (const period of Object.keys(groups) as Period[]) {
-          const savedIds = sortOrder[period];
-          if (savedIds && savedIds.length > 0) {
-            const shiftMap = new Map(groups[period].map(s => [s.id, s]));
-            const sorted: Shift[] = [];
-            for (const id of savedIds) {
-              const s = shiftMap.get(id);
-              if (s) { sorted.push(s); shiftMap.delete(id); }
-            }
-            shiftMap.forEach(s => sorted.push(s));
-            groups[period] = sorted;
-          }
-        }
-      }
-    } catch {}
+    // Sort by sort_order from database
+    for (const period of Object.keys(groups) as Period[]) {
+      groups[period].sort((a, b) => ((a as any).sort_order ?? 0) - ((b as any).sort_order ?? 0));
+    }
 
     return groups;
   }, [shifts]);

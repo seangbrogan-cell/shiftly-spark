@@ -160,6 +160,25 @@ export function useUpdateShift() {
   });
 }
 
+export function useBulkUpdateShiftOrder() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (updates: { id: string; sort_order: number }[]) => {
+      // Update each shift's sort_order
+      const promises = updates.map(({ id, sort_order }) =>
+        supabase.from('shifts').update({ sort_order } as any).eq('id', id)
+      );
+      const results = await Promise.all(promises);
+      const err = results.find(r => r.error);
+      if (err?.error) throw err.error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['shifts'] });
+      qc.invalidateQueries({ queryKey: ['time-off-types'] });
+    },
+  });
+}
+
 export function useDeleteShift() {
   const qc = useQueryClient();
   return useMutation({
