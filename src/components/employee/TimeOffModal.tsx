@@ -62,8 +62,8 @@ export function TimeOffModal({ open, onOpenChange, employeeId, employerId }: Tim
     if (!startDate) errs.startDate = 'Start date is required';
     if (!endDate) errs.endDate = 'End date is required';
     if (startDate && endDate && endDate < startDate) errs.endDate = 'End date must be on or after start date';
-    if (!reason.trim()) errs.reason = 'Reason is required';
-    if (reason.trim().length > 500) errs.reason = 'Reason must be under 500 characters';
+    if (!finalReason) errs.reason = 'Reason is required';
+    else if (finalReason.length > 500) errs.reason = 'Reason must be under 500 characters';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
