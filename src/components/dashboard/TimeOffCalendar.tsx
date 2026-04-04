@@ -10,6 +10,8 @@ import type { Employee } from '@/hooks/use-dashboard-data';
 
 interface TimeOffCalendarProps {
   employees: Employee[];
+  weekOverride?: Date;
+  onWeekChange?: (week: Date) => void;
   employerId: string;
 }
 
@@ -28,8 +30,10 @@ function getWeekDays(weekStart: Date): Date[] {
   return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
 }
 
-export function TimeOffCalendar({ employees, employerId }: TimeOffCalendarProps) {
-  const [currentWeek, setCurrentWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekChange }: TimeOffCalendarProps) {
+  const [internalWeek, setInternalWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const currentWeek = weekOverride ?? internalWeek;
+  const setCurrentWeek = (w: Date) => { setInternalWeek(w); onWeekChange?.(w); };
   const days = getWeekDays(currentWeek);
 
   const start = format(days[0], 'yyyy-MM-dd');

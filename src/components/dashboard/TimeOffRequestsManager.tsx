@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, startOfWeek } from 'date-fns';
 import { Check, X, Clock, ChevronRight, ChevronLeft, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +52,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [calendarWeek, setCalendarWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const { data: employees = [] } = useEmployees();
 
   const { data: requests = [], isLoading } = useQuery({
@@ -154,6 +155,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
                   request={r}
                   onApprove={() => updateStatus.mutate({ id: r.id, status: 'approved', request: r })}
                   onReject={() => { setRejectTarget(r); setRejectReason(''); }}
+                  onDateClick={(date) => setCalendarWeek(startOfWeek(date, { weekStartsOn: 1 }))}
                 />
               ))}
             </div>
@@ -162,7 +164,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
 
         {/* Time Off Calendar */}
         <section>
-          <TimeOffCalendar employees={employees} employerId={employerId} />
+          <TimeOffCalendar employees={employees} employerId={employerId} weekOverride={calendarWeek} onWeekChange={setCalendarWeek} />
         </section>
       </div>
 
@@ -233,7 +235,7 @@ export function TimeOffRequestsManager({ employerId }: Props) {
   );
 }
 
-function RequestCard({ request: r, onApprove, onReject, compact }: { request: TimeOffRequest; onApprove?: () => void; onReject?: () => void; compact?: boolean }) {
+function RequestCard({ request: r, onApprove, onReject, onDateClick, compact }: { request: TimeOffRequest; onApprove?: () => void; onReject?: () => void; onDateClick?: (date: Date) => void; compact?: boolean }) {
   if (compact) {
     return (
       <Card>
@@ -259,9 +261,18 @@ function RequestCard({ request: r, onApprove, onReject, compact }: { request: Ti
           <p className="font-medium text-sm text-foreground truncate">{r.employees?.name ?? 'Unknown'}</p>
           {statusBadge(r.status)}
         </div>
-        <p className="text-xs text-muted-foreground">
-          {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
-        </p>
+        {onDateClick ? (
+          <button
+            className="text-xs text-primary hover:underline cursor-pointer text-left"
+            onClick={() => onDateClick(new Date(r.start_date))}
+          >
+            {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+          </button>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            {format(new Date(r.start_date), 'MMM d')} – {format(new Date(r.end_date), 'MMM d, yyyy')}
+          </p>
+        )}
         <p className="text-xs mt-1 truncate"><span className="font-medium">Reason:</span> {r.reason}</p>
         {r.notes && <p className="text-xs text-muted-foreground mt-0.5 truncate">{r.notes}</p>}
         {r.replacement?.name && (
