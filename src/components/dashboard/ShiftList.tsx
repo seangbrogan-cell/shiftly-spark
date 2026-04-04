@@ -17,8 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useDeleteShift, type Shift } from '@/hooks/use-dashboard-data';
+import { useDeleteShift, useBulkUpdateShiftOrder, type Shift } from '@/hooks/use-dashboard-data';
 import { getShiftColor } from '@/lib/shift-colors';
 import {
   AlertDialog,
