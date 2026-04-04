@@ -36,9 +36,9 @@
     /* Status Colors */
     --success: 152 69% 30%;
     --success-foreground: 0 0% 100%;
-    --error: 0 84% 60%;
+    --error: 0 84% 43%;
     --error-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 43%;
     --destructive-foreground: 0 0% 100%;
     --warning: 38 92% 32%;
     --warning-foreground: 0 0% 100%;
