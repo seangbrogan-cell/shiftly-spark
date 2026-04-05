@@ -50,6 +50,7 @@ function statusBadge(status: string) {
 export function TimeOffRequestsManager({ employerId }: Props) {
   const { toast } = useToast();
   const qc = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState('');
   const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
