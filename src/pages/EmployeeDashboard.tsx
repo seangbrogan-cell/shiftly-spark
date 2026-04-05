@@ -355,31 +355,43 @@ export default function EmployeeDashboard() {
 }
 
 function EmployeeHeader({ email, displayName, onSignOut, employeeId, isAdmin }: { email?: string; displayName?: string | null; onSignOut: () => void; employeeId?: string; isAdmin?: boolean }) {
+  const [profileOpen, setProfileOpen] = useState(false);
+
   return (
-    <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <Clock className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold text-foreground">WorkSchedule</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:block text-sm text-muted-foreground">
-            {displayName || email}
-          </span>
-          {isAdmin && (
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/dashboard">
-                <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Dashboard</span>
-              </Link>
+    <>
+      <header className="border-b border-border bg-card sticky top-0 z-40 print:hidden">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <Clock className="h-7 w-7 text-primary" />
+            <span className="text-xl font-bold text-foreground">WorkSchedule</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setProfileOpen(true)}
+              className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted transition-colors"
+              title="Profile settings"
+            >
+              <UserCircle className="h-5 w-5 text-muted-foreground" />
+              <span className="hidden sm:block text-sm text-muted-foreground">
+                {displayName || email}
+              </span>
+            </button>
+            {isAdmin && (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/dashboard">
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </Link>
+              </Button>
+            )}
+            <NotificationBell employeeId={employeeId} />
+            <Button variant="ghost" size="sm" onClick={onSignOut}>
+              <LogOut className="h-4 w-4" />
             </Button>
-          )}
-          <NotificationBell employeeId={employeeId} />
-          <Button variant="ghost" size="sm" onClick={onSignOut}>
-            <LogOut className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      <EmployeeProfileModal open={profileOpen} onOpenChange={setProfileOpen} />
+    </>
   );
 }
