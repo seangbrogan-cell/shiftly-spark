@@ -366,16 +366,14 @@ function EmployeeHeader({ email, displayName, onSignOut, employeeId, isAdmin }: 
             <span className="text-xl font-bold text-foreground">WorkSchedule</span>
           </div>
           <div className="flex items-center gap-4">
-            <button
+            <Button
+              size="sm"
               onClick={() => setProfileOpen(true)}
-              className="flex items-center gap-2 rounded-md px-2 py-1 hover:bg-muted transition-colors"
               title="Profile settings"
             >
-              <UserCircle className="h-5 w-5 text-muted-foreground" />
-              <span className="hidden sm:block text-sm text-muted-foreground">
-                {displayName || email}
-              </span>
-            </button>
+              <UserCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">{displayName || email}</span>
+            </Button>
             {isAdmin && (
               <Button variant="outline" size="sm" asChild>
                 <Link to="/dashboard">
