@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { format, addWeeks, subWeeks, startOfWeek, endOfWeek, addDays, isToday, parseISO, isWithinInterval } from 'date-fns';
-import { ChevronLeft, ChevronRight, Palmtree, Clock, X as XIcon, Ban } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Palmtree, Clock, X as XIcon, Ban, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
