@@ -154,6 +154,17 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     <div className="flex gap-0">
       {/* Main content */}
       <div className="flex-1 space-y-8 min-w-0">
+        {/* Search */}
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, date, reason, status..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
         {/* Pending */}
         <section>
           <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
