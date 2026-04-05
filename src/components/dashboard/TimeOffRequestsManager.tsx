@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO, startOfWeek } from 'date-fns';
-import { Check, X, Clock, ChevronRight, ChevronLeft, History } from 'lucide-react';
+import { Check, X, Clock, ChevronRight, ChevronLeft, History, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -49,6 +50,7 @@ function statusBadge(status: string) {
 export function TimeOffRequestsManager({ employerId }: Props) {
   const { toast } = useToast();
   const qc = useQueryClient();
+  const [searchQuery, setSearchQuery] = useState('');
   const [rejectTarget, setRejectTarget] = useState<TimeOffRequest | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -124,8 +126,21 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     updateStatus.mutate({ id: rejectTarget.id, status: 'denied', request: rejectTarget, explanation: rejectReason || undefined });
   };
 
-  const pending = requests.filter(r => r.status === 'pending');
-  const resolved = requests.filter(r => r.status !== 'pending');
+  const filterRequests = (list: TimeOffRequest[]) => {
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase();
+    return list.filter(r =>
+      (r.employees?.name ?? '').toLowerCase().includes(q) ||
+      r.reason.toLowerCase().includes(q) ||
+      (r.notes ?? '').toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q) ||
+      format(new Date(r.start_date), 'MMM d, yyyy').toLowerCase().includes(q) ||
+      format(new Date(r.end_date), 'MMM d, yyyy').toLowerCase().includes(q)
+    );
+  };
+
+  const pending = filterRequests(requests.filter(r => r.status === 'pending'));
+  const resolved = filterRequests(requests.filter(r => r.status !== 'pending'));
 
   if (isLoading) {
     return (
@@ -139,6 +154,17 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     <div className="flex gap-0">
       {/* Main content */}
       <div className="flex-1 space-y-8 min-w-0">
+        {/* Search */}
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, date, reason, status..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
         {/* Pending */}
         <section>
           <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
