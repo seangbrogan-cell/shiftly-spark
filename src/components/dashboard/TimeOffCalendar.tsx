@@ -164,18 +164,25 @@ export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekCha
             </tr>
           </thead>
           <tbody>
-            {visibleEmployees.length === 0 ? (
+            {employees.length === 0 ? (
               <tr>
                 <td colSpan={8} className="text-center text-muted-foreground py-8">No employees</td>
               </tr>
             ) : (
-              visibleEmployees.map(emp => {
+              employees.map(emp => {
                 const empAvail = availabilityMap.get(emp.id) ?? new Set(DAY_NAMES);
                 const empTimeOff = timeOffMap.get(emp.id);
+                const isHighlighted = highlightedIds.size > 0 && highlightedIds.has(emp.id);
+                const isDimmed = highlightedIds.size > 0 && !highlightedIds.has(emp.id);
 
                 return (
-                  <tr key={emp.id} className="border-b border-border last:border-b-0 hover:bg-muted/30">
-                    <td className="p-2 font-medium text-foreground truncate">{emp.name}</td>
+                  <tr key={emp.id} className={cn(
+                    "border-b border-border last:border-b-0",
+                    isHighlighted && "bg-primary/10 ring-1 ring-primary/30",
+                    isDimmed && "opacity-40",
+                    !isHighlighted && !isDimmed && "hover:bg-muted/30"
+                  )}>
+                    <td className={cn("p-2 font-medium truncate", isHighlighted ? "text-primary" : "text-foreground")}>{emp.name}</td>
                     {days.map((day, i) => {
                       const dateKey = format(day, 'yyyy-MM-dd');
                       const dayAbbr = DAY_NAMES[i];
