@@ -97,8 +97,12 @@ export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekCha
     return map;
   }, [timeOffRequests]);
 
-  // Only show employees who have at least one time-off request this week, or show all
-  const visibleEmployees = employees;
+  // Search highlight
+  const highlightedIds = useMemo(() => {
+    if (!searchQuery.trim()) return new Set<string>();
+    const q = searchQuery.toLowerCase();
+    return new Set(employees.filter(e => e.name.toLowerCase().includes(q)).map(e => e.id));
+  }, [searchQuery, employees]);
 
   return (
     <div className="space-y-3">
@@ -106,6 +110,15 @@ export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekCha
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-foreground">Time Off Schedule</h3>
         <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Input
+              placeholder="Search employee..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 h-8 w-44 text-xs"
+            />
+          </div>
           <Button variant="outline" size="icon" onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
