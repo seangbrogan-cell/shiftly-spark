@@ -88,7 +88,7 @@ export function EmployeeWeeklyView({ assignments, weekStart, timeOffDates }: Emp
             <div
               key={dateStr}
               className={cn(
-                'px-0.5 py-0.5 border-r border-border min-h-[40px] flex flex-col gap-0.5',
+                'px-0.5 py-0.5 border-r border-border min-h-[40px] sm:min-h-[52px] flex flex-col gap-0.5',
                 isToday(day) && 'bg-primary-light/10',
                 isOnLeave && 'bg-amber-50/60 dark:bg-amber-950/20'
               )}

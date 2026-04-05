@@ -155,7 +155,7 @@ export default function EmployeeDashboard() {
           </div>
         )}
         {isEmployerPreview && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg border-2 border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 text-sm text-blue-800 dark:text-blue-300">
+          <div className="mb-4 flex items-center gap-2 rounded-lg border-2 border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-950/30 px-4 py-3 text-sm text-blue-800 dark:text-blue-300 print:hidden">
             <Users className="h-5 w-5 shrink-0" />
             <span className="font-medium">Admin Preview — You're viewing the employee portal as an employer. Only the Full Schedule is available.</span>
           </div>
