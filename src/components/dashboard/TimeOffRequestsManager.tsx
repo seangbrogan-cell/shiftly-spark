@@ -126,8 +126,21 @@ export function TimeOffRequestsManager({ employerId }: Props) {
     updateStatus.mutate({ id: rejectTarget.id, status: 'denied', request: rejectTarget, explanation: rejectReason || undefined });
   };
 
-  const pending = requests.filter(r => r.status === 'pending');
-  const resolved = requests.filter(r => r.status !== 'pending');
+  const filterRequests = (list: TimeOffRequest[]) => {
+    if (!searchQuery.trim()) return list;
+    const q = searchQuery.toLowerCase();
+    return list.filter(r =>
+      (r.employees?.name ?? '').toLowerCase().includes(q) ||
+      r.reason.toLowerCase().includes(q) ||
+      (r.notes ?? '').toLowerCase().includes(q) ||
+      r.status.toLowerCase().includes(q) ||
+      format(new Date(r.start_date), 'MMM d, yyyy').toLowerCase().includes(q) ||
+      format(new Date(r.end_date), 'MMM d, yyyy').toLowerCase().includes(q)
+    );
+  };
+
+  const pending = filterRequests(requests.filter(r => r.status === 'pending'));
+  const resolved = filterRequests(requests.filter(r => r.status !== 'pending'));
 
   if (isLoading) {
     return (
