@@ -17,7 +17,7 @@ import {
 } from '@/hooks/use-employee-data';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users, Printer, LayoutDashboard } from 'lucide-react';
+import { Clock, LogOut, ChevronLeft, ChevronRight, CalendarDays, CalendarRange, CalendarClock, History, Plus, Users, Printer, LayoutDashboard, UserCircle } from 'lucide-react';
 import { EmployeeWeeklyView } from '@/components/employee/EmployeeWeeklyView';
 import { EmployeeMonthlyView } from '@/components/employee/EmployeeMonthlyView';
 import { FullScheduleView } from '@/components/employee/FullScheduleView';
