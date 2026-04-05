@@ -24,6 +24,7 @@ import { FullScheduleView } from '@/components/employee/FullScheduleView';
 import { TimeOffModal } from '@/components/employee/TimeOffModal';
 import { TimeOffHistory } from '@/components/employee/TimeOffHistory';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { EmployeeProfileModal } from '@/components/employee/EmployeeProfileModal';
 import { getWeekDays } from '@/hooks/use-calendar-data';
 
 export default function EmployeeDashboard() {
