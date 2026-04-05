@@ -33,6 +33,7 @@ function getWeekDays(weekStart: Date): Date[] {
 
 export function TimeOffCalendar({ employees, employerId, weekOverride, onWeekChange }: TimeOffCalendarProps) {
   const [internalWeek, setInternalWeek] = useState(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [searchQuery, setSearchQuery] = useState('');
   const currentWeek = weekOverride ?? internalWeek;
   const setCurrentWeek = (w: Date) => { setInternalWeek(w); onWeekChange?.(w); };
   const days = getWeekDays(currentWeek);
