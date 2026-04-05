@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
 
     /* Primary Blue */
     --primary: 217 91% 50%;
