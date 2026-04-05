@@ -168,16 +168,16 @@ export default function Dashboard() {
             <div className="flex flex-col gap-3 mb-6 print:hidden">
               <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1">
                 <TabsList className="shrink-0 gap-1">
-                  <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                  <TabsTrigger value="schedule" className="gap-1.5 text-xs sm:text-sm sm:gap-2 border">
                     <Calendar className="h-4 w-4" /> <span className="hidden xs:inline">Schedule</span>
                   </TabsTrigger>
-                  <TabsTrigger value="employees" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                  <TabsTrigger value="employees" className="gap-1.5 text-xs sm:text-sm sm:gap-2 border">
                     <Users className="h-4 w-4" /> <span className="hidden xs:inline">Employees</span>
                   </TabsTrigger>
-                   <TabsTrigger value="shifts" className="gap-1.5 text-xs sm:text-sm sm:gap-2">
+                   <TabsTrigger value="shifts" className="gap-1.5 text-xs sm:text-sm sm:gap-2 border">
                      <LayoutGrid className="h-4 w-4" /> <span className="hidden xs:inline">Shifts</span>
                    </TabsTrigger>
-                   <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm sm:gap-2 relative">
+                   <TabsTrigger value="time-off" className="gap-1.5 text-xs sm:text-sm sm:gap-2 relative border">
                      <CalendarOff className="h-4 w-4" /> <span className="hidden xs:inline">Time Off</span>
                      {pendingTimeOffCount > 0 && (
                        <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground px-1 animate-pulse">
